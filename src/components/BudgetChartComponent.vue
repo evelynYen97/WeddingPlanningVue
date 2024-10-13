@@ -8,7 +8,16 @@
   <script setup>
   import { onMounted, ref } from 'vue';
   import * as echarts from 'echarts';
-  
+    const API_URL='https://localhost:7048/api/MemberBudgetItems'
+    //呼叫圓餅圖資料  待修改成傳入會員ID！！
+    const pieData=ref([])
+    const loadPieData=async()=>{
+        const response=await fetch('`${API_URL}/ForChart/1`')
+        const datas=await response.json()
+        console.log(datas)
+    }
+    loadPieData()
+    //宣告圖表
     const pieChart = ref(null);
     const barChart = ref(null);
   

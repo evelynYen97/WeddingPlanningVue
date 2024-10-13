@@ -6,7 +6,9 @@ import BudgetPlanView from './views/BudgetPlanView.vue';
 </script>
 
 <template>
-    <BudgetPlanView></BudgetPlanView>
+    <!-- <BudgetPlanView></BudgetPlanView> -->
+    <RouterLink to="/budgetplan">圖表</RouterLink>
+    <RouterView></RouterView>
 </template>
 
 <style scoped>

@@ -1,3 +1,4 @@
+import BudgetChartComponent from '@/components/BudgetChartComponent.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 
@@ -17,6 +18,11 @@ const router = createRouter({
     //   // which is lazy-loaded when the route is visited.
     //   component: () => import('../views/AboutView.vue')
     // }
+    {
+      path: '/budgetplan',
+      name: 'budgetplan',
+      component: BudgetChartComponent
+    },
   ]
 })
 
