@@ -17,17 +17,44 @@
     const barChartInstance = echarts.init(barChart.value);
   
     const pieOption = {
-        series: [{
-         type: 'pie',
-        data: [
-          { value: 10, name: 'A' },
-          { value: 20, name: 'B' },
-           { value: 30, name: 'C' }
-         ]
-         }]
+        title: {
+                text: '類別預算',
+                subtext: '點擊查看細項',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left'
+            },
+            series: [{
+                name: '訂單類別',
+                type: 'pie',
+                radius: '50%',
+                data: [
+                    { value: 10, name: '菜色' },
+                    { value: 20, name: '禮車' }
+                ],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }]
         };
   
         const barOption = {
+            title: {
+                text: '類別細項'
+            },
+            tooltip: {},
+            legend: {
+                data: ['金額']
+            },
           xAxis: {
             type: 'category',
             data: ['X', 'Y', 'Z', 'd']
@@ -36,6 +63,7 @@
             type: 'value'
           },
           series: [{
+            name:'金額',
             type: 'bar',
             data: [5, 10, 15, 7]
           }]
