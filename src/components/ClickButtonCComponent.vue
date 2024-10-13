@@ -4,7 +4,7 @@
 
 <template>
     <div class="container">
-        <a href="#" class="button type--A">
+        <a href="#" class="button type--C">
         <div class="button__line"></div>
         <div class="button__line"></div>
         <span class="button__text"><slot></slot></span>
@@ -16,9 +16,9 @@
 
 <style lang="css" scoped>
     
-.type--A{
-  --line_color : #555555 ;
-  --back_color : #FFECF6  ;
+.type--C{
+  --line_color : #00135C ;
+  --back_color : #DEFFFA 
 }
 
 .button{
