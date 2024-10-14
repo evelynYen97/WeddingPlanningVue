@@ -7,10 +7,10 @@
   
   <script setup>
   import { onMounted, ref } from 'vue';
-  import * as echarts from 'echarts';
+import * as echarts from 'echarts';
 
 const API_URL = 'https://localhost:7048/api/MemberBudgetItems';
-const pieData = ref([]); 
+const pieData = ref([]);
 const barData = ref([]);
 const pieChart = ref(null);
 const barChart = ref(null);
@@ -18,18 +18,23 @@ const barChart = ref(null);
 const loadPieData = async (memberId) => {
     const response = await fetch(`${API_URL}/ForChart/${memberId}`);
     const datas = await response.json();
-    pieData.value = datas; 
-    updateChart(); 
+    pieData.value = datas;
+    updatePieChart();
 };
-const loadBarData = async (memberId,categoryName) => {
-    // const response = await fetch(`${API_URL}/ForBarChart/${memberId}?sort=${encodeURIComponent(categoryName)}`);
-    const response = await fetch(`${API_URL}/ForBarChart/1?sort=${encodeURIComponent('裝飾')}`);
+
+const loadBarData = async (memberId, categoryName) => {
+    // 假設這個 API 返回結構為 { categories: ['項目A', '項目B'], value: [10, 5] }
+    const response = await fetch(`${API_URL}/ForBarChart/${memberId}?sort=${encodeURIComponent(categoryName)}`);
     const barDatas = await response.json();
-    barData.value = barDatas; 
-    console.log(barData.value)
+    
+    // 返回格式化數據
+    return {
+        categories: barDatas.categories,
+        values: barDatas.values
+    };
 };
-loadBarData();
-const updateChart = () => {
+
+const updatePieChart = () => {
     const pieChartInstance = echarts.init(pieChart.value);
     const pieOption = {
         title: {
@@ -48,7 +53,7 @@ const updateChart = () => {
             name: '訂單類別',
             type: 'pie',
             radius: '50%',
-            data: pieData.value, 
+            data: pieData.value,
             emphasis: {
                 itemStyle: {
                     shadowBlur: 10,
@@ -74,7 +79,7 @@ const initCharts = () => {
         },
         xAxis: {
             type: 'category',
-            data: ['X', 'Y', 'Z', 'd']
+            data: []
         },
         yAxis: {
             type: 'value'
@@ -82,29 +87,36 @@ const initCharts = () => {
         series: [{
             name: '金額',
             type: 'bar',
-            data: [5, 10, 15, 7]
+            data: []
         }]
     };
 
     barChartInstance.setOption(barOption);
 
-    const pieChartInstance = updatePieChart(); // Get the pie chart instance after updating it
-    pieChartInstance.on('click', (params) => {
-        const index = params.dataIndex;
-        const data = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]; // Example data
+    const pieChartInstance = updatePieChart();
+    pieChartInstance.on('click', async (params) => {
+        const categoryName = params.name;
+        const memberId = 2; // 根據實際情況替換
+        const barChartData = await loadBarData(memberId, categoryName);
+
+        // 更新柱狀圖數據
         barChartInstance.setOption({
+            xAxis: {
+                data: barChartData.categories // 更新類別項目
+            },
             series: [{
-                data: data[index]
+                data: barChartData.values // 更新對應的數值
             }]
         });
     });
 };
 
 onMounted(() => {
-    const memberId = 2; // Replace with the actual member ID you want to use
-    loadPieData(memberId); // Pass the member ID to load the data
-    initCharts(); // Initialize the charts after loading data
+    const memberId = 2; // 使用的會員 ID
+    loadPieData(memberId);
+    initCharts();
 });
+
   </script>
   
   <style scoped>
