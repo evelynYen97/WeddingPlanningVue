@@ -2,13 +2,14 @@
     import 'bootstrap/dist/css/bootstrap.min.css'
     import 'bootstrap/dist/js/bootstrap.min.js'
     import 'jquery/dist/jquery.min.js'
-import CircleButtonComponent from './components/CircleButtonComponent.vue';
+import BudgetChartComponent from './components/BudgetChartComponent.vue';
+import FooterComponent from './components/FooterComponent.vue';
 </script>
 
 <template>
-    <RouterLink to="/budgetplan">圖表</RouterLink>
     <RouterView></RouterView>
-    <CircleButtonComponent></CircleButtonComponent>
+    <BudgetChartComponent></BudgetChartComponent>
+    <FooterComponent></FooterComponent>
 </template>
 
 <style scoped>

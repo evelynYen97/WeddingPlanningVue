@@ -9,18 +9,27 @@
   import { onMounted, ref } from 'vue';
   import * as echarts from 'echarts';
     const API_URL='https://localhost:7048/api/MemberBudgetItems'
-    //呼叫圓餅圖資料  待修改成傳入會員ID！！
+    //宣告圓餅圖資料
     const pieData=ref([])
-    const loadPieData=async()=>{
-        const response=await fetch('`${API_URL}/ForChart/1`')
-        const datas=await response.json()
-        console.log(datas)
-    }
-    loadPieData()
     //宣告圖表
     const pieChart = ref(null);
     const barChart = ref(null);
-  
+    //呼叫圓餅圖資料  待修改成傳入會員ID！！
+    const loadPieData=async()=>{
+        const response=await fetch(`${API_URL}/ForChart/1`)
+        const datas=await response.json()
+        console.log(datas)
+        pieData.value = datas
+        console.log(pieData.value)
+        pieChart.setOption({
+                series: [{
+                    data:pieData // 將獲取到的資料設置到圓餅圖中
+                }]
+            });
+    }
+    
+    
+    //圖表初始化設定
     const initCharts = () => {
     const pieChartInstance = echarts.init(pieChart.value);
     const barChartInstance = echarts.init(barChart.value);
@@ -42,10 +51,7 @@
                 name: '訂單類別',
                 type: 'pie',
                 radius: '50%',
-                data: [
-                    { value: 10, name: '菜色' },
-                    { value: 20, name: '禮車' }
-                ],
+                data: [],
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -92,8 +98,12 @@
         });
       };
   
-    onMounted(initCharts);
-  
+    onMounted(()=>{
+      initCharts();
+
+      loadPieData()
+      
+    });
   </script>
   
   <style scoped>
