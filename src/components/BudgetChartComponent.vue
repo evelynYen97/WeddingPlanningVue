@@ -1,7 +1,22 @@
 <template>
     <div>
-      <div ref="pieChart" style="width: 50%; height: 400px;"></div>
-      <div ref="barChart" style="width: 50%; height: 400px;"></div>
+      <!-- .container>.row>.col-12.col-sm-4*3 -->
+      <div class="container">
+        <div class="row ">
+            <div class="mt-5 col-12 col-sm-5" id="piechartOuterContain">
+                <div id="piechartContain">
+                   <div ref="pieChart" style="width: 100%; height: 400px;"></div>
+                </div>
+            </div>
+            <div class="mt-5 col-12 col-sm-6" id="barchartOuterContain" >
+              <div id="barchartContain">
+                <div ref="barChart" style="width: 100%; height: 400px;"></div></div>
+           </div>
+        </div>
+      </div>
+
+      
+      
     </div>
   </template>
   
@@ -40,17 +55,19 @@ const updatePieChart = () => {
         title: {
             text: '類別預算',
             subtext: '點擊查看細項',
-            left: 'center'
-        },
-        tooltip: {
-            trigger: 'item'
-        },
-        legend: {
-            orient: 'vertical',
             left: 'left'
         },
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b}: {c} TWD ({d}%)'
+        },
+        legend: {
+          orient: 'horizontal', // 設置為水平
+          bottom: '0%', // 放置在底部
+          left: 'center' // 水平居中
+        },
         series: [{
-            name: '訂單類別',
+            name: '金額及佔比',
             type: 'pie',
             radius: '50%',
             data: pieData.value,
@@ -61,7 +78,8 @@ const updatePieChart = () => {
                     shadowColor: 'rgba(0, 0, 0, 0.5)'
                 }
             }
-        }]
+        }],
+        
     };
     pieChartInstance.setOption(pieOption);
     return pieChartInstance; 
@@ -75,7 +93,10 @@ const initCharts = () => {
         },
         tooltip: {},
         legend: {
-            data: ['金額']
+            data: ['金額 (TWD)'],
+            orient: 'horizontal', // 設置為水平
+        bottom: '0%', // 放置在底部
+        left: 'center' // 水平居中
         },
         xAxis: {
             type: 'category',
@@ -85,7 +106,7 @@ const initCharts = () => {
             type: 'value'
         },
         series: [{
-            name: '金額',
+            name: '金額 (TWD)',
             type: 'bar',
             data: []
         }]
@@ -96,7 +117,7 @@ const initCharts = () => {
     const pieChartInstance = updatePieChart();
     pieChartInstance.on('click', async (params) => {
         const categoryName = params.name;
-        const memberId = 2; // 根據實際情況替換
+        const memberId = 1; // 根據實際情況替換
         const barChartData = await loadBarData(memberId, categoryName);
 
         // 更新柱狀圖數據
@@ -112,14 +133,58 @@ const initCharts = () => {
 };
 
 onMounted(() => {
-    const memberId = 2; // 使用的會員 ID
+    const memberId = 1; // 使用的會員 ID
     loadPieData(memberId);
     initCharts();
+
+    window.onresize = () => {
+        if (pieChart.value) {
+            echarts.getInstanceByDom(pieChart.value).resize();
+        }
+        if (barChart.value) {
+            echarts.getInstanceByDom(barChart.value).resize();
+        }
+    };
 });
 
   </script>
   
   <style scoped>
-  /* Add any additional styles here */
+  *{
+    margin: 0;
+    padding: 0;
+  }
+  .row{
+    margin:50px;
+    height: 400px;
+  }
+
+     #piechartContain{
+      border:3px dashed burlywood; 
+      padding:40px;
+      padding-top:50px;
+      border-radius: 25px;
+      height:500px;
+      
+      
+    }
+    
+    #barchartContain{
+      border-radius: 25px;
+      padding:40px;
+      padding-top:60px;
+      border:3px dashed burlywood; 
+      height:500px;
+    }
+
+    #piechartOuterContain,#barchartOuterContain {
+    border: 1px solid rgb(245, 240, 240); 
+    border-radius: 25px;
+    padding:5px; 
+    box-shadow: 2px 4px 8px 0 rgba(0,0,0,0.2);
+    margin:10px;
+}
+
+    
   </style>
   
