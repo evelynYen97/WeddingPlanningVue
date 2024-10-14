@@ -10,7 +10,8 @@
   import * as echarts from 'echarts';
 
 const API_URL = 'https://localhost:7048/api/MemberBudgetItems';
-const pieData = ref([]); // Use ref to make pieData reactive
+const pieData = ref([]); 
+const barData = ref([]);
 const pieChart = ref(null);
 const barChart = ref(null);
 
@@ -20,7 +21,14 @@ const loadPieData = async (memberId) => {
     pieData.value = datas; 
     updateChart(); 
 };
-
+const loadBarData = async (memberId,categoryName) => {
+    // const response = await fetch(`${API_URL}/ForBarChart/${memberId}?sort=${encodeURIComponent(categoryName)}`);
+    const response = await fetch(`${API_URL}/ForBarChart/1?sort=${encodeURIComponent('裝飾')}`);
+    const barDatas = await response.json();
+    barData.value = barDatas; 
+    console.log(barData.value)
+};
+loadBarData();
 const updateChart = () => {
     const pieChartInstance = echarts.init(pieChart.value);
     const pieOption = {
