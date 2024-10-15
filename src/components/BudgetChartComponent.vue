@@ -1,30 +1,31 @@
 <template>
     <div>
-      <!-- .container>.row>.col-12.col-sm-4*3 -->
-      <div class="container">
-        <div class="row ">
-            <div class="mt-5 col-12 col-sm-5" id="piechartOuterContain">
-                <div id="piechartContain">
-                   <div ref="pieChart" style="width: 100%; height: 400px;"></div>
+        <!-- .container>.row>.col-12.col-sm-4*3 -->
+        <div class="container">
+            <div class="row">
+                <div class="mt-5 col-12 col-sm-5" id="piechartOuterContain">
+                    <div id="piechartContain">
+                        <div ref="pieChart" style="width: 100%; height: 400px;"></div>
+                    </div>
+                </div>
+                <div class="mt-5 col-12 col-sm-6" id="barchartOuterContain">
+                    <div id="barchartContain">
+                        <div ref="barChart" style="width: 100%; height: 400px;"></div>
+                    </div>
                 </div>
             </div>
-            <div class="mt-5 col-12 col-sm-6" id="barchartOuterContain" >
-              <div id="barchartContain">
-                <div ref="barChart" style="width: 100%; height: 400px;"></div></div>
-           </div>
         </div>
-      </div>
 
-      
-      
+
+
     </div>
-  </template>
-  
-  <script setup>
-  import { onMounted, ref } from 'vue';
-import * as echarts from 'echarts';
+</template>
 
-const API_URL = 'https://localhost:7048/api/MemberBudgetItems';
+<script setup>
+import { onMounted, ref } from 'vue';
+import * as echarts from 'echarts';
+const BaseUrl = import.meta.env.VITE_API_BASEURL;
+const API_URL = `${BaseUrl}/MemberBudgetItems`;
 const pieData = ref([]);
 const barData = ref([]);
 const pieChart = ref(null);
@@ -41,7 +42,7 @@ const loadBarData = async (memberId, categoryName) => {
     // 假設這個 API 返回結構為 { categories: ['項目A', '項目B'], value: [10, 5] }
     const response = await fetch(`${API_URL}/ForBarChart/${memberId}?sort=${encodeURIComponent(categoryName)}`);
     const barDatas = await response.json();
-    
+
     // 返回格式化數據
     return {
         categories: barDatas.categories,
@@ -62,9 +63,9 @@ const updatePieChart = () => {
             formatter: '{a} <br/>{b}: {c} TWD ({d}%)'
         },
         legend: {
-          orient: 'horizontal', // 設置為水平
-          bottom: '0%', // 放置在底部
-          left: 'center' // 水平居中
+            orient: 'horizontal', // 設置為水平
+            bottom: '0%', // 放置在底部
+            left: 'center' // 水平居中
         },
         series: [{
             name: '金額及佔比',
@@ -79,10 +80,10 @@ const updatePieChart = () => {
                 }
             }
         }],
-        
+
     };
     pieChartInstance.setOption(pieOption);
-    return pieChartInstance; 
+    return pieChartInstance;
 };
 
 const initCharts = () => {
@@ -95,8 +96,8 @@ const initCharts = () => {
         legend: {
             data: ['金額 (TWD)'],
             orient: 'horizontal', // 設置為水平
-        bottom: '0%', // 放置在底部
-        left: 'center' // 水平居中
+            bottom: '0%', // 放置在底部
+            left: 'center' // 水平居中
         },
         xAxis: {
             type: 'category',
@@ -147,44 +148,43 @@ onMounted(() => {
     };
 });
 
-  </script>
-  
-  <style scoped>
-  *{
+</script>
+
+<style scoped>
+* {
     margin: 0;
     padding: 0;
-  }
-  .row{
-    margin:50px;
-    height: 400px;
-  }
-
-     #piechartContain{
-      border:3px dashed burlywood; 
-      padding:40px;
-      padding-top:50px;
-      border-radius: 25px;
-      height:500px;
-      
-      
-    }
-    
-    #barchartContain{
-      border-radius: 25px;
-      padding:40px;
-      padding-top:60px;
-      border:3px dashed burlywood; 
-      height:500px;
-    }
-
-    #piechartOuterContain,#barchartOuterContain {
-    border: 1px solid rgb(245, 240, 240); 
-    border-radius: 25px;
-    padding:5px; 
-    box-shadow: 2px 4px 8px 0 rgba(0,0,0,0.2);
-    margin:10px;
 }
 
-    
-  </style>
-  
+.row {
+    margin: 50px;
+    height: 400px;
+}
+
+#piechartContain {
+    border: 3px dashed burlywood;
+    padding: 40px;
+    padding-top: 50px;
+    border-radius: 25px;
+    height: 500px;
+
+
+}
+
+#barchartContain {
+    border-radius: 25px;
+    padding: 40px;
+    padding-top: 60px;
+    border: 3px dashed burlywood;
+    height: 500px;
+}
+
+#piechartOuterContain,
+#barchartOuterContain {
+    border: 1px solid rgb(245, 240, 240);
+    border-radius: 25px;
+    padding: 5px;
+    box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2);
+    margin: 10px;
+}
+</style>
