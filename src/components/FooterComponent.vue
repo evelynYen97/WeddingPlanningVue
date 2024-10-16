@@ -115,10 +115,14 @@
 @import '../assets/css/FooterStyle.css';
 
 .footer-container {
-    display: flex; /* 使用 flexbox */
-    flex-direction: column; /* 確保 footer 內容按列排列 */
-    min-height: 100vh; /* 確保 footer 在頁面底部 */
+    display: flex; 
+    /* 使用 flexbox */
+    flex-direction: column; 
+    /* 確保 footer 內容按列排列 */
+    min-height: 100vh; 
+    /* 確保 footer 在頁面底部 */
     justify-content: space-between; /* 確保內容分散在容器中 */
+    
 }
 
 .brand-list {
