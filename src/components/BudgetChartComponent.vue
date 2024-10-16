@@ -1,6 +1,5 @@
 <template>
     <div>
-        <!-- .container>.row>.col-12.col-sm-4*3 -->
         <div class="container">
             <div class="row">
                 <div class="mt-5 col-12 col-sm-5" id="piechartOuterContain">
@@ -27,7 +26,6 @@ import * as echarts from 'echarts';
 const BaseUrl = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BaseUrl}/MemberBudgetItems`;
 const pieData = ref([]);
-const barData = ref([]);
 const pieChart = ref(null);
 const barChart = ref(null);
 
@@ -39,11 +37,9 @@ const loadPieData = async (memberId) => {
 };
 
 const loadBarData = async (memberId, categoryName) => {
-    // 假設這個 API 返回結構為 { categories: ['項目A', '項目B'], value: [10, 5] }
     const response = await fetch(`${API_URL}/ForBarChart/${memberId}?sort=${encodeURIComponent(categoryName)}`);
     const barDatas = await response.json();
 
-    // 返回格式化數據
     return {
         categories: barDatas.categories,
         values: barDatas.values
@@ -63,9 +59,9 @@ const updatePieChart = () => {
             formatter: '{a} <br/>{b}: {c} TWD ({d}%)'
         },
         legend: {
-            orient: 'horizontal', // 設置為水平
-            bottom: '0%', // 放置在底部
-            left: 'center' // 水平居中
+            orient: 'horizontal',
+            bottom: '0%', 
+            left: 'center' 
         },
         series: [{
             name: '金額及佔比',
@@ -95,9 +91,9 @@ const initCharts = () => {
         tooltip: {},
         legend: {
             data: ['金額 (TWD)'],
-            orient: 'horizontal', // 設置為水平
-            bottom: '0%', // 放置在底部
-            left: 'center' // 水平居中
+            orient: 'horizontal',
+            bottom: '0%', 
+            left: 'center' 
         },
         xAxis: {
             type: 'category',
@@ -124,10 +120,10 @@ const initCharts = () => {
         // 更新柱狀圖數據
         barChartInstance.setOption({
             xAxis: {
-                data: barChartData.categories // 更新類別項目
+                data: barChartData.categories 
             },
             series: [{
-                data: barChartData.values // 更新對應的數值
+                data: barChartData.values 
             }]
         });
     });
@@ -156,9 +152,11 @@ onMounted(() => {
     padding: 0;
 }
 
+
+
 .row {
     margin: 50px;
-    height: 400px;
+    height: 600px;
 }
 
 #piechartContain {
@@ -167,8 +165,6 @@ onMounted(() => {
     padding-top: 50px;
     border-radius: 25px;
     height: 500px;
-
-
 }
 
 #barchartContain {
@@ -183,8 +179,8 @@ onMounted(() => {
 #barchartOuterContain {
     border: 1px solid rgb(245, 240, 240);
     border-radius: 25px;
-    padding: 5px;
+    padding: 10px;
     box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2);
-    margin: 10px;
+    margin:auto
 }
 </style>
