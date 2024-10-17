@@ -107,7 +107,7 @@ import { ref } from 'vue';
                      <div class="col-12 col-sm-3">
                         <div id="sortListContain">
                             <div class="list-group">
-                                <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort" @click="onCategoryClick(budgetItemSort.budgetItemSort)" :style="{ backgroundColor: selectedSort === budgetItemSort.budgetItemSort ? 'yellow' : '' }">{{budgetItemSort.budgetItemSort}}</button>
+                                <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort" @click="onCategoryClick(budgetItemSort.budgetItemSort)" :class="selectedSort === budgetItemSort.budgetItemSort ? 'ActiveButton':'InActiveButton'">{{budgetItemSort.budgetItemSort}}</button>
                             </div>
                         </div>
                      </div>
@@ -194,5 +194,11 @@ import { ref } from 'vue';
         border-left:none;
         border-right:none;
         color:#4C4C4C;
+    }
+    .ActiveButton{
+        background-color: #F0F2F2;
+    }
+    .InActiveButton{
+        background-color: transparent;
     }
 </style>
