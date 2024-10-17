@@ -30,8 +30,11 @@ import { ref } from 'vue';
 
     //點擊分類獲得對應細項
     const onCategoryClick = (sort) => {
-    loadBudgetItems(sort);
+        selectedSort.value = sort;
+        loadBudgetItems(sort);
 };
+    //宣告變數接當前選項
+    const selectedSort = ref('');
 </script>
 
 <template>
@@ -104,7 +107,7 @@ import { ref } from 'vue';
                      <div class="col-12 col-sm-3">
                         <div id="sortListContain">
                             <div class="list-group">
-                                <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort" @click="onCategoryClick(budgetItemSort.budgetItemSort)">{{budgetItemSort.budgetItemSort}}</button>
+                                <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort" @click="onCategoryClick(budgetItemSort.budgetItemSort)" :style="{ backgroundColor: selectedSort === budgetItemSort.budgetItemSort ? 'yellow' : '' }">{{budgetItemSort.budgetItemSort}}</button>
                             </div>
                         </div>
                      </div>
