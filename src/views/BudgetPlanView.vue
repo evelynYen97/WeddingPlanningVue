@@ -27,6 +27,11 @@ import { ref } from 'vue';
     budgetItems.value = await response.json();
     console.log(budgetItems.value); 
 }
+
+    //點擊分類獲得對應細項
+    const onCategoryClick = (sort) => {
+    loadBudgetItems(sort);
+};
 </script>
 
 <template>
@@ -99,7 +104,7 @@ import { ref } from 'vue';
                      <div class="col-12 col-sm-3">
                         <div id="sortListContain">
                             <div class="list-group">
-                                <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort">{{budgetItemSort.budgetItemSort}}</button>
+                                <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort" @click="onCategoryClick(budgetItemSort.budgetItemSort)">{{budgetItemSort.budgetItemSort}}</button>
                             </div>
                         </div>
                      </div>
