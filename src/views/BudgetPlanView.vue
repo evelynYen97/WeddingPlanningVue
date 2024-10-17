@@ -2,7 +2,7 @@
 import BudgetChartComponent from '@/components/BudgetChartComponent.vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
-import { ref } from 'vue';
+import { ref ,computed, watchEffect} from 'vue';
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
     // const API_URL = `${BaseUrl}/MemberBudgetItems/${memberID}?sort=${encodeURIComponent(sort)}`;
     const API_URL_Sort=`${BaseUrl}/MemberBudgetItems/ItemsSort/1`; //待改成會員ID
@@ -47,6 +47,29 @@ import { ref } from 'vue';
         changeSort(inputSort);
         onCategoryClick(inputSort);
     }
+
+    //新增預算項目
+    const NewBudgetItem=async()=>{
+
+    }
+
+    //宣告變數準備回傳資料
+    const budgetItem =ref({
+        "budgetItemId": 0,
+        "memberId": 0,
+        "budgetItemDetail": "",
+        "budgetItemPrice": 0,
+        "budgetItemAmount": 1,
+         "budgetItemSubtotal": 0,
+         "budgetItemSort": "",
+        "actualPay": 0,
+         "alreadyPay": 0
+    })
+    
+    const subtotal = computed(() => {
+        budgetItem.value.budgetItemSubtotal=budgetItem.value.budgetItemPrice * budgetItem.value.budgetItemAmount
+  return (budgetItem.value.budgetItemSubtotal) || 0;
+});
 </script>
 
 <template>
@@ -57,7 +80,55 @@ import { ref } from 'vue';
     </header>
     <main>
         <article>
-            
+            <!-- AddModal -->
+        <div class="modal fade" id="AddModal" tabindex="-1"         aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">新增預算項目</h5>
+                       <button type="button" class="btn-close"      data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                 <div class="modal-body">
+                    <div class="input-group-modal">
+                        <label class="label-modal">預算項目名稱</label>
+                     <div class="input-container">
+                         <input autocomplete="off" class="input-modal" type="text" v-model="budgetItem.budgetItemDetail">
+                    </div>
+                     <label class="label-modal">單價</label>
+                     <div class="input-container">
+                        <input autocomplete="off" class="input-modal" type="text" v-model="budgetItem.budgetItemPrice">
+                     <span class="unit">NT$</span>
+                    </div>
+                     <label class="label-modal">數量</label>
+                     <div class="input-container">
+                        <input autocomplete="off" class="input-modal" type="text" v-model="budgetItem.budgetItemAmount">
+                    </div>
+                     <label class="label-modal">小計</label>
+                     <div class="input-container">
+                     <input autocomplete="off" class="input-modal-readonly" type="text" v-model="subtotal" disabled>
+                     <span class="unit">NT$</span>
+                    </div>
+                     <label class="label-modal">實際支出</label>
+                     <div class="input-container">
+                        <input autocomplete="off" class="input-modal" type="text" v-model="budgetItem.actualPay">
+                     <span class="unit">NT$</span>
+                    </div>
+                     <label class="label-modal">已支付</label>
+                     <div class="input-container">
+                     <input autocomplete="off" class="input-modal" type="text" v-model="budgetItem.alreadyPay">
+                     <span class="unit">NT$</span>
+                    </div>
+                     <div></div></div>
+
+               </div>
+          <div class="modal-footer">
+           <button type="button" class="btn ActiveButton" data-bs-dismiss="modal">取消</button>
+           <button type="button" class="btn modalButton">新增</button>
+             </div>
+        </div>
+     </div>
+</div>
+
              <BudgetChartComponent :selectSort="selectedSort" @changeTableData="onCategoryClick"></BudgetChartComponent>
              <div class="container">
                 <div class="row">
@@ -82,7 +153,7 @@ import { ref } from 'vue';
                     <div class="row">
                     <!-- 預算項目表 -->
                     <div class="col-12 col-sm-9">
-                        <button id="AddBudgetItem"><i class="bi bi-patch-plus fs-5"></i>  新增預算項目</button>
+                        <button id="AddBudgetItem" @click="NewBudgetItem" data-bs-toggle='modal' data-bs-target='#AddModal'><i class="bi bi-patch-plus fs-5"></i>  新增預算項目</button>
                         <div id="tableContain">
                             <table class="table"> 
                  <thead>
@@ -138,6 +209,7 @@ import { ref } from 'vue';
 </template>
 
 <style lang="css" scoped>
+    @import url(src/assets/css/budgetPlanViewModal.css);
     #InputBudgetContain,#tableContain,#sortListContain{
          border: 1px solid rgb(245, 240, 240);
          border-radius: 25px;
@@ -213,4 +285,7 @@ import { ref } from 'vue';
     .InActiveButton{
         background-color: transparent;
     }
+    
+
+
 </style>
