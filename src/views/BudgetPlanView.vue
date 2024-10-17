@@ -6,7 +6,7 @@ import { ref } from 'vue';
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
     // const API_URL = `${BaseUrl}/MemberBudgetItems/${memberID}?sort=${encodeURIComponent(sort)}`;
     const API_URL_Sort=`${BaseUrl}/MemberBudgetItems/ItemsSort/1`; //待改成會員ID
-
+    
 
     //獲得member的所有分類
     const ItemSorts=ref([]);
@@ -37,10 +37,12 @@ import { ref } from 'vue';
     //宣告變數接當前選項
     const selectedSort = ref('');
 
+    //實時改變當前分類的值用於傳送至子組件
     const changeSort = (sort) => {
         selectedSort.value = sort; 
+        console.log('zdao f'+sort)
     };
-
+    //集中 按下分類按鈕的事件
     const buttonClickHandler=(inputSort)=>{
         changeSort(inputSort);
         onCategoryClick(inputSort);
@@ -56,7 +58,7 @@ import { ref } from 'vue';
     <main>
         <article>
             
-             <BudgetChartComponent :selectSort="selectedSort"></BudgetChartComponent>
+             <BudgetChartComponent :selectSort="selectedSort" @changeTableData="onCategoryClick"></BudgetChartComponent>
              <div class="container">
                 <div class="row">
                      <!-- 總預算輸入計算 -->

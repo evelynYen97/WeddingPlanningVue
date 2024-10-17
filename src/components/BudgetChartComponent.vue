@@ -31,6 +31,9 @@ const  props  =  defineProps({
 });
 
 
+//宣告子傳父觸發事件
+const emit = defineEmits(['changeTableData']);
+
 const loadPieData = async (memberId) => {
     const response = await fetch(`${API_URL}/ForChart/${memberId}`);
     const datas = await response.json();
@@ -122,7 +125,7 @@ const initCharts = async() => {
         const categoryName = params.name;
         const memberId = 1; // 根據實際情況替換
         const barChartData = await loadBarData(memberId, categoryName);
-        console.log('從pie的數據'+barChartData)
+        emit('changeTableData',params.name);
         // 更新柱狀圖數據
         barChartInstance.setOption({
             xAxis: {
@@ -136,7 +139,6 @@ const initCharts = async() => {
     watchEffect(async () => {
     if (props.selectSort) {
         const barChartData = await loadBarData(1, props.selectSort);
-        console.log('barData', barChartData);
 
         // 更新柱状图数据
         barChartInstance.setOption({
@@ -152,6 +154,7 @@ const initCharts = async() => {
 };
 
     
+
 
 onMounted(() => {
     const memberId = 1; // 使用的會員 ID
