@@ -66,10 +66,26 @@ import { ref ,computed, watchEffect} from 'vue';
          "alreadyPay": 0
     })
     
+    //自動計算小計
     const subtotal = computed(() => {
         budgetItem.value.budgetItemSubtotal=budgetItem.value.budgetItemPrice * budgetItem.value.budgetItemAmount
-  return (budgetItem.value.budgetItemSubtotal) || 0;
-});
+        return (budgetItem.value.budgetItemSubtotal) || 0;
+        });
+    
+    //清空欄位
+    const clearData=()=>{
+        budgetItem.value={
+            "budgetItemId": 0,
+            "memberId": 0,
+            "budgetItemDetail": "",
+            "budgetItemPrice": 0,
+            "budgetItemAmount": 1,
+            "budgetItemSubtotal": 0,
+            "budgetItemSort": "",
+            "actualPay": 0,
+            "alreadyPay": 0
+        }
+    }
 </script>
 
 <template>
@@ -80,13 +96,13 @@ import { ref ,computed, watchEffect} from 'vue';
     </header>
     <main>
         <article>
-            <!-- AddModal -->
+     <!-- AddModal -->
         <div class="modal fade" id="AddModal" tabindex="-1"         aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                   <div class="modal-header">
                       <h5 class="modal-title" id="exampleModalLabel">新增預算項目</h5>
-                       <button type="button" class="btn-close"      data-bs-dismiss="modal" aria-label="Close"></button>
+                       <button type="button" class="btn-close"      data-bs-dismiss="modal" aria-label="Close" @click="clearData"></button>
                   </div>
                  <div class="modal-body">
                     <div class="input-group-modal">
@@ -122,13 +138,13 @@ import { ref ,computed, watchEffect} from 'vue';
 
                </div>
           <div class="modal-footer">
-           <button type="button" class="btn ActiveButton" data-bs-dismiss="modal">取消</button>
+           <button type="button" class="btn ActiveButton" data-bs-dismiss="modal" @click="clearData">取消</button>
            <button type="button" class="btn modalButton">新增</button>
              </div>
         </div>
      </div>
-</div>
-
+        </div>
+    <!-- AddModal end-->
              <BudgetChartComponent :selectSort="selectedSort" @changeTableData="onCategoryClick"></BudgetChartComponent>
              <div class="container">
                 <div class="row">
@@ -155,7 +171,7 @@ import { ref ,computed, watchEffect} from 'vue';
                     <div class="col-12 col-sm-9">
                         <button id="AddBudgetItem" @click="NewBudgetItem" data-bs-toggle='modal' data-bs-target='#AddModal'><i class="bi bi-patch-plus fs-5"></i>  新增預算項目</button>
                         <div id="tableContain">
-                            <table class="table"> 
+                <table class="table"> 
                  <thead>
                      <tr>
                          <th>預算項目名稱</th>
@@ -173,8 +189,8 @@ import { ref ,computed, watchEffect} from 'vue';
                         <td >{{ budgetItem.budgetItemPrice }}</td>
                         <td >{{ budgetItem.budgetItemAmount }}</td>
                         <td >{{ budgetItem.budgetItemSubtotal }}</td>
-                        <td ><input type="text" class="payInput form-control fs-6 fw-bold" v-model="budgetItem.actualPay"></td>
-                        <td ><input type="text" class="payInput form-control fs-6 fw-bold" v-model="budgetItem.alreadyPay"></td>
+                        <td >{{ budgetItem.actualPay }}</td>
+                        <td >{{ budgetItem.alreadyPay }}</td>
                         <td>
                             <button id="EditBudgetItem" class="text-info"><i class="bi bi-pen"></i></button>|
                             <button id="DeleteBudgetItem" class="text-danger"><i class="bi bi-trash3"></i></button>
@@ -258,10 +274,11 @@ import { ref ,computed, watchEffect} from 'vue';
 }
   td, th {
     border-bottom: 0.1rem solid rgba(0, 0, 0, 0.05);
+    text-align: center;
   }
   th {
     padding: 2.0rem 1.0rem;
-    text-align: left;
+    
   }
   td {
     padding: 1.8rem 1.0rem;
@@ -270,9 +287,6 @@ import { ref ,computed, watchEffect} from 'vue';
   }
   tr:hover td { background: #FAFAFA; }
 
-    .payInput{
-        width:100px;
-    }
     .SortButton{
         border-top:none;
         border-left:none;
