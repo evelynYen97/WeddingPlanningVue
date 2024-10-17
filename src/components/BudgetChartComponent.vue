@@ -14,20 +14,22 @@
                 </div>
             </div>
         </div>
-
-
-
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watchEffect } from 'vue';
 import * as echarts from 'echarts';
 const BaseUrl = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BaseUrl}/MemberBudgetItems`;
 const pieData = ref([]);
 const pieChart = ref(null);
 const barChart = ref(null);
+//接收父傳來的sort
+const  props  =  defineProps({
+          selectSort:String
+});
+
 
 const loadPieData = async (memberId) => {
     const response = await fetch(`${API_URL}/ForChart/${memberId}`);
@@ -82,7 +84,8 @@ const updatePieChart = () => {
     return pieChartInstance;
 };
 
-const initCharts = () => {
+const initCharts = async() => {
+
     const barChartInstance = echarts.init(barChart.value);
     const barOption = {
         title: {
@@ -119,7 +122,7 @@ const initCharts = () => {
         const categoryName = params.name;
         const memberId = 1; // 根據實際情況替換
         const barChartData = await loadBarData(memberId, categoryName);
-
+        console.log('從pie的數據'+barChartData)
         // 更新柱狀圖數據
         barChartInstance.setOption({
             xAxis: {
@@ -130,11 +133,30 @@ const initCharts = () => {
             }]
         });
     });
+    watchEffect(async () => {
+    if (props.selectSort) {
+        const barChartData = await loadBarData(1, props.selectSort);
+        console.log('barData', barChartData);
+
+        // 更新柱状图数据
+        barChartInstance.setOption({
+            xAxis: {
+                data: barChartData.categories 
+            },
+            series: [{
+                data: barChartData.values 
+            }]
+        });
+    }
+});
 };
+
+    
 
 onMounted(() => {
     const memberId = 1; // 使用的會員 ID
     loadPieData(memberId);
+    
     initCharts();
 
     window.onresize = () => {

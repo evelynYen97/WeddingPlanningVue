@@ -16,6 +16,7 @@ import { ref } from 'vue';
         console.log(ItemSorts)
         if (ItemSorts.value.length > 0) {
         loadBudgetItems(ItemSorts.value[0].budgetItemSort);
+        onCategoryClick(ItemSorts.value[0].budgetItemSort)
         }
     }
     loadBudgetItemsSort();
@@ -35,6 +36,15 @@ import { ref } from 'vue';
 };
     //宣告變數接當前選項
     const selectedSort = ref('');
+
+    const changeSort = (sort) => {
+        selectedSort.value = sort; 
+    };
+
+    const buttonClickHandler=(inputSort)=>{
+        changeSort(inputSort);
+        onCategoryClick(inputSort);
+    }
 </script>
 
 <template>
@@ -46,7 +56,7 @@ import { ref } from 'vue';
     <main>
         <article>
             
-             <BudgetChartComponent></BudgetChartComponent>
+             <BudgetChartComponent :selectSort="selectedSort"></BudgetChartComponent>
              <div class="container">
                 <div class="row">
                      <!-- 總預算輸入計算 -->
@@ -107,7 +117,7 @@ import { ref } from 'vue';
                      <div class="col-12 col-sm-3">
                         <div id="sortListContain">
                             <div class="list-group">
-                                <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort" @click="onCategoryClick(budgetItemSort.budgetItemSort)" :class="selectedSort === budgetItemSort.budgetItemSort ? 'ActiveButton':'InActiveButton'">{{budgetItemSort.budgetItemSort}}</button>
+                                <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort" @click="buttonClickHandler(budgetItemSort.budgetItemSort)" :class="selectedSort === budgetItemSort.budgetItemSort ? 'ActiveButton':'InActiveButton'">{{budgetItemSort.budgetItemSort}}</button>
                             </div>
                         </div>
                      </div>
