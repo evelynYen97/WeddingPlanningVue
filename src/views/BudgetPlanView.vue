@@ -2,13 +2,30 @@
 import BudgetChartComponent from '@/components/BudgetChartComponent.vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
+import { ref } from 'vue';
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
-    const API_URL = `${BaseUrl}/MemberBudgetItems`;
+    // const API_URL = `${BaseUrl}/MemberBudgetItems/${memberID}?sort=${encodeURIComponent(sort)}`;
+    const API_URL_Sort=`${BaseUrl}/MemberBudgetItems/ItemsSort/1`; //待改成會員ID
+
+
+    //獲得member的所有分類
+    const ItemSorts=ref([]);
+    const loadBudgetItemsSort=async () =>{
+        const responseSort =await fetch(API_URL_Sort);
+        ItemSorts.value=await responseSort.json();
+        console.log(ItemSorts)
+        if (ItemSorts.value.length > 0) {
+        loadBudgetItems(ItemSorts.value[0].budgetItemSort);
+        }
+    }
+    loadBudgetItemsSort();
+    
+    //獲得分類中的細項
     const budgetItems=ref([]);
-    const loadBudgetItems = async () => {    
-    const response = await fetch(API_URL)
-    budgetItems.value = await response.json( )
-    console.log(budgetItems.value)   
+    const loadBudgetItems = async (sort) => {    
+    const response = await fetch(`${BaseUrl}/MemberBudgetItems/ItemsBySort/1?sort=${encodeURIComponent(sort)}`); //待改成會員ID
+    budgetItems.value = await response.json();
+    console.log(budgetItems.value); 
 }
 </script>
 
@@ -25,11 +42,11 @@ import SampleComponent from '@/components/SampleComponent.vue';
              <div class="container">
                 <div class="row">
                      <!-- 總預算輸入計算 -->
-             <div id="InputBudgetContain" class="col-12 col-sm-6">
+                <div id="InputBudgetContain" class="col-12 col-sm-6">
                 <div id="InputContent">
                         <div class="d-flex align-items-center">
                             <label class="fs-5 fw-bold">預算總金額：</label>
-                             <input type="text" id="" class="form-control fs-5 fw-bold">
+                             <input type="text" id="TotalBudget" class="form-control fs-5 fw-bold">
                              <label class="fs-6 fw-bold">TWD</label>
                          </div>
                     <span class="col-sm-2">
@@ -39,12 +56,12 @@ import SampleComponent from '@/components/SampleComponent.vue';
                         <label for="" class="fs-5 fw-bold">當前剩餘金額 ：0 TWD</label>
                 </span >
                 </div>
-             </div>
-             <!-- 總預算輸入計算 end-->
-                </div>
-                <div class="row">
+                 </div>
+                 </div>
+                 <!-- 總預算輸入計算 end-->
+                    <div class="row">
                     <!-- 預算項目表 -->
-                    <div class="col-12 col-sm-10">
+                    <div class="col-12 col-sm-9">
                         <button id="AddBudgetItem"><i class="bi bi-patch-plus fs-5"></i>  新增預算項目</button>
                         <div id="tableContain">
                             <table class="table"> 
@@ -60,13 +77,13 @@ import SampleComponent from '@/components/SampleComponent.vue';
                      </tr>
                  </thead>
                  <tbody>
-                    <tr>
-                        <td ></td>
-                        <td ></td>
-                        <td ></td>
-                        <td ></td>
-                        <td ><input type="text"></td>
-                        <td ><input type="text"></td>
+                    <tr v-for="budgetItem in budgetItems" :key="budgetItem.budgetItemId">
+                        <td >{{ budgetItem.budgetItemDetail }}</td>
+                        <td >{{ budgetItem.budgetItemPrice }}</td>
+                        <td >{{ budgetItem.budgetItemAmount }}</td>
+                        <td >{{ budgetItem.budgetItemSubtotal }}</td>
+                        <td ><input type="text" class="payInput form-control fs-6 fw-bold" v-model="budgetItem.actualPay"></td>
+                        <td ><input type="text" class="payInput form-control fs-6 fw-bold" v-model="budgetItem.alreadyPay"></td>
                         <td>
                             <button id="EditBudgetItem" class="text-info"><i class="bi bi-pen"></i></button>|
                             <button id="DeleteBudgetItem" class="text-danger"><i class="bi bi-trash3"></i></button>
@@ -76,13 +93,19 @@ import SampleComponent from '@/components/SampleComponent.vue';
                 </table>
                         </div>
                 
-            </div>
-            <!-- 預算項目表end -->
-                </div>
-                    
-            
-            
-        </div>
+                     </div>
+                   <!-- 預算項目表end -->
+                    <!-- 預算項目分類 -->
+                     <div class="col-12 col-sm-3">
+                        <div id="sortListContain">
+                            <div class="list-group">
+                                <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort">{{budgetItemSort.budgetItemSort}}</button>
+                            </div>
+                        </div>
+                     </div>
+                    <!-- 預算項目分類end -->
+                  </div>
+             </div>
          </article>
     </main>
     <aside>
@@ -95,7 +118,7 @@ import SampleComponent from '@/components/SampleComponent.vue';
 </template>
 
 <style lang="css" scoped>
-    #InputBudgetContain,#tableContain{
+    #InputBudgetContain,#tableContain,#sortListContain{
          border: 1px solid rgb(245, 240, 240);
          border-radius: 25px;
          padding: 10px;
@@ -105,7 +128,7 @@ import SampleComponent from '@/components/SampleComponent.vue';
     #tableContain{
         padding:30px;
     }
-    input.form-control{
+    #TotalBudget{
 
         width: 50%;
         border-radius: 5px;
@@ -138,7 +161,9 @@ import SampleComponent from '@/components/SampleComponent.vue';
 	width: 100%;
   margin: 2rem 0 4rem 0;
 	border-spacing: 0;
-    border:1px solid rgb(22, 54, 22)
+    border-radius: 15px;
+    border-bottom:1px solid rgb(235, 235, 235)
+}
   td, th {
     border-bottom: 0.1rem solid rgba(0, 0, 0, 0.05);
   }
@@ -151,7 +176,15 @@ import SampleComponent from '@/components/SampleComponent.vue';
     transition: all 0.3s ease;
     .btn { display: inline; }
   }
-  tr:hover td { background: rgba(0, 0, 0, 0.03); }
-}
+  tr:hover td { background: #FAFAFA; }
 
+    .payInput{
+        width:100px;
+    }
+    .SortButton{
+        border-top:none;
+        border-left:none;
+        border-right:none;
+        color:#4C4C4C;
+    }
 </style>

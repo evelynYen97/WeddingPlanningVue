@@ -1,8 +1,8 @@
 <template>
     <div>
-        <div class="container">
+        <div class="">
             <div class="row">
-                <div class="mt-5 col-12 col-sm-5" id="piechartOuterContain">
+                <div class="mt-5 col-12 col-sm-3" id="piechartOuterContain">
                     <div id="piechartContain">
                         <div ref="pieChart" style="width: 100%; height: 400px;"></div>
                     </div>
@@ -92,12 +92,15 @@ const initCharts = () => {
         legend: {
             data: ['金額 (TWD)'],
             orient: 'horizontal',
-            bottom: '0%', 
-            left: 'center' 
+            top: '0%', 
+            left: 'right' ,
         },
         xAxis: {
             type: 'category',
-            data: []
+            data: [],
+            axisLabel: {
+        rotate: 45
+    }
         },
         yAxis: {
             type: 'value'
@@ -173,6 +176,7 @@ onMounted(() => {
     padding-top: 60px;
     border: 3px dashed burlywood;
     height: 500px;
+    width: auto;
 }
 
 #piechartOuterContain,
@@ -182,5 +186,8 @@ onMounted(() => {
     padding: 10px;
     box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2);
     margin:auto
+}
+#barchartOuterContain{
+
 }
 </style>
