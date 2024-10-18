@@ -1,13 +1,13 @@
 <template>
-    <div>
-        <div class="">
+    <div id="ChartsContain">
+        <div >
             <div class="row">
-                <div class="mt-5 col-12 col-sm-3" id="piechartOuterContain">
+                <div class="mt-5 col-12 col-lg-3" id="piechartOuterContain">
                     <div id="piechartContain">
                         <div ref="pieChart" style="width: 100%; height: 400px;"></div>
                     </div>
                 </div>
-                <div class="mt-5 col-12 col-sm-6" id="barchartOuterContain">
+                <div class="mt-5 col-12 col-lg-6" id="barchartOuterContain">
                     <div id="barchartContain">
                         <div ref="barChart" style="width: 100%; height: 400px;"></div>
                     </div>
@@ -211,7 +211,10 @@ onMounted(() => {
     box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2);
     margin:auto
 }
-#barchartOuterContain{
-
+@media (max-width: 992px) {
+    #ChartsContain{
+        height:1200px;
+    }
 }
+
 </style>

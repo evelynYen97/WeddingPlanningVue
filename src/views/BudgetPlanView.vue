@@ -290,12 +290,12 @@ import { ref ,computed, watchEffect} from 'vue';
      </div>
     </div>
      <!-- DeleteModal end-->
-
              <BudgetChartComponent :selectSort="selectedSort" :thisMemberId="memberId" @changeTableData="onCategoryClick"></BudgetChartComponent>
              <div class="container">
                 <div class="row">
+                    <div class="col-12 col-sm-3 ForSpace"></div>
                      <!-- 總預算輸入計算 -->
-                <div id="InputBudgetContain" class="col-12 col-sm-6">
+                    <div id="InputBudgetContain" class="col-12 col-sm-6">
                 <div id="InputContent">
                         <div class="d-flex align-items-center">
                             <label class="fs-5 fw-bold">預算總金額：</label>
@@ -309,12 +309,15 @@ import { ref ,computed, watchEffect} from 'vue';
                         <label for="" class="fs-5 fw-bold">當前剩餘金額 ：0 TWD</label>
                 </span >
                 </div>
+                     </div>
+                     <!-- 總預算輸入計算 end-->
+                    <div class="col-12 col-sm-3 ForSpace"></div>
                  </div>
-                 </div>
-                 <!-- 總預算輸入計算 end-->
+                </div>
+                 <div class="container">
                     <div class="row">
                     <!-- 預算項目表 -->
-                    <div class="col-12 col-sm-9">
+                         <div class="col-12 col-sm-9">
                         <button id="AddBudgetItem" data-bs-toggle='modal' data-bs-target='#AddModal'><i class="bi bi-patch-plus fs-5"></i>  新增預算項目</button>
                         <div id="tableContain">
                 <table class="table"> 
@@ -346,16 +349,22 @@ import { ref ,computed, watchEffect} from 'vue';
                 </table>
                         </div>
                 
-                     </div>
+                        </div>
                    <!-- 預算項目表end -->
                     <!-- 預算項目分類 -->
-                     <div class="col-12 col-sm-3">
+                          <div class="col-12 col-sm-3">
                         <div id="sortListContain">
                             <div class="list-group">
+                                <li class="list-group-item " style="border:none;padding-bottom: 0;">
+                                    <div class="ms-2 me-auto" >
+                                      <label class="fs-5 fw-bold text-secondary" >預算項目分類</label>
+                                    </div>
+                                </li>
+                                <div style="height:3px; margin-bottom: 3px; background-color: #B4BEA7;"></div>
                                 <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort" @click="buttonClickHandler(budgetItemSort.budgetItemSort)" :class="selectedSort === budgetItemSort.budgetItemSort ? 'ActiveButton':'InActiveButton'">{{budgetItemSort.budgetItemSort}}</button>
                             </div>
                         </div>
-                     </div>
+                         </div>
                     <!-- 預算項目分類end -->
                   </div>
              </div>
@@ -452,6 +461,8 @@ import { ref ,computed, watchEffect} from 'vue';
     .ForSpace{
         height:50px;
     }
-
-
+    .SortListHead{
+        border-bottom: 3px dashed darkolivegreen;
+    }
+    
 </style>
