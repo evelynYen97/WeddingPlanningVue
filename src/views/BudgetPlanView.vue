@@ -4,8 +4,8 @@ import HeaderComponent from '@/components/HeaderComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
 import { ref ,computed, watchEffect} from 'vue';
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
-    // const API_URL = `${BaseUrl}/MemberBudgetItems/${memberID}?sort=${encodeURIComponent(sort)}`;
-    const API_URL_Sort=`${BaseUrl}/MemberBudgetItems/ItemsSort/1`; //待改成會員ID
+    const memberId=2;
+    const API_URL_Sort=`${BaseUrl}/MemberBudgetItems/ItemsSort/${memberId}`; //待改成會員ID
     
 
     //獲得member的所有分類
@@ -24,7 +24,7 @@ import { ref ,computed, watchEffect} from 'vue';
     //獲得分類中的細項
     const budgetItems=ref([]);
     const loadBudgetItems = async (sort) => {    
-    const response = await fetch(`${BaseUrl}/MemberBudgetItems/ItemsBySort/1?sort=${encodeURIComponent(sort)}`); //待改成會員ID
+    const response = await fetch(`${BaseUrl}/MemberBudgetItems/ItemsBySort/${memberId}?sort=${encodeURIComponent(sort)}`); 
     budgetItems.value = await response.json();
     console.log(budgetItems.value); 
 }
@@ -54,7 +54,7 @@ import { ref ,computed, watchEffect} from 'vue';
     }
 
     //宣告變數準備回傳資料
-    const budgetItem =ref({
+    const budgetItemBack =ref({
         "budgetItemId": 0,
         "memberId": 0,
         "budgetItemDetail": "",
@@ -68,13 +68,13 @@ import { ref ,computed, watchEffect} from 'vue';
     
     //自動計算小計
     const subtotal = computed(() => {
-        budgetItem.value.budgetItemSubtotal=budgetItem.value.budgetItemPrice * budgetItem.value.budgetItemAmount
-        return (budgetItem.value.budgetItemSubtotal) || 0;
+        budgetItemBack.value.budgetItemSubtotal=budgetItemBack.value.budgetItemPrice * budgetItemBack.value.budgetItemAmount
+        return (budgetItemBack.value.budgetItemSubtotal) || 0;
         });
     
     //清空欄位
     const clearData=()=>{
-        budgetItem.value={
+        budgetItemBack.value={
             "budgetItemId": 0,
             "memberId": 0,
             "budgetItemDetail": "",
@@ -86,6 +86,8 @@ import { ref ,computed, watchEffect} from 'vue';
             "alreadyPay": 0
         }
     }
+
+    
 </script>
 
 <template>
@@ -108,16 +110,16 @@ import { ref ,computed, watchEffect} from 'vue';
                     <div class="input-group-modal">
                         <label class="label-modal">預算項目名稱</label>
                      <div class="input-container">
-                         <input autocomplete="off" class="input-modal" type="text" v-model="budgetItem.budgetItemDetail">
+                         <input autocomplete="off" class="input-modal" type="text" v-model="budgetItemBack.budgetItemDetail">
                     </div>
                      <label class="label-modal">單價</label>
                      <div class="input-container">
-                        <input autocomplete="off" class="input-modal" type="text" v-model="budgetItem.budgetItemPrice">
+                        <input autocomplete="off" class="input-modal" type="text" v-model="budgetItemBack.budgetItemPrice">
                      <span class="unit">NT$</span>
                     </div>
                      <label class="label-modal">數量</label>
                      <div class="input-container">
-                        <input autocomplete="off" class="input-modal" type="text" v-model="budgetItem.budgetItemAmount">
+                        <input autocomplete="off" class="input-modal" type="text" v-model="budgetItemBack.budgetItemAmount">
                     </div>
                      <label class="label-modal">小計</label>
                      <div class="input-container">
@@ -126,12 +128,12 @@ import { ref ,computed, watchEffect} from 'vue';
                     </div>
                      <label class="label-modal">實際支出</label>
                      <div class="input-container">
-                        <input autocomplete="off" class="input-modal" type="text" v-model="budgetItem.actualPay">
+                        <input autocomplete="off" class="input-modal" type="text" v-model="budgetItemBack.actualPay">
                      <span class="unit">NT$</span>
                     </div>
                      <label class="label-modal">已支付</label>
                      <div class="input-container">
-                     <input autocomplete="off" class="input-modal" type="text" v-model="budgetItem.alreadyPay">
+                     <input autocomplete="off" class="input-modal" type="text" v-model="budgetItemBack.alreadyPay">
                      <span class="unit">NT$</span>
                     </div>
                      <div></div></div>
@@ -145,7 +147,7 @@ import { ref ,computed, watchEffect} from 'vue';
      </div>
         </div>
     <!-- AddModal end-->
-             <BudgetChartComponent :selectSort="selectedSort" @changeTableData="onCategoryClick"></BudgetChartComponent>
+             <BudgetChartComponent :selectSort="selectedSort" :thisMemberId="memberId" @changeTableData="onCategoryClick"></BudgetChartComponent>
              <div class="container">
                 <div class="row">
                      <!-- 總預算輸入計算 -->
@@ -225,7 +227,7 @@ import { ref ,computed, watchEffect} from 'vue';
 </template>
 
 <style lang="css" scoped>
-    @import url(src/assets/css/budgetPlanViewModal.css);
+    @import url(@/assets/css/budgetPlanViewModal.css);
     #InputBudgetContain,#tableContain,#sortListContain{
          border: 1px solid rgb(245, 240, 240);
          border-radius: 25px;

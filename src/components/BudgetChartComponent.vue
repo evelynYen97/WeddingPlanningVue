@@ -27,7 +27,8 @@ const pieChart = ref(null);
 const barChart = ref(null);
 //接收父傳來的sort
 const  props  =  defineProps({
-          selectSort:String
+          selectSort:String,
+    thisMemberId:Number,
 });
 
 
@@ -123,8 +124,7 @@ const initCharts = async() => {
     const pieChartInstance = updatePieChart();
     pieChartInstance.on('click', async (params) => {
         const categoryName = params.name;
-        const memberId = 1; // 根據實際情況替換
-        const barChartData = await loadBarData(memberId, categoryName);
+        const barChartData = await loadBarData(props.thisMemberId, categoryName);
         emit('changeTableData',params.name);
         // 更新柱狀圖數據
         barChartInstance.setOption({
@@ -157,8 +157,7 @@ const initCharts = async() => {
 
 
 onMounted(() => {
-    const memberId = 1; // 使用的會員 ID
-    loadPieData(memberId);
+    loadPieData(props.thisMemberId);
     
     initCharts();
 
