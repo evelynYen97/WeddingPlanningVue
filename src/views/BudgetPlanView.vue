@@ -27,8 +27,6 @@ import { ref ,computed, watchEffect} from 'vue';
             const { budgetItemId, ...rest } = item; // 解構賦值，去掉 budgetItemId
              return rest; // 返回剩餘的屬性
             });
-          console.log(defaultBudgetData)
-          console.log(returnData)
           // 複製預設预算到當前會員
           await fetch(`${API_URL}/initialItem/${memberId}`, {
             method: 'POST',
@@ -53,7 +51,6 @@ import { ref ,computed, watchEffect} from 'vue';
     const loadBudgetItemsSort=async () =>{
         const responseSort =await fetch(API_URL_Sort);
         ItemSorts.value=await responseSort.json();
-        console.log(ItemSorts)
         if (ItemSorts.value.length > 0) {
         await loadBudgetItems(ItemSorts.value[0].budgetItemSort);
         await onCategoryClick(ItemSorts.value[0].budgetItemSort)
@@ -66,7 +63,6 @@ import { ref ,computed, watchEffect} from 'vue';
     const loadBudgetItems = async (sort) => {    
     const response = await fetch(`${BaseUrl}/MemberBudgetItems/ItemsBySort/${memberId}?sort=${encodeURIComponent(sort)}`); 
     budgetItems.value = await response.json();
-    console.log(budgetItems.value); 
 }
 
     //點擊分類獲得對應細項
@@ -88,14 +84,41 @@ import { ref ,computed, watchEffect} from 'vue';
     }
 
     //新增預算項目
-    const NewBudgetItem=async()=>{
+    const addOrEditBudgetItem=async()=>{
+        // console.log(category.value)
+        if(budgetItemBack.value.budgetItemSort==""||budgetItemBack.value.budgetItemDetail==""){
+            alert("請確實輸入預算項目名稱及分類")
+        }
+        else{
+            const response = await fetch(API_URL,{
+            method:'POST',
+             body:JSON.stringify(budgetItemBack.value),
+             headers:{'Content-Type':'application/json'}
+             })
+         if(response.ok){
+          await loadBudgetItemsSort();
+          await onCategoryClick(budgetItemBack.value.budgetItemSort)
+          }else{
+               alert('新增失敗,請確認預算項目及分類名稱以外的欄位輸入内容為數字');
+             }
+        }
+    }
 
+    //判斷會員登入與否 觸發編輯或新增事件
+    const AddOrEditEventHandler=()=>{
+        if(memberId>1){
+            addOrEditBudgetItem();
+            clearData();
+        }
+        else{
+            alert("請登入以獲得完整服務。")
+        }
     }
 
     //宣告變數準備回傳資料
     const budgetItemBack =ref({
         "budgetItemId": 0,
-        "memberId": 0,
+        "memberId": memberId,
         "budgetItemDetail": "",
         "budgetItemPrice": 0,
         "budgetItemAmount": 1,
@@ -104,7 +127,11 @@ import { ref ,computed, watchEffect} from 'vue';
         "actualPay": 0,
          "alreadyPay": 0
     })
-    
+    watchEffect(
+        ()=>{
+            console.log(JSON.stringify(budgetItemBack.value))
+        }
+    )
     //自動計算小計
     const subtotal = computed(() => {
         budgetItemBack.value.budgetItemSubtotal=budgetItemBack.value.budgetItemPrice * budgetItemBack.value.budgetItemAmount
@@ -151,6 +178,12 @@ import { ref ,computed, watchEffect} from 'vue';
                      <div class="input-container">
                          <input autocomplete="off" class="input-modal" type="text" v-model="budgetItemBack.budgetItemDetail">
                     </div>
+                    <div class="input-group-modal">
+                        <label class="label-modal">預算項目分類</label>
+                     <div class="input-container">
+                         <input autocomplete="off" class="input-modal" type="text" v-model="budgetItemBack.budgetItemSort">
+                    </div>
+                </div>
                      <label class="label-modal">單價</label>
                      <div class="input-container">
                         <input autocomplete="off" class="input-modal" type="text" v-model="budgetItemBack.budgetItemPrice">
@@ -180,7 +213,7 @@ import { ref ,computed, watchEffect} from 'vue';
                </div>
           <div class="modal-footer">
            <button type="button" class="btn ActiveButton" data-bs-dismiss="modal" @click="clearData">取消</button>
-           <button type="button" class="btn modalButton">新增</button>
+           <button type="button" class="btn modalButton" @click="AddOrEditEventHandler">新增</button>
              </div>
         </div>
      </div>
@@ -210,7 +243,7 @@ import { ref ,computed, watchEffect} from 'vue';
                     <div class="row">
                     <!-- 預算項目表 -->
                     <div class="col-12 col-sm-9">
-                        <button id="AddBudgetItem" @click="NewBudgetItem" data-bs-toggle='modal' data-bs-target='#AddModal'><i class="bi bi-patch-plus fs-5"></i>  新增預算項目</button>
+                        <button id="AddBudgetItem" data-bs-toggle='modal' data-bs-target='#AddModal'><i class="bi bi-patch-plus fs-5"></i>  新增預算項目</button>
                         <div id="tableContain">
                 <table class="table"> 
                  <thead>
