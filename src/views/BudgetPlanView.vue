@@ -143,6 +143,7 @@ import { ref ,computed, watchEffect} from 'vue';
         "actualPay": 0,
          "alreadyPay": 0
     })
+    
     watchEffect(
         ()=>{
             console.log(JSON.stringify(budgetItemBack.value))
@@ -174,8 +175,34 @@ import { ref ,computed, watchEffect} from 'vue';
         budgetItemBack.value=item;
         modalText.value="編輯預算項目";
     }
-    
-    
+
+    //刪除資料
+    const deleteItem=ref({
+        "budgetItemId": 0,
+        "budgetItemDetail": "",
+    });
+    const whichItemToDelete=async(itemID, detailName)=>{
+        deleteItem.value.budgetItemId=itemID,
+        deleteItem.value.budgetItemDetail=detailName
+        console.log(deleteItem.value)
+    }
+    const deleteBudgetItem=async(itemID)=>{
+        const deleteAction=await fetch(`${API_URL}/${itemID}`,{
+            method:'DELETE',
+        })
+        if(deleteAction.ok){
+            alert("資料刪除成功");
+            deleteItem.value={
+                "budgetItemId": 0,
+                 "budgetItemDetail": "",
+            }
+            await loadBudgetItemsSort();
+        }
+        else{
+            alert("資料刪除失敗");
+        }
+
+    }
 </script>
 
 <template>
@@ -241,6 +268,29 @@ import { ref ,computed, watchEffect} from 'vue';
      </div>
         </div>
     <!-- AddModal end-->
+     <!-- DeleteModal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">刪除預算項目</h5>
+           <button type="button" class="btn-close ActiveButton" data-bs-dismiss="modal"     aria-label="Close"></button>
+          </div>
+         <div class="modal-body">
+             <h4>是否確認刪除這筆預算項目？</h4>
+             <div class="ForSpace"> </div>
+             <h5>預算項目名稱:</h5>
+             <h6>{{ deleteItem.budgetItemDetail }}</h6>
+          </div>
+              <div class="modal-footer">
+            <button type="button" class="btn ActiveButton" data-bs-dismiss="modal">取消</button>
+            <button type="button" class="btn DeleteButton" @click="deleteBudgetItem(deleteItem.budgetItemId)" data-bs-dismiss="modal">刪除</button>
+          </div>
+        </div>
+     </div>
+    </div>
+     <!-- DeleteModal end-->
+
              <BudgetChartComponent :selectSort="selectedSort" :thisMemberId="memberId" @changeTableData="onCategoryClick"></BudgetChartComponent>
              <div class="container">
                 <div class="row">
@@ -289,7 +339,7 @@ import { ref ,computed, watchEffect} from 'vue';
                         <td >{{ budgetItem.alreadyPay }}</td>
                         <td>
                             <button id="EditBudgetItem" class="text-info" data-bs-toggle='modal' data-bs-target='#AddModal' @click="editData(budgetItem)"><i class="bi bi-pen"></i></button>|
-                            <button id="DeleteBudgetItem" class="text-danger"><i class="bi bi-trash3"></i></button>
+                            <button id="DeleteBudgetItem" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" @click="whichItemToDelete(budgetItem.budgetItemId,budgetItem.budgetItemDetail)"><i class="bi bi-trash3"></i></button>
                         </td>
                     </tr>      
                  </tbody>
@@ -395,7 +445,13 @@ import { ref ,computed, watchEffect} from 'vue';
     .InActiveButton{
         background-color: transparent;
     }
-    
+    .DeleteButton{
+        background-color: rgb(238, 78, 78);
+        color:white;
+    }
+    .ForSpace{
+        height:50px;
+    }
 
 
 </style>
