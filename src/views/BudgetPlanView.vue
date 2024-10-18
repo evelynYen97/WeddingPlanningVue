@@ -10,7 +10,8 @@ import { ref ,computed, watchEffect} from 'vue';
     const API_URL_Sort=`${API_URL}/ItemsSort/${memberId}`; 
     //宣告變數接當前選項
     const selectedSort = ref('');
-
+    //宣告變數改變modal標題
+    const modalText=ref('新增預算項目');
     //初始化
     const hasItems=ref(false);
     const checkItems=async()=>{
@@ -90,17 +91,32 @@ import { ref ,computed, watchEffect} from 'vue';
             alert("請確實輸入預算項目名稱及分類")
         }
         else{
-            const response = await fetch(API_URL,{
-            method:'POST',
-             body:JSON.stringify(budgetItemBack.value),
-             headers:{'Content-Type':'application/json'}
+            if(budgetItemBack.value.budgetItemId>0){
+                const response = await fetch(`${API_URL}/${budgetItemBack.value.budgetItemId}`,{
+                method:'PUT',
+                 body:JSON.stringify(budgetItemBack.value),
+                headers:{'Content-Type':'application/json'}
              })
-         if(response.ok){
-          await loadBudgetItemsSort();
-          await onCategoryClick(budgetItemBack.value.budgetItemSort)
-          }else{
+             if(response.ok){
+                alert("資料修改成功");
+             await loadBudgetItemsSort();
+             }else{
+               alert('修改失敗,請確認預算項目及分類名稱以外的欄位輸入内容為數字');
+             }
+            }
+            else{
+                const response = await fetch(API_URL,{
+                method:'POST',
+                 body:JSON.stringify(budgetItemBack.value),
+                headers:{'Content-Type':'application/json'}
+             })
+             if(response.ok){
+                alert("資料新增成功");
+             await loadBudgetItemsSort();
+             }else{
                alert('新增失敗,請確認預算項目及分類名稱以外的欄位輸入内容為數字');
              }
+            }
         }
     }
 
@@ -151,8 +167,14 @@ import { ref ,computed, watchEffect} from 'vue';
             "actualPay": 0,
             "alreadyPay": 0
         }
+        modalText.value="新增預算項目";
     }
-
+    //宣告變數準備編輯資料
+    const editData=(item)=>{
+        budgetItemBack.value=item;
+        modalText.value="編輯預算項目";
+    }
+    
     
 </script>
 
@@ -169,7 +191,7 @@ import { ref ,computed, watchEffect} from 'vue';
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                   <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalLabel">新增預算項目</h5>
+                      <h5 class="modal-title" id="exampleModalLabel">{{ modalText }}</h5>
                        <button type="button" class="btn-close"      data-bs-dismiss="modal" aria-label="Close" @click="clearData"></button>
                   </div>
                  <div class="modal-body">
@@ -213,7 +235,7 @@ import { ref ,computed, watchEffect} from 'vue';
                </div>
           <div class="modal-footer">
            <button type="button" class="btn ActiveButton" data-bs-dismiss="modal" @click="clearData">取消</button>
-           <button type="button" class="btn modalButton" @click="AddOrEditEventHandler">新增</button>
+           <button type="button" class="btn modalButton" data-bs-dismiss="modal" @click="AddOrEditEventHandler">儲存</button>
              </div>
         </div>
      </div>
@@ -266,7 +288,7 @@ import { ref ,computed, watchEffect} from 'vue';
                         <td >{{ budgetItem.actualPay }}</td>
                         <td >{{ budgetItem.alreadyPay }}</td>
                         <td>
-                            <button id="EditBudgetItem" class="text-info"><i class="bi bi-pen"></i></button>|
+                            <button id="EditBudgetItem" class="text-info" data-bs-toggle='modal' data-bs-target='#AddModal' @click="editData(budgetItem)"><i class="bi bi-pen"></i></button>|
                             <button id="DeleteBudgetItem" class="text-danger"><i class="bi bi-trash3"></i></button>
                         </td>
                     </tr>      
