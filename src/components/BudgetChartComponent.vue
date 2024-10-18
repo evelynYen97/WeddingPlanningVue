@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watchEffect } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import * as echarts from 'echarts';
 const BaseUrl = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BaseUrl}/MemberBudgetItems`;
@@ -136,11 +136,10 @@ const initCharts = async() => {
             }]
         });
     });
-    watchEffect(async () => {
-    if (props.selectSort) {
-        const barChartData = await loadBarData(1, props.selectSort);
-
-        // 更新柱状图数据
+    watch(() => props.selectSort, async (newSort) => {
+    if (newSort) {
+        const barChartData = await loadBarData(props.thisMemberId, newSort);
+        await loadPieData(props.thisMemberId);
         barChartInstance.setOption({
             xAxis: {
                 data: barChartData.categories 
@@ -151,6 +150,7 @@ const initCharts = async() => {
         });
     }
 });
+    
 };
 
     

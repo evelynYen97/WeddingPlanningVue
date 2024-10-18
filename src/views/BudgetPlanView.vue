@@ -4,9 +4,49 @@ import HeaderComponent from '@/components/HeaderComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
 import { ref ,computed, watchEffect} from 'vue';
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
-    const memberId=2;
-    const API_URL_Sort=`${BaseUrl}/MemberBudgetItems/ItemsSort/${memberId}`; //待改成會員ID
-    
+    const memberId=101;  //待改成當前會員ID
+    const API_URL=`${BaseUrl}/MemberBudgetItems`;
+    const initialItemsURL=`${API_URL}/${memberId}`;
+    const API_URL_Sort=`${API_URL}/ItemsSort/${memberId}`; 
+    //宣告變數接當前選項
+    const selectedSort = ref('');
+
+    //初始化
+    const hasItems=ref(false);
+    const checkItems=async()=>{
+        // try {
+        // 获取当前会员预算
+        const budgetResponse = await fetch(initialItemsURL);
+        const budgetData = await budgetResponse.json();
+        if (budgetData.length === 0) {
+          try{
+          const defaults = await fetch(`${BaseUrl}/MemberBudgetItems/1`)
+          console.log(defaults)
+          const defaultBudgetData = await defaults.json();
+          const returnData= defaultBudgetData.map(item => {
+            const { budgetItemId, ...rest } = item; // 解構賦值，去掉 budgetItemId
+             return rest; // 返回剩餘的屬性
+            });
+          console.log(defaultBudgetData)
+          console.log(returnData)
+          // 複製預設预算到當前會員
+          await fetch(`${API_URL}/initialItem/${memberId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(returnData)
+          })}
+      catch (error) {
+        console.error('Error fetching budget data:', error);
+      }
+      await loadBudgetItemsSort();
+    }
+    else{
+        await loadBudgetItemsSort();
+    }
+    }
+    checkItems();
 
     //獲得member的所有分類
     const ItemSorts=ref([]);
@@ -15,11 +55,11 @@ import { ref ,computed, watchEffect} from 'vue';
         ItemSorts.value=await responseSort.json();
         console.log(ItemSorts)
         if (ItemSorts.value.length > 0) {
-        loadBudgetItems(ItemSorts.value[0].budgetItemSort);
-        onCategoryClick(ItemSorts.value[0].budgetItemSort)
+        await loadBudgetItems(ItemSorts.value[0].budgetItemSort);
+        await onCategoryClick(ItemSorts.value[0].budgetItemSort)
         }
     }
-    loadBudgetItemsSort();
+    
     
     //獲得分類中的細項
     const budgetItems=ref([]);
@@ -34,8 +74,7 @@ import { ref ,computed, watchEffect} from 'vue';
         selectedSort.value = sort;
         loadBudgetItems(sort);
 };
-    //宣告變數接當前選項
-    const selectedSort = ref('');
+    
 
     //實時改變當前分類的值用於傳送至子組件
     const changeSort = (sort) => {
