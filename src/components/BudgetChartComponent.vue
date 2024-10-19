@@ -3,13 +3,15 @@
         <div >
             <div class="row">
                 <div class="mt-5 col-12 col-lg-3" id="piechartOuterContain">
-                    <div id="piechartContain">
-                        <div ref="pieChart" style="width: 100%; height: 400px;"></div>
+                    <div id="piechartContain" class="position-relative">
+                        <button @click="downloadPieChart" class="position-absolute top-0 end-0 mt-3 me-3 downloadButton rounded"><i class="bi bi-download  "></i></button>
+                        <div ref="pieChart" style="width: 100%; height: 450px;"></div>
                     </div>
                 </div>
                 <div class="mt-5 col-12 col-lg-6" id="barchartOuterContain">
-                    <div id="barchartContain">
-                        <div ref="barChart" style="width: 100%; height: 400px;"></div>
+                    <div id="barchartContain" class="position-relative">
+                        <div ref="barChart" style="width: 100%; height: 450px;"></div>
+                        <button @click="downloadBarChart" class="position-absolute top-0 end-0 mt-3 me-3 downloadButton rounded"><i class="bi bi-download  "></i></button>
                     </div>
                 </div>
             </div>
@@ -55,10 +57,12 @@ const loadBarData = async (memberId, categoryName) => {
 const updatePieChart = () => {
     const pieChartInstance = echarts.init(pieChart.value);
     const pieOption = {
+        backgroundColor: '#ffffff',
         title: {
             text: '類別預算',
             subtext: '點擊查看細項',
-            left: 'left'
+            left: 'left',
+            top:'5%',
         },
         tooltip: {
             trigger: 'item',
@@ -67,7 +71,7 @@ const updatePieChart = () => {
         legend: {
             orient: 'horizontal',
             bottom: '0%', 
-            left: 'center' 
+            left: 'center' ,
         },
         series: [{
             name: '金額及佔比',
@@ -80,7 +84,12 @@ const updatePieChart = () => {
                     shadowOffsetX: 0,
                     shadowColor: 'rgba(0, 0, 0, 0.5)'
                 }
-            }
+            },
+            label:{
+                fontSize:14
+            },
+            bottom: '20%',
+            top:'10%'
         }],
 
     };
@@ -92,6 +101,7 @@ const initCharts = async() => {
 
     const barChartInstance = echarts.init(barChart.value);
     const barOption = {
+        backgroundColor: '#ffffff',
         title: {
             text: '類別細項'
         },
@@ -101,21 +111,33 @@ const initCharts = async() => {
             orient: 'horizontal',
             top: '0%', 
             left: 'right' ,
+            textStyle: {
+             fontSize: 14, 
+              },
         },
         xAxis: {
+            
             type: 'category',
             data: [],
             axisLabel: {
-        rotate: 45
-    }
+                textStyle: {
+             fontSize: 14, 
+              },
+        rotate: -25
+        }
         },
         yAxis: {
-            type: 'value'
+            type: 'value',
+            axisLabel: {
+                textStyle: {
+             fontSize: 14, 
+              },
+        }
         },
         series: [{
             name: '金額 (TWD)',
             type: 'bar',
-            data: []
+            data: [],
         }]
     };
 
@@ -153,9 +175,6 @@ const initCharts = async() => {
     
 };
 
-    
-
-
 onMounted(() => {
     loadPieData(props.thisMemberId);
     
@@ -171,6 +190,31 @@ onMounted(() => {
     };
 });
 
+const downloadPieChart = () => {
+      const myChart = echarts.getInstanceByDom(pieChart.value);
+      const imgData = myChart.getDataURL({
+        type: 'png',
+        pixelRatio: 2,
+      });
+      
+      const link = document.createElement('a');
+      link.href = imgData;
+      link.download = 'WeddingPieChart.png';
+      link.click();
+    };
+
+    const downloadBarChart = () => {
+      const myChart = echarts.getInstanceByDom(barChart.value);
+      const imgData = myChart.getDataURL({
+        type: 'png',
+        pixelRatio: 2,
+      });
+      
+      const link = document.createElement('a');
+      link.href = imgData;
+      link.download = 'WeddingBarChart.png';
+      link.click();
+    };
 </script>
 
 <style scoped>
@@ -179,11 +223,17 @@ onMounted(() => {
     padding: 0;
 }
 
-
-
+.downloadButton{
+    background-color: #CED3C6;
+    color: white;
+    width: 40px;
+}
+.downloadButton:hover{
+    background-color: #DEE1D9;
+}
 .row {
     margin: 50px;
-    height: 600px;
+    height: 700px;
 }
 
 #piechartContain {
@@ -191,7 +241,7 @@ onMounted(() => {
     padding: 40px;
     padding-top: 50px;
     border-radius: 25px;
-    height: 500px;
+    height: 550px;
 }
 
 #barchartContain {
@@ -199,7 +249,7 @@ onMounted(() => {
     padding: 40px;
     padding-top: 60px;
     border: 3px dashed burlywood;
-    height: 500px;
+    height: 550px;
     width: auto;
 }
 
