@@ -4,7 +4,7 @@ import HeaderComponent from '@/components/HeaderComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
 import { ref ,computed, watchEffect} from 'vue';
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
-    const memberId=7;  //待改成當前會員ID
+    const memberId=1;  //待改成當前會員ID
     const API_URL=`${BaseUrl}/MemberBudgetItems`;
     const initialItemsURL=`${API_URL}/${memberId}`;
     const API_URL_Sort=`${API_URL}/ItemsSort/${memberId}`; 
@@ -52,7 +52,12 @@ import { ref ,computed, watchEffect} from 'vue';
     //預算項目按鈕事件集合
     const editTotalButtonClick=()=>{
         if(totalBudgetShow.value===false){
-            EditTotalBudget();
+            if(memberId>1){
+                EditTotalBudget();
+            }
+            else{
+                alert("請登入以獲得完整服務。")
+            }
             totalBudgetShow.value=true;
         }
         else{
@@ -178,6 +183,7 @@ import { ref ,computed, watchEffect} from 'vue';
         }
         else{
             alert("請登入以獲得完整服務。")
+            cancelEdit();
         }
     }
 
@@ -194,20 +200,21 @@ import { ref ,computed, watchEffect} from 'vue';
          "alreadyPay": 0
     })
     
-    watchEffect(
-        ()=>{
-            console.log("BACK:"+JSON.stringify(budgetItemBack.value))
-        }
-    )
     //自動計算小計
     const subtotal = computed(() => {
         budgetItemBack.value.budgetItemSubtotal=budgetItemBack.value.budgetItemPrice * budgetItemBack.value.budgetItemAmount
         return (budgetItemBack.value.budgetItemSubtotal) || 0;
         });
-    
+    //用於判斷當前狀態避免顯示資訊錯誤
+    const AddOrEditNow=ref('');
+    const IsAddOrEdit=(doing)=>{
+        AddOrEditNow.value=doing;
+    }
     //取消編輯
     const cancelEdit=()=>{
-        budgetItems.value=[JSON.parse(JSON.stringify(budgetItemTemp.value))];
+        if(AddOrEditNow.value==='編輯'){
+            budgetItems.value=budgetItemTemp.value;
+        }
         clearData();
     }
     //清空欄位
@@ -231,8 +238,10 @@ import { ref ,computed, watchEffect} from 'vue';
     const budgetItemTemp = ref(null);
     const editData=(item)=>{
         budgetItemBack.value=item;
-        budgetItemTemp.value=JSON.parse(JSON.stringify(item)); //深拷貝避免資料變動
+        budgetItemTemp.value=JSON.parse(JSON.stringify(budgetItems.value)); //深拷貝避免資料變動
         modalText.value="編輯預算項目";
+        AddOrEditNow.value="編輯";
+        console.log("is"+AddOrEditNow.value)
     }
     watchEffect(
         ()=>{
@@ -254,7 +263,8 @@ import { ref ,computed, watchEffect} from 'vue';
     }
     //刪除
     const deleteBudgetItem=async(itemID)=>{
-        const deleteAction=await fetch(`${API_URL}/${itemID}`,{
+        if(memberId>1){
+            const deleteAction=await fetch(`${API_URL}/${itemID}`,{
             method:'DELETE',
         })
         if(deleteAction.ok){
@@ -268,6 +278,11 @@ import { ref ,computed, watchEffect} from 'vue';
         else{
             alert("資料刪除失敗");
         }
+        }
+        else{
+            alert("請登入以獲得完整服務。")
+        }
+        
 
     }
 </script>
@@ -400,7 +415,7 @@ import { ref ,computed, watchEffect} from 'vue';
                     </div>
                 </div>
                      <!-- 總預算輸入計算 end-->
-                        <button id="AddBudgetItem" data-bs-toggle='modal' data-bs-target='#AddModal'><i class="bi bi-patch-plus fs-5"></i>  新增預算項目</button>
+                        <button id="AddBudgetItem" data-bs-toggle='modal' data-bs-target='#AddModal' @click="IsAddOrEdit('新增')"><i class="bi bi-patch-plus fs-5"></i>  新增預算項目</button>
                         <div id="tableContain">
                 <table class="table"> 
                  <thead>
@@ -475,7 +490,7 @@ import { ref ,computed, watchEffect} from 'vue';
     }
     #TotalBudget{
 
-        width: 50%;
+        width: 100%;
         border-radius: 5px;
         border-bottom: 3px solid rgb(255, 231, 231);
         display: inline;
