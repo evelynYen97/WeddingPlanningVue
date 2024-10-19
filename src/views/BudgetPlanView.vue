@@ -4,16 +4,32 @@ import HeaderComponent from '@/components/HeaderComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
 import { ref ,computed, watchEffect} from 'vue';
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
-    const memberId=101;  //待改成當前會員ID
+    const memberId=7;  //待改成當前會員ID
     const API_URL=`${BaseUrl}/MemberBudgetItems`;
     const initialItemsURL=`${API_URL}/${memberId}`;
     const API_URL_Sort=`${API_URL}/ItemsSort/${memberId}`; 
-    //宣告變數接當前選項
+    //宣告變數接當前分類選擇
     const selectedSort = ref('');
     //宣告變數改變modal標題
     const modalText=ref('新增預算項目');
+    //宣告變數接會員設定總預算金額
+    const totalBudgetShow=ref(true);
+    const totalBudget=ref(0);
+    const loadMemberBudget=async()=>{
+        const responseMemberbudget=await fetch(`${API_URL}/BudgetTotal/${memberId}`);
+        const data=await responseMemberbudget.json();
+        totalBudget.value=data.budgetTotal;
+    }
+    loadMemberBudget();
+    //宣告變數接當前預算總金額
+    const totalNow=ref(0);
+    const loadBudgetNow=async()=>{
+        const responseBudgetNow=await fetch(`${API_URL}/BudgetNowTotal/${memberId}`)
+        const data=await responseBudgetNow.json();
+        totalNow.value=data.budgetNowTotal;
+    }
+    const restNow=computed(()=>{return Number(totalBudget.value)-Number(totalNow.value)})
     //初始化
-    const hasItems=ref(false);
     const checkItems=async()=>{
         // try {
         // 获取当前会员预算
@@ -54,7 +70,8 @@ import { ref ,computed, watchEffect} from 'vue';
         ItemSorts.value=await responseSort.json();
         if (ItemSorts.value.length > 0) {
         await loadBudgetItems(ItemSorts.value[0].budgetItemSort);
-        await onCategoryClick(ItemSorts.value[0].budgetItemSort)
+        await onCategoryClick(ItemSorts.value[0].budgetItemSort);
+        await loadBudgetNow();
         }
     }
     
@@ -292,32 +309,42 @@ import { ref ,computed, watchEffect} from 'vue';
      <!-- DeleteModal end-->
              <BudgetChartComponent :selectSort="selectedSort" :thisMemberId="memberId" @changeTableData="onCategoryClick"></BudgetChartComponent>
              <div class="container">
-                <div class="row">
-                    <div class="col-12 col-sm-3 ForSpace"></div>
-                     <!-- 總預算輸入計算 -->
-                    <div id="InputBudgetContain" class="col-12 col-sm-6">
-                <div id="InputContent">
-                        <div class="d-flex align-items-center">
-                            <label class="fs-5 fw-bold">預算總金額：</label>
-                             <input type="text" id="TotalBudget" class="form-control fs-5 fw-bold">
-                             <label class="fs-6 fw-bold">TWD</label>
-                         </div>
-                    <span class="col-sm-2">
-                        <label for="" class="fs-5 fw-bold">當前預算總支出：0 TWD</label>
-                    </span>   
-                     <span class="col-sm-2">
-                        <label for="" class="fs-5 fw-bold">當前剩餘金額 ：0 TWD</label>
-                </span >
+                
                 </div>
-                     </div>
-                     <!-- 總預算輸入計算 end-->
-                    <div class="col-12 col-sm-3 ForSpace"></div>
-                 </div>
-                </div>
-                 <div class="container">
-                    <div class="row">
+                 
+                    <div class="row listContainRow">
                     <!-- 預算項目表 -->
                          <div class="col-12 col-sm-9">
+                            <!-- 總預算輸入計算 -->
+                             <div class="row">
+                    <div class="col-12 col-md-4 me-0 InputBudgetContain" style="height: 142px;">
+                        <div id="InputContent">
+                            <div class="me-0 w-100">
+                            <label class="fs-5 fw-bold ms-0">會員預算總金額： </label></div>
+                            <div class="d-flex justify-content-end ">
+                            <label class="fs-5 fw-bold" v-if="totalBudgetShow">{{ totalBudget }}</label>
+                             <input type="text" id="TotalBudget" class="form-control fs-5 fw-bold" v-else>
+                             <span class="me-2"></span>
+                             <label class="fs-5 fw-bold"> TWD</label>
+                            </div>
+                        
+                         
+                </div>
+                     </div>
+                     <div class="col-12 col-md-5 mx-2 InputBudgetContain">
+                        <div id="InputContent">
+                        <div class="d-flex justify-content-between">
+                            <label class="fs-5 fw-bold">當前預算總支出：</label>
+                            <label class="fs-5 fw-bold">{{totalNow}} TWD</label>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <label class="fs-5 fw-bold">當前剩餘金額 ：</label>
+                            <label class="fs-5 fw-bold">{{restNow}} TWD</label>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                     <!-- 總預算輸入計算 end-->
                         <button id="AddBudgetItem" data-bs-toggle='modal' data-bs-target='#AddModal'><i class="bi bi-patch-plus fs-5"></i>  新增預算項目</button>
                         <div id="tableContain">
                 <table class="table"> 
@@ -367,7 +394,7 @@ import { ref ,computed, watchEffect} from 'vue';
                          </div>
                     <!-- 預算項目分類end -->
                   </div>
-             </div>
+             
          </article>
     </main>
     <aside>
@@ -381,7 +408,7 @@ import { ref ,computed, watchEffect} from 'vue';
 
 <style lang="css" scoped>
     @import url(@/assets/css/budgetPlanViewModal.css);
-    #InputBudgetContain,#tableContain,#sortListContain{
+    .InputBudgetContain,#tableContain,#sortListContain{
          border: 1px solid rgb(245, 240, 240);
          border-radius: 25px;
          padding: 10px;
@@ -463,6 +490,9 @@ import { ref ,computed, watchEffect} from 'vue';
     }
     .SortListHead{
         border-bottom: 3px dashed darkolivegreen;
+    }
+    .listContainRow{
+        margin:20px 150px 100px 150px;
     }
     
 </style>
