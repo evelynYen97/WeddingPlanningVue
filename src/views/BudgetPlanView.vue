@@ -13,7 +13,6 @@ import { ref ,computed, watchEffect} from 'vue';
     //宣告變數改變modal標題
     const modalText=ref('新增預算項目');
     //宣告變數接會員設定總預算金額
-    const totalBudgetShow=ref(true);
     const totalBudget=ref(0);
     const loadMemberBudget=async()=>{
         const responseMemberbudget=await fetch(`${API_URL}/BudgetTotal/${memberId}`);
@@ -21,6 +20,9 @@ import { ref ,computed, watchEffect} from 'vue';
         totalBudget.value=data.budgetTotal;
     }
     loadMemberBudget();
+    //會員預算編輯顯示與否
+    const totalBudgetShow=ref(true);
+    
     //宣告變數接當前預算總金額
     const totalNow=ref(0);
     const loadBudgetNow=async()=>{
@@ -29,6 +31,36 @@ import { ref ,computed, watchEffect} from 'vue';
         totalNow.value=data.budgetNowTotal;
     }
     const restNow=computed(()=>{return Number(totalBudget.value)-Number(totalNow.value)})
+
+    //修改會員預算項目
+    const EditTotalBudget=async()=>{
+        const backMemberBudget=ref({
+            "budgetTotal":totalBudget.value
+        })
+        const response=await fetch((`${API_URL}/BudgetTotal/${memberId}`),{
+            method:"PUT",
+            body:JSON.stringify(backMemberBudget.value),
+            headers:{'Content-type':'application/json'}
+        })
+        // if(response.ok){
+        //     alert('會員總預算設定修改成功');
+        // }
+        // else{
+        //     alert('修改儲存失敗')
+        // }
+    }
+    //預算項目按鈕事件集合
+    const editTotalButtonClick=()=>{
+        if(totalBudgetShow.value===false){
+            EditTotalBudget();
+            totalBudgetShow.value=true;
+        }
+        else{
+            totalBudgetShow.value=false;
+        }
+        
+    }
+
     //初始化
     const checkItems=async()=>{
         // try {
@@ -214,11 +246,13 @@ import { ref ,computed, watchEffect} from 'vue';
         "budgetItemId": 0,
         "budgetItemDetail": "",
     });
+    //顯示刪除資料内容提示
     const whichItemToDelete=async(itemID, detailName)=>{
         deleteItem.value.budgetItemId=itemID,
         deleteItem.value.budgetItemDetail=detailName
         console.log(deleteItem.value)
     }
+    //刪除
     const deleteBudgetItem=async(itemID)=>{
         const deleteAction=await fetch(`${API_URL}/${itemID}`,{
             method:'DELETE',
@@ -335,13 +369,18 @@ import { ref ,computed, watchEffect} from 'vue';
                              <div class="row">
                     <div class="col-12 col-md-4 me-0 InputBudgetContain" style="height: 142px;">
                         <div id="InputContent">
-                            <div class="me-0 w-100">
-                            <label class="fs-5 fw-bold ms-0">會員預算總金額： </label></div>
+                            <div class="me-0 w-100 d-flex justify-content-between">
+                                <label class="fs-5 fw-bold ms-0">會員預算總金額： </label>
+                                <button class="ActiveButton rounded" @click="editTotalButtonClick"><i class="bi bi-pencil-square text-secondary" v-show="totalBudgetShow"></i> <i class="bi bi-floppy text-secondary" v-show="!totalBudgetShow"></i></button>
+                               
+                            </div>
                             <div class="d-flex justify-content-end ">
-                            <label class="fs-5 fw-bold" v-if="totalBudgetShow">{{ totalBudget }}</label>
-                             <input type="text" id="TotalBudget" class="form-control fs-5 fw-bold" v-else>
-                             <span class="me-2"></span>
-                             <label class="fs-5 fw-bold"> TWD</label>
+                                 <label class="fs-5 fw-bold" v-if="totalBudgetShow">{{ totalBudget }}</label>
+                               <div v-else>
+                                <input type="text" id="TotalBudget" class="form-control fs-5 fw-bold h-50"  v-model="totalBudget">
+                              </div>
+                                <span class="me-2"></span>
+                                <label class="fs-5 fw-bold"> TWD</label>
                             </div>
                         
                          
@@ -452,10 +491,7 @@ import { ref ,computed, watchEffect} from 'vue';
         border-radius: 15px;
         margin-bottom: 10px;
     }
-    #AddBudgetItem:hover{
-        color: #EEF0F0;
-        background-color: darkolivegreen;
-    }
+
     #EditBudgetItem,#DeleteBudgetItem{
         border-radius: 15px;
     }
@@ -493,6 +529,9 @@ import { ref ,computed, watchEffect} from 'vue';
     }
     .ActiveButton{
         background-color: #F0F2F2;
+    }
+    .ActiveButton:hover,.InActiveButton:hover,#AddBudgetItem:hover{
+        background-color: #DBDFD6;
     }
     .InActiveButton{
         background-color: transparent;
