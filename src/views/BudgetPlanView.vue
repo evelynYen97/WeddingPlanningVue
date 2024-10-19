@@ -69,6 +69,7 @@ import { ref ,computed, watchEffect} from 'vue';
         const responseSort =await fetch(API_URL_Sort);
         ItemSorts.value=await responseSort.json();
         if (ItemSorts.value.length > 0) {
+            selectedSort.value="";
         await loadBudgetItems(ItemSorts.value[0].budgetItemSort);
         await onCategoryClick(ItemSorts.value[0].budgetItemSort);
         await loadBudgetNow();
@@ -93,7 +94,6 @@ import { ref ,computed, watchEffect} from 'vue';
     //實時改變當前分類的值用於傳送至子組件
     const changeSort = (sort) => {
         selectedSort.value = sort; 
-        console.log('zdao f'+sort)
     };
     //集中 按下分類按鈕的事件
     const buttonClickHandler=(inputSort)=>{
@@ -115,8 +115,8 @@ import { ref ,computed, watchEffect} from 'vue';
                 headers:{'Content-Type':'application/json'}
              })
              if(response.ok){
-                alert("資料修改成功");
-             await loadBudgetItemsSort();
+                 await loadBudgetItemsSort();
+                 alert("資料修改成功");
              }else{
                alert('修改失敗,請確認預算項目及分類名稱以外的欄位輸入内容為數字');
              }
@@ -138,10 +138,11 @@ import { ref ,computed, watchEffect} from 'vue';
     }
 
     //判斷會員登入與否 觸發編輯或新增事件
-    const AddOrEditEventHandler=()=>{
+    const AddOrEditEventHandler=async()=>{
         if(memberId>1){
-            addOrEditBudgetItem();
-            clearData();
+            await addOrEditBudgetItem();
+            await loadBudgetNow();
+            await clearData();
         }
         else{
             alert("請登入以獲得完整服務。")
@@ -163,7 +164,7 @@ import { ref ,computed, watchEffect} from 'vue';
     
     watchEffect(
         ()=>{
-            console.log(JSON.stringify(budgetItemBack.value))
+            console.log("BACK:"+JSON.stringify(budgetItemBack.value))
         }
     )
     //自動計算小計
@@ -172,11 +173,17 @@ import { ref ,computed, watchEffect} from 'vue';
         return (budgetItemBack.value.budgetItemSubtotal) || 0;
         });
     
+    //取消編輯
+    const cancelEdit=()=>{
+        budgetItems.value=[JSON.parse(JSON.stringify(budgetItemTemp.value))];
+        clearData();
+    }
     //清空欄位
     const clearData=()=>{
+        
         budgetItemBack.value={
             "budgetItemId": 0,
-            "memberId": 0,
+            "memberId": memberId,
             "budgetItemDetail": "",
             "budgetItemPrice": 0,
             "budgetItemAmount": 1,
@@ -187,11 +194,20 @@ import { ref ,computed, watchEffect} from 'vue';
         }
         modalText.value="新增預算項目";
     }
+
     //宣告變數準備編輯資料
+    const budgetItemTemp = ref(null);
     const editData=(item)=>{
         budgetItemBack.value=item;
+        budgetItemTemp.value=JSON.parse(JSON.stringify(item)); //深拷貝避免資料變動
         modalText.value="編輯預算項目";
     }
+    watchEffect(
+        ()=>{
+            console.log("item"+JSON.stringify(budgetItems.value))
+            console.log("Temp:"+JSON.stringify(budgetItemTemp.value))
+        }
+    )
 
     //刪除資料
     const deleteItem=ref({
@@ -236,7 +252,7 @@ import { ref ,computed, watchEffect} from 'vue';
               <div class="modal-content">
                   <div class="modal-header">
                       <h5 class="modal-title" id="exampleModalLabel">{{ modalText }}</h5>
-                       <button type="button" class="btn-close"      data-bs-dismiss="modal" aria-label="Close" @click="clearData"></button>
+                       <button type="button" class="btn-close"      data-bs-dismiss="modal" aria-label="Close" @click="cancelEdit"></button>
                   </div>
                  <div class="modal-body">
                     <div class="input-group-modal">
@@ -278,7 +294,7 @@ import { ref ,computed, watchEffect} from 'vue';
 
                </div>
           <div class="modal-footer">
-           <button type="button" class="btn ActiveButton" data-bs-dismiss="modal" @click="clearData">取消</button>
+           <button type="button" class="btn ActiveButton" data-bs-dismiss="modal" @click="cancelEdit">取消</button>
            <button type="button" class="btn modalButton" data-bs-dismiss="modal" @click="AddOrEditEventHandler">儲存</button>
              </div>
         </div>
