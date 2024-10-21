@@ -343,19 +343,10 @@ a {
   color: #000;
 }
 
-a:hover {
-  color: #fff;
-  text-decoration: none;
-}
-
-.light a {
-  color: #fff;
-}
-
 .light a:hover,
 .light a:active,
 .light a:focus {
-  color: #fff;
+  color: black;
 }
 
 .light b,
@@ -748,8 +739,6 @@ h3 a:hover {
 .light h5,
 .light h6,
 .light p,
-.light span,
-.light div,
 .light ul {
   color: #fff;
 }
@@ -778,32 +767,7 @@ h6.light a {
   color: #121212;
 }
 
-.light h1.light a,
-.light h2.light a,
-.light h3.light a,
-.light h4.light a,
-.light h5.light a,
-.light h6.light a {
-  color: #fff;
-}
 
-h1.light a:hover,
-h2.light a:hover,
-h3.light a:hover,
-h4.light a:hover,
-h5.light a:hover,
-h6.light a:hover {
-  color: #23527c;
-}
-
-.light h1.light a:hover,
-.light h2.light a:hover,
-.light h3.light a:hover,
-.light h4.light a:hover,
-.light h5.light a:hover,
-.light h6.light a:hover {
-  color: #fff;
-}
 
 p {
   margin: 0 0 .75em;
@@ -7786,7 +7750,6 @@ tfoot {
   width: 100%;
   display: flex;
   justify-content: center;
-  transition: top 0.3s ease-out;
 }
 
 
@@ -7794,7 +7757,6 @@ tfoot {
 #header.fixed {
   position: fixed;
   top: -200px;
-  background: rgb(0, 0, 0, 0);
   transition: background-color 1s ease;
 }
 
@@ -7805,7 +7767,7 @@ tfoot {
   width: 100%;
   z-index: 9;
   margin-bottom: 50px;
-  background: rgb(0, 0, 0, 0.7);
+  background: rgba(225, 229, 230, 0.7);
   transition: background-color 1s ease;
   /* 背景顏色變化的過渡效果 */
   padding: 0;
@@ -7826,11 +7788,6 @@ tfoot {
 --------------------------------------------------------------*/
 .navbar-nav {
   letter-spacing: 1px;
-}
-
-.navbar-light .navbar-nav .nav-link .icon-navicon {
-  color: #fff;
-  border: none;
 }
 
 /* 強制讓 icon 在任何情況下保持白色 */
@@ -7866,13 +7823,13 @@ tfoot {
   padding: 8px;
 }
 
-.navbar ul li.active a.nav-link,
-.navbar ul li a.nav-link:hover {
-  border-bottom: 1px solid #03b4e8;
-  color: #03b4e8;
+.nav-link {
+  color: #000;
 }
 
+
 @media screen and (max-width: 575px) {
+
   .navbar button.navbar-toggler {
     position: absolute;
     top: 0;
@@ -7883,14 +7840,21 @@ tfoot {
   }
 
   .navbar #slide-navbar-collapse {
-    background: rgba(0, 0, 0, 0.7);
-    position: absolute;
+    background: rgba(0, 0, 0, 0.1);
+    position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     padding: 30px 20px;
     z-index: 1100;
     /* 下拉選單的 z-index */
+    overflow-y: auto;
+    /* 讓內容可滾動 */
+
+  }
+
+  .show {
+    z-index: 5000;
   }
 
   .navbar-collapse li.nav-item .nav-link {
@@ -8406,6 +8370,46 @@ body.chocolat-open>.chocolat-image-wrapper {
 .chocolat-zoomable.chocolat-zooming-in .chocolat-img,
 .chocolat-zoomable.chocolat-zooming-out .chocolat-img {
   transition: margin .2s ease;
+}
+
+/*按鈕樣式 */
+/* <!-- HTML !-->
+<button class="button-89" role="button">Button 89</button> */
+/* CSS */
+.button-89 {
+  --b: 3px;
+  /* border thickness */
+  --s: .45em;
+  /* size of the corner */
+  --color: #373B44;
+
+  padding: calc(.5em + var(--s)) calc(.9em + var(--s));
+  color: var(--color);
+  --_p: var(--s);
+  background:
+    conic-gradient(from 90deg at var(--b) var(--b), #0000 90deg, var(--color) 0) var(--_p) var(--_p)/calc(100% - var(--b) - 2*var(--_p)) calc(100% - var(--b) - 2*var(--_p));
+  transition: .3s linear, color 0s, background-color 0s;
+  outline: var(--b) solid #0000;
+  outline-offset: .6em;
+  font-size: 16px;
+
+  border: 0;
+
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-89:hover,
+.button-89:focus-visible {
+  --_p: 0px;
+  outline-color: var(--color);
+  outline-offset: .05em;
+}
+
+.button-89:active {
+  background: var(--color);
+  color: #fff;
 }
 
 /* uncomment to hide controls when zoomed-in*/

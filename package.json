@@ -20,6 +20,7 @@
     "plugin": "^0.0.15",
     "slick": "^1.12.2",
     "slick-carousel": "^1.8.1",
+    "swiper": "^11.1.14",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3"
   },
