@@ -8,15 +8,23 @@
 import FooterComponent from './components/FooterComponent.vue'
 import BudgetChartComponent from './components/BudgetChartComponent.vue'
 import BudgetPlanView from './views/BudgetPlanView.vue'
+import LoginView from './views/LoginView.vue'
+import RegisterView from './views/RegisterView.vue'
+
+
 
 </script>
 
 <template>
     <BudgetPlanView></BudgetPlanView>
     <RouterView></RouterView>
-    <BudgetChartComponent></BudgetChartComponent>
+    <BudgetChartComponent></BudgetChartComponent> 
     <div id="footerTop"></div>
     <FooterComponent></FooterComponent>
+    <RegisterView></RegisterView>
+    <LoginView></LoginView>
+
+
 
 </template>
 
