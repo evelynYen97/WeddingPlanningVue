@@ -7,16 +7,23 @@
     import 'slick-carousel/slick/slick.css'
     import 'slick-carousel/slick/slick-theme.css'
 import FooterComponent from './components/FooterComponent.vue'
-import BudgetPlanView from './views/BudgetPlanView.vue'
 
 </script>
 
 <template>
-    <BudgetPlanView></BudgetPlanView>
     <RouterView></RouterView>
     <FooterComponent></FooterComponent>
 
 </template>
+
+
+
+
+
+
+
+
+
 
 <style scoped>
 #footerTop{
