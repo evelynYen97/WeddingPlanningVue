@@ -3,7 +3,10 @@
 </script>
 
 <template>
-  <v-timeline direction="horizontal">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <v-timeline direction="horizontal">
     <v-timeline-item>
       <template v-slot:opposite> Opposite content </template>
       <div>
@@ -55,6 +58,10 @@
       </div>
     </v-timeline-item>
   </v-timeline>
+      </div>
+    </div>
+  </div>
+ 
 </template>
 
 <style lang="css" scoped>
