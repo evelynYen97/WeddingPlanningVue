@@ -1,0 +1,65 @@
+/* modal */
+/* From Uiverse.io by alexruix */
+.modalButton {
+    background-color: #809166;
+    color: #EEF0F0
+}
+
+.input-modal {
+    height: 44px;
+    background-color: #05060f0a;
+    border-radius: .5rem;
+    padding: 0 1rem;
+    border: 2px solid transparent;
+    font-size: 1rem;
+    transition: border-color .3s cubic-bezier(.25, .01, .25, 1) 0s, color .3s cubic-bezier(.25, .01, .25, 1) 0s, background .2s cubic-bezier(.25, .01, .25, 1) 0s;
+    width: 65%;
+    margin-left: 10%;
+}
+
+.input-modal-readonly {
+    height: 44px;
+    background-color: #05060f0a;
+    border-radius: .5rem;
+    padding: 0 1rem;
+    border: 2px solid transparent;
+    font-size: 1rem;
+    width: 65%;
+    margin-left: 10%;
+}
+
+.label-modal {
+    display: block;
+    margin-bottom: .3rem;
+    margin-left: 10%;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #05060f99;
+    transition: color .3s cubic-bezier(.25, .01, .25, 1) 0s;
+}
+
+.input-modal:hover,
+.input-modal:focus,
+.input-group-modal:hover .input {
+    outline: none;
+    border-color: #556B2F;
+    border: 3px solid #7E8F63;
+}
+
+.input-group-modal:hover .label,
+.input:focus {
+    color: #05060fc2;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    margin-left: 10%;
+}
+
+.unit {
+    margin-left: 10px;
+    /* 为单位和输入框添加间距 */
+    font-size: 1rem;
+    color: #05060f99;
+}

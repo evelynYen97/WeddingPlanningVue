@@ -1,6 +1,7 @@
 <script setup>
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.min.js'
+    import 'bootstrap-icons/font/bootstrap-icons.min.css'
 
 import 'jquery/dist/jquery.min.js'
 import 'aos/dist/aos.css'
@@ -18,11 +19,22 @@ import FooterComponent from './components/FooterComponent.vue'
 </script>
 
 <template>
-<HeaderComponent></HeaderComponent>
-<SampleComponent></SampleComponent>
-<RouterView></RouterView>
-<FooterComponent></FooterComponent>
+    <BudgetPlanView></BudgetPlanView>
+    <RouterView></RouterView>
+    <BudgetChartComponent></BudgetChartComponent>
+    <div id="footerTop"></div>
+    <FooterComponent></FooterComponent>
+
 </template>
+
+
+
+
+
+
+
+
+
 
 <style scoped>
 #footerTop{

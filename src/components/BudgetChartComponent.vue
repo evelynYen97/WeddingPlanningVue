@@ -1,35 +1,41 @@
 <template>
-    <div>
-        <!-- .container>.row>.col-12.col-sm-4*3 -->
-        <div class="container">
+    <div id="ChartsContain">
+        <div >
             <div class="row">
-                <div class="mt-5 col-12 col-sm-5" id="piechartOuterContain">
-                    <div id="piechartContain">
-                        <div ref="pieChart" style="width: 100%; height: 400px;"></div>
+                <div class="mt-5 col-12 col-lg-3" id="piechartOuterContain">
+                    <div id="piechartContain" class="position-relative">
+                        <button @click="downloadPieChart" class="position-absolute top-0 end-0 mt-3 me-3 downloadButton rounded"><i class="bi bi-download  "></i></button>
+                        <div ref="pieChart" style="width: 100%; height: 450px;"></div>
                     </div>
                 </div>
-                <div class="mt-5 col-12 col-sm-6" id="barchartOuterContain">
-                    <div id="barchartContain">
-                        <div ref="barChart" style="width: 100%; height: 400px;"></div>
+                <div class="mt-5 col-12 col-lg-6" id="barchartOuterContain">
+                    <div id="barchartContain" class="position-relative">
+                        <div ref="barChart" style="width: 100%; height: 450px;"></div>
+                        <button @click="downloadBarChart" class="position-absolute top-0 end-0 mt-3 me-3 downloadButton rounded"><i class="bi bi-download  "></i></button>
                     </div>
                 </div>
             </div>
         </div>
-
-
-
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import * as echarts from 'echarts';
 const BaseUrl = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BaseUrl}/MemberBudgetItems`;
 const pieData = ref([]);
-const barData = ref([]);
 const pieChart = ref(null);
 const barChart = ref(null);
+//接收父傳來的sort
+const  props  =  defineProps({
+          selectSort:String,
+    thisMemberId:Number,
+});
+
+
+//宣告子傳父觸發事件
+const emit = defineEmits(['changeTableData']);
 
 const loadPieData = async (memberId) => {
     const response = await fetch(`${API_URL}/ForChart/${memberId}`);
@@ -39,11 +45,9 @@ const loadPieData = async (memberId) => {
 };
 
 const loadBarData = async (memberId, categoryName) => {
-    // 假設這個 API 返回結構為 { categories: ['項目A', '項目B'], value: [10, 5] }
     const response = await fetch(`${API_URL}/ForBarChart/${memberId}?sort=${encodeURIComponent(categoryName)}`);
     const barDatas = await response.json();
 
-    // 返回格式化數據
     return {
         categories: barDatas.categories,
         values: barDatas.values
@@ -53,19 +57,21 @@ const loadBarData = async (memberId, categoryName) => {
 const updatePieChart = () => {
     const pieChartInstance = echarts.init(pieChart.value);
     const pieOption = {
+        backgroundColor: '#ffffff',
         title: {
             text: '類別預算',
             subtext: '點擊查看細項',
-            left: 'left'
+            left: 'left',
+            top:'5%',
         },
         tooltip: {
             trigger: 'item',
             formatter: '{a} <br/>{b}: {c} TWD ({d}%)'
         },
         legend: {
-            orient: 'horizontal', // 設置為水平
-            bottom: '0%', // 放置在底部
-            left: 'center' // 水平居中
+            orient: 'horizontal',
+            bottom: '0%', 
+            left: 'center' ,
         },
         series: [{
             name: '金額及佔比',
@@ -78,7 +84,12 @@ const updatePieChart = () => {
                     shadowOffsetX: 0,
                     shadowColor: 'rgba(0, 0, 0, 0.5)'
                 }
-            }
+            },
+            label:{
+                fontSize:14
+            },
+            bottom: '20%',
+            top:'10%'
         }],
 
     };
@@ -86,30 +97,47 @@ const updatePieChart = () => {
     return pieChartInstance;
 };
 
-const initCharts = () => {
+const initCharts = async() => {
+
     const barChartInstance = echarts.init(barChart.value);
     const barOption = {
+        backgroundColor: '#ffffff',
         title: {
             text: '類別細項'
         },
         tooltip: {},
         legend: {
             data: ['金額 (TWD)'],
-            orient: 'horizontal', // 設置為水平
-            bottom: '0%', // 放置在底部
-            left: 'center' // 水平居中
+            orient: 'horizontal',
+            top: '0%', 
+            left: 'right' ,
+            textStyle: {
+             fontSize: 14, 
+              },
         },
         xAxis: {
+            
             type: 'category',
-            data: []
+            data: [],
+            axisLabel: {
+                textStyle: {
+             fontSize: 14, 
+              },
+        rotate: -25
+        }
         },
         yAxis: {
-            type: 'value'
+            type: 'value',
+            axisLabel: {
+                textStyle: {
+             fontSize: 14, 
+              },
+        }
         },
         series: [{
             name: '金額 (TWD)',
             type: 'bar',
-            data: []
+            data: [],
         }]
     };
 
@@ -118,24 +146,38 @@ const initCharts = () => {
     const pieChartInstance = updatePieChart();
     pieChartInstance.on('click', async (params) => {
         const categoryName = params.name;
-        const memberId = 1; // 根據實際情況替換
-        const barChartData = await loadBarData(memberId, categoryName);
-
+        const barChartData = await loadBarData(props.thisMemberId, categoryName);
+        emit('changeTableData',params.name);
         // 更新柱狀圖數據
         barChartInstance.setOption({
             xAxis: {
-                data: barChartData.categories // 更新類別項目
+                data: barChartData.categories 
             },
             series: [{
-                data: barChartData.values // 更新對應的數值
+                data: barChartData.values 
             }]
         });
     });
+    watch(() => props.selectSort, async (newSort) => {
+    if (newSort) {
+        const barChartData = await loadBarData(props.thisMemberId, newSort);
+        await loadPieData(props.thisMemberId);
+        barChartInstance.setOption({
+            xAxis: {
+                data: barChartData.categories 
+            },
+            series: [{
+                data: barChartData.values 
+            }]
+        });
+    }
+});
+    
 };
 
 onMounted(() => {
-    const memberId = 1; // 使用的會員 ID
-    loadPieData(memberId);
+    loadPieData(props.thisMemberId);
+    
     initCharts();
 
     window.onresize = () => {
@@ -148,6 +190,31 @@ onMounted(() => {
     };
 });
 
+const downloadPieChart = () => {
+      const myChart = echarts.getInstanceByDom(pieChart.value);
+      const imgData = myChart.getDataURL({
+        type: 'png',
+        pixelRatio: 2,
+      });
+      
+      const link = document.createElement('a');
+      link.href = imgData;
+      link.download = 'WeddingPieChart.png';
+      link.click();
+    };
+
+    const downloadBarChart = () => {
+      const myChart = echarts.getInstanceByDom(barChart.value);
+      const imgData = myChart.getDataURL({
+        type: 'png',
+        pixelRatio: 2,
+      });
+      
+      const link = document.createElement('a');
+      link.href = imgData;
+      link.download = 'WeddingBarChart.png';
+      link.click();
+    };
 </script>
 
 <style scoped>
@@ -156,9 +223,17 @@ onMounted(() => {
     padding: 0;
 }
 
+.downloadButton{
+    background-color: #CED3C6;
+    color: white;
+    width: 40px;
+}
+.downloadButton:hover{
+    background-color: #DEE1D9;
+}
 .row {
     margin: 50px;
-    height: 400px;
+    height: 700px;
 }
 
 #piechartContain {
@@ -166,9 +241,7 @@ onMounted(() => {
     padding: 40px;
     padding-top: 50px;
     border-radius: 25px;
-    height: 500px;
-
-
+    height: 550px;
 }
 
 #barchartContain {
@@ -176,15 +249,22 @@ onMounted(() => {
     padding: 40px;
     padding-top: 60px;
     border: 3px dashed burlywood;
-    height: 500px;
+    height: 550px;
+    width: auto;
 }
 
 #piechartOuterContain,
 #barchartOuterContain {
     border: 1px solid rgb(245, 240, 240);
     border-radius: 25px;
-    padding: 5px;
+    padding: 10px;
     box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2);
-    margin: 10px;
+    margin:auto
 }
+@media (max-width: 992px) {
+    #ChartsContain{
+        height:1200px;
+    }
+}
+
 </style>
