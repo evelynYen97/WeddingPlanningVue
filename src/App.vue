@@ -7,10 +7,12 @@
     import 'slick-carousel/slick/slick.css'
     import 'slick-carousel/slick/slick-theme.css'
 import FooterComponent from './components/FooterComponent.vue'
+import EventsView from './views/EventsView.vue'
 
 </script>
 
 <template>
+    <EventsView></EventsView>
     <RouterView></RouterView>
     <FooterComponent></FooterComponent>
 
