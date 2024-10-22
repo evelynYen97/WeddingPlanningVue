@@ -35,6 +35,11 @@ const router = createRouter({
       name: 'cake',
       component: CakeView
     },
+    // {
+    //   path:'LayerSimulation'
+    //   name:'layers',
+    //   component:
+    // }
   ]
 })
 

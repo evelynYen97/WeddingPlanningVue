@@ -1,5 +1,4 @@
 <script setup>
-import '@fortawesome/fontawesome-free/css/all.css';
 
 </script>
 
@@ -149,7 +148,6 @@ import '@fortawesome/fontawesome-free/css/all.css';
 </template>
 
 <style lang="css" scoped>
-
 @import '../assets/css/FooterStyle.css';
 
 .footer-widget-title {
