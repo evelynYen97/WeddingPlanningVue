@@ -1,5 +1,6 @@
 import BudgetChartComponent from '@/components/BudgetChartComponent.vue'
 import CakeView from '@/views/CakeView.vue'
+import ImageLayerManager from '@/views/ImageLayerManager.vue'
 import ShopView from '@/views/ShopView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -35,11 +36,11 @@ const router = createRouter({
       name: 'cake',
       component: CakeView
     },
-    // {
-    //   path:'LayerSimulation'
-    //   name:'layers',
-    //   component:
-    // }
+    {//圖層頁面
+      path: '/LayerSimulation',
+      name: 'layers',
+      component: ImageLayerManager
+    }
   ]
 })
 

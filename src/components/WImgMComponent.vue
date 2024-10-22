@@ -3,7 +3,7 @@
         <h3>Materials</h3>
         <div class="col" v-for="term in terms" :key="term.materialId">
             <div class="card" @click="sendData(term)">
-            <img :src="`/src/assets/images素材/${term.imageName}`" class="card-img-top" :alt="term.materialId" :title="term.materialId">
+            <img :src="`/src/assets/images/Layer_WebImg/${term.imageName}`" class="card-img-top" :alt="term.materialId" :title="term.materialId">
                 <div class="card-body">
                     <!-- 使用split來根據.分割字只取第一部分 為了去掉.png-->
                     <p class="card-text">{{ term.imageName.split('.').slice(0, -1).join('.') }}</p>
@@ -15,7 +15,7 @@
 
 <script setup>
 import {ref,defineProps,defineEmits} from 'vue';
-const BASE_URL = import.meta.env.VITE_BASE_URL
+const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BASE_URL}/Materials`
 const terms = ref([])
 
@@ -42,7 +42,7 @@ loadImg()
 
 const emit = defineEmits(['data-sent']); // 定義 emit
 const sendData = (term) => {
-    const imagePath = `/src/assets/images素材/${term.imageName}`;
+    const imagePath = `/src/assets/images/Layer_WebImg/${term.imageName}`;
     const materialId = term.materialId; // 假設你還想傳送 materialId
     const width = term.estimatedW
     const height = term.estimatedL

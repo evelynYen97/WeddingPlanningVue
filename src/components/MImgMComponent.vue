@@ -3,7 +3,7 @@
         <h5>MemberMaterials</h5>
         <div class="col" v-for="term in terms" :key="term.memberMaterialId">
             <div class="card" @click="sendMemData(term)">
-            <img :src="`/src/assets/會員images素材/${term.memberImgName}`" class="card-img-top" :alt="term.memberMaterialId" :title="term.memberMaterialId">
+            <img :src="`/src/assets/images/Layer_MemImg/${term.memberImgName}`" class="card-img-top" :alt="term.memberMaterialId" :title="term.memberMaterialId">
                 <div class="card-body">
                     <!-- 使用split來根據.分割字只取第一部分 為了去掉.png-->
                     <p class="card-text">{{ term.memberImgName.split('.').slice(0, -1).join('.') }}</p>
@@ -15,7 +15,9 @@
 
 <script setup>
 import {ref,defineProps} from 'vue';
-const BASE_URL = import.meta.env.VITE_BASE_URL
+
+
+const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BASE_URL}/MemberMaterials`
 const terms = ref([])
 
@@ -30,7 +32,7 @@ const loadImg = async () => {
     try {
         const response = await fetch(API_URL);
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         const results = await response.json();
         terms.value = results; // 將 API 回傳的結果存入 terms 陣列
@@ -42,7 +44,7 @@ loadImg()
 
 const emit = defineEmits(['Memdata-sent']); // 定義 emit
 const sendMemData = (term) => {
-    const imagePath = `/src/assets/會員images素材/${term.memberImgName}`;
+    const imagePath = `/src/assets/images/Layer_MemImg/${term.memberImgName}`;
     const memberid = term.memberid;
     const materialId = term.memberMaterialId;
     const width = term.estimatedWidth;

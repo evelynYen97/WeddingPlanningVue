@@ -86,7 +86,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
                   <li><RouterLink class="dropdown-item" :to="{name:'shop'}">婚禮企劃</RouterLink></li>
                   <li><RouterLink class="dropdown-item" :to="{name:'shop'}">婚禮流程規劃</RouterLink></li>
                   <li><RouterLink class="dropdown-item" :to="{name:'shop'}">婚禮預算規劃</RouterLink></li>
-                  <li><RouterLink class="dropdown-item" :to="{name:'shop'}">場佈模擬器</RouterLink></li>
+                  <li><RouterLink class="dropdown-item" :to="{name:'layers'}">場佈模擬器</RouterLink></li>
                 </ul>
               </li>
 
