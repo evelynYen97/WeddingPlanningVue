@@ -1,27 +1,30 @@
 <template>
     <div>
-        <div>
-            <div class="components-wrapper">
-                <WImgMComponent @data-sent="handleDataSent"/>
-                <MImgMComponent @Memdata-sent="MemhandleDataSent"/>
-            </div>
-            <div class="container" ref="container">
-                <div class="size-info" v-if="selectedImage">{{ sizeInfo }}</div>
-            </div>
+        <div class="wrapper">
             <div class="menu">
                 <div @click="changeContainerSize(600, 600)">1:1</div>
                 <div @click="changeContainerSize(750, 600)">5:4</div>
                 <div @click="changeContainerSize(900, 600)">3:2</div>
-                <div @click="changeContainerSize(1008, 627)">16:9</div>
+                <div @click="changeContainerSize(1010, 625.5)">16:9</div>
+            </div>
+            <div class="container" ref="container">
+                <div class="size-info" v-if="selectedImage">{{ sizeInfo }}</div>
+            </div>
+            <div class="components-wrapper">
+                <WImgMComponent @data-sent="handleDataSent" class="Mh3"/>
+                <MImgMComponent @Memdata-sent="MemhandleDataSent" class="Mh5"/>
             </div>
         </div>
-        
         <div class="controls">
-            <button @click="moveLayer('down')">上移</button>
-            <button @click="moveLayer('up')">下移</button>
-            <button @click="undoLastAction(selectedImage)">回復</button>
-            <button @click="deleteImage" style="background-color: red;">刪除</button>
-            <button @click="captureScreenshot" style="background-color:yellowgreen;">截取截图</button>
+            <button @click="moveLayer('down')" class="btn">上移</button>
+            <button @click="moveLayer('up')" class="btn">下移</button>
+            <button @click="undoLastAction(selectedImage)" class="btn" style="background-color: #6A6AFF;">回復</button>
+            <button @click="deleteImage" style="background-color: red;" class="btn red">刪除</button>
+            <button @click="captureScreenshot" style="background-color:yellowgreen;" class="btn">保存</button>
+            <button class="btn">會員上傳圖片</button>
+        </div>
+        <div class="wrapper">
+
         </div>
     </div>
 </template>
@@ -45,9 +48,9 @@ export default {
             sizeInfo: '',
             stateHistory: [],// 用於保存每次的狀態
             maxHistory: 80,//位置狀態陣列的最大儲存量
-            containerSize: {//初始container大小
-            width: 600,
-            height: 600,
+            containerSize: {
+                width: 0,
+                height: 0,
             },
         };
     },
@@ -365,15 +368,45 @@ export default {
 </script>
     
 <style scoped>
-    WimgmenuComponent,MimgmenuComponent {
+    WimgmenuComponent{
         position: relative;
-        margin-right: 10px;
+        padding: 10px;
     }
-    .components-wrapper {
+
+    MimgmenuComponent{
+        position: relative;
+        padding: 10px;
+    }
+    .Mh3 {
+        background-color: #F5F5DC;
+        color: #6f8170;
+        text-align: center;
+        padding: 8px;
+        position: sticky; /* 讓 h3 固定 */
+    }
+    .Mh5 {
+        background-color: #F5F5DC;
+        color: #6f8170;
+        text-align: center;
+        padding: 8px;
+        position: sticky;
+    }
+    /* 使用 flexbox 讓 .container 和 .components-wrapper 橫向排列 */
+    .wrapper {
         display: flex;
-        justify-content: flex-start;
+        justify-content: flex-start; /* 元素從左往右排列 */
         align-items: flex-start;
+        padding-top: 50px;
     }
+
+    /* .components-wrapper 緊跟在 .container 右邊 */
+    .components-wrapper {
+        height: 626px;
+        margin-right: 50px;
+        display: flex;
+        gap: 1px; /* 兩個 component 之間設置 3px 的間距 */
+    }
+
     body {
         display: flex;
         flex-direction: column;
@@ -383,13 +416,12 @@ export default {
         margin: 0;
         background-color: #f0f0f0;
     }
-        
+    
     .container {
         position: relative;
-        width: 750px;
-        height: 600px;
-        background-color: lightgray;
-        border: 1px solid #ccc;
+        width: 1012px;
+        height: 626px;
+        background-color: #D8CAB8;
         margin-bottom: 20px;
     }
         
@@ -405,11 +437,6 @@ export default {
         display: none;
     }
         
-    img {
-        position: absolute;
-        cursor: move;
-    }
-        
     .lock-icon {
         position: absolute;
         bottom: 5px;
@@ -423,25 +450,75 @@ export default {
         display: flex;
         justify-content: center;
         margin-top: 10px;
+        gap: 10px;
     }
         
     .controls input {
         margin-right: 10px;
     }
         
-    button {
-        padding: 10px 15px;
-        background-color: #007bff;
-        color: #ffffff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        margin-right: 10px;
+    .btn,
+    .btn:focus {
+        position: relative;
+        min-width: 100px;
+        background-color: black;
+        border-radius: 4em;
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        text-transform: uppercase;
+        transition-duration: 0.4s;
+        padding: 10px 20px;
     }
-        
-    button:hover {
-        background-color: #0056b3;
+    .btn:hover {
+        background-color:#CCCCCC;
+        color: #3A3A3A;
+        transition-duration: 0.1s;
+    }
+    .btn:after {
+        content: "";
+        display: block;
+        position: absolute;
+        left: 0;
+        top:0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: all 0.5s;
+        box-shadow: 0 0 10px 40px rgb(0, 0, 0);
+        border-radius: 4em;
+    }
+    .btn:active:after {
+        opacity: 1;
+        transition: 0s;
+        box-shadow: 0 0 0 0 rgb(123, 123, 123);
+    }
+    .btn:active {
+        top: 1px;
+    }
+
+    .btn.red:after {
+        content: "";
+        display: block;
+        position: absolute;
+        left: 0;
+        top:0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: all 0.5s;
+        box-shadow: 0 0 10px 40px rgb(253, 2, 2);
+        border-radius: 4em;
+    }
+    .btn.red:active:after {
+        opacity: 1;
+        transition: 0s;
+        box-shadow: 0 0 0 0 rgb(139, 65, 65);
+    }
+    .btn.red:active {
+        top: 1px;
     }
         
     input[type="file"] {
@@ -449,15 +526,17 @@ export default {
         border: 1px solid #ccc;
         border-radius: 5px;
     }
-    
+    /* 調整尺寸的框 */
     .menu {
-        position: fixed;
-        top: 0;
-        right: 0;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+        margin-left: 127px;
+        padding-top: 10px;
+        position: relative;
         width: 100px;
-        height: 100vh;
-        background-color: #333;
-        color: white;
+        height: 90vh;
+        background-color: #F5F5DC;
+        color: #6f8170;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -468,90 +547,12 @@ export default {
         padding: 20px;
         cursor: pointer;
         text-align: center;
-        background-color: #444;
+        background-color: #C3E0C5;
         margin-bottom: 10px;
     }
     
     .menu div:hover {
-        background-color: yellow;
+        background-color: rgb(203, 255, 213);
         color: black;
-    }
-    
-    h3 {
-        color: yellow;
-        width: 100%; /* 確保 h2 佔滿父元素的寬度 */
-        text-align: center;
-        padding-bottom: 10px;
-    }
-    .img-menu {
-        width: 130px; /* 根據需求調整 */
-        height: 500px; /* 根據需求調整 */
-        overflow-y: scroll; /* 垂直方向顯示滾動條 */
-        padding: 10px;
-    }
-    
-    .card-img-top {
-        width: 50px;
-        height: 50px;
-        object-fit: cover; /* 保持圖片比例裁切 */
-        position: relative; /* 圖片相對於卡片容器進行定位 */
-    }
-    
-    .card {
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* 垂直方向居中對齊 */
-        position: relative; /* 保證卡片內元素相對定位 */
-        margin-bottom: 20px; /* 卡片之間的距離 */
-    }
-    
-    .col {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .resize-handle {
-        position: absolute;
-        width: 10px;
-        height: 10px;
-        background-color: transparent;
-        z-index: 10;
-    }
-    .left {
-        top: 50%;
-        left: 0;
-        cursor: ew-resize;
-    }
-    
-    .right {
-        top: 50%;
-        right: 0;
-        cursor: ew-resize;
-    }
-    
-    .top {
-        top: 0;
-        left: 50%;
-        cursor: ns-resize;
-    }
-    
-    .bottom {
-        bottom: 0;
-        left: 50%;
-        cursor: ns-resize;
-    }
-        /* 自定義滾動條的樣式 */
-    .img-menu::-webkit-scrollbar {
-        width: 8px; /* 滾動條寬度 */
-    }
-    
-    .img-menu::-webkit-scrollbar-thumb {
-        background-color: #888; /* 滾動條顏色 */
-        border-radius: 5px; /* 滾動條圓角 */
-    }
-    
-    .img-menu::-webkit-scrollbar-thumb:hover {
-        background-color: #555; /* 滾動條滑過時的顏色 */
     }
 </style>

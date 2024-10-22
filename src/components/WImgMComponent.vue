@@ -52,33 +52,30 @@ const sendData = (term) => {
 </script>
 
 <style lang="css" scoped>
-h3 {
-    color: yellow;
-    width: 100%;
-    text-align: center;
-    padding: 8px;
-    position: sticky; /* 讓 h3 固定 */
-    top: 0; /* 固定在 img-menu 的頂部 */
-    background-color: #333;
-    z-index: 10; /* 確保 h3 顯示在最前方 */
+h3{
+    font-size:20px;
 }
-
 .img-menu {
     width: 130px; /* 根據需求調整 */
-    height: 500px; /* 根據需求調整 */
+    height: 626px; /* 根據需求調整 */
     overflow-y: scroll; /* 垂直方向顯示滾動條 */
     padding: 10px;
     position: relative;
 }
 
 .card-img-top {
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: auto;
     object-fit: cover; /* 保持圖片比例裁切 */
     position: relative; /* 圖片相對於卡片容器進行定位 */
 }
 
+.card-text{
+    font-size:14px
+}
+
 .card {
+    border: 2px solid #aba092;
     display: flex;
     flex-direction: column;
     align-items: center; /* 垂直方向居中對齊 */
@@ -98,12 +95,12 @@ h3 {
 }
 
 .img-menu::-webkit-scrollbar-thumb {
-    background-color: #888; /* 滾動條顏色 */
-    border-radius: 5px; /* 滾動條圓角 */
+    background-color:#E6D8C5; /* 滾動條顏色 */
+    border-radius: 5px;
 }
 
 .img-menu::-webkit-scrollbar-thumb:hover {
-    background-color: #555; /* 滾動條滑過時的顏色 */
+    background-color: #aba092; /* 滾動條滑過時的顏色 */
 }
 
 </style>
