@@ -1,6 +1,8 @@
-import BudgetChartComponent from '@/components/BudgetChartComponent.vue'
+
+import BudgetPlanView from '@/views/BudgetPlanView.vue'
 import CakeView from '@/views/CakeView.vue'
 import ShopView from '@/views/ShopView.vue'
+import WeddingPlanView from '@/views/WeddingPlanView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 
@@ -23,7 +25,12 @@ const router = createRouter({
     { //預算
       path: '/budgetplan',
       name: 'budgetplan',
-      component: BudgetChartComponent
+      component: BudgetPlanView
+    },
+    { //婚禮企劃書
+      path: '/weddingplan',
+      name: 'weddingplan',
+      component: WeddingPlanView
     },
     { //商家預選畫面
       path: '/shop',

@@ -1,10 +1,10 @@
 <script setup>
 import BudgetChartComponent from '@/components/BudgetChartComponent.vue';
-import HeaderComponent from '@/components/HeaderComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
 import { ref ,computed, watchEffect} from 'vue';
+import { VAlert} from 'vuetify/components';
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
-    const memberId=1;  //待改成當前會員ID
+    const memberId=7;  //待改成當前會員ID
     const API_URL=`${BaseUrl}/MemberBudgetItems`;
     const initialItemsURL=`${API_URL}/${memberId}`;
     const API_URL_Sort=`${API_URL}/ItemsSort/${memberId}`; 
@@ -56,7 +56,9 @@ import { ref ,computed, watchEffect} from 'vue';
                 EditTotalBudget();
             }
             else{
-                alert("請登入以獲得完整服務。")
+                alertShow.value=true;
+                alertType.value='warning';
+                alertMessage.value='請登入以獲得完整服務。';
             }
             totalBudgetShow.value=true;
         }
@@ -142,7 +144,9 @@ import { ref ,computed, watchEffect} from 'vue';
     const addOrEditBudgetItem=async()=>{
         // console.log(category.value)
         if(budgetItemBack.value.budgetItemSort==""||budgetItemBack.value.budgetItemDetail==""){
-            alert("請確實輸入預算項目名稱及分類")
+            alertShow.value=true;
+                alertType.value='danger';
+                alertMessage.value='請確實輸入預算項目名稱及分類';
         }
         else{
             if(budgetItemBack.value.budgetItemId>0){
@@ -153,9 +157,14 @@ import { ref ,computed, watchEffect} from 'vue';
              })
              if(response.ok){
                  await loadBudgetItemsSort();
-                 alert("資料修改成功");
+                    alertShow.value=true;
+                    alertType.value='success';
+                    alertMessage.value='資料修改成功';
              }else{
-               alert('修改失敗,請確認預算項目及分類名稱以外的欄位輸入内容為數字');
+            //    alert('修改失敗,請確認預算項目及分類名稱以外的欄位輸入内容為數字');
+                alertShow.value=true;
+                alertType.value='danger';
+                alertMessage.value='修改失敗';
              }
             }
             else{
@@ -165,10 +174,14 @@ import { ref ,computed, watchEffect} from 'vue';
                 headers:{'Content-Type':'application/json'}
              })
              if(response.ok){
-                alert("資料新增成功");
+                     alertShow.value=true;
+                    alertType.value='success';
+                    alertMessage.value='資料新增成功';
              await loadBudgetItemsSort();
              }else{
-               alert('新增失敗,請確認預算項目及分類名稱以外的欄位輸入内容為數字');
+                alertShow.value=true;
+                alertType.value='danger';
+                alertMessage.value='新增失敗';
              }
             }
         }
@@ -182,7 +195,9 @@ import { ref ,computed, watchEffect} from 'vue';
             await clearData();
         }
         else{
-            alert("請登入以獲得完整服務。")
+                alertShow.value=true;
+                alertType.value='warning';
+                alertMessage.value='請登入以獲得完整服務。';
             cancelEdit();
         }
     }
@@ -268,7 +283,9 @@ import { ref ,computed, watchEffect} from 'vue';
             method:'DELETE',
         })
         if(deleteAction.ok){
-            alert("資料刪除成功");
+            alertShow.value=true;
+            alertType.value='success';
+            alertMessage.value='資料刪除成功';
             deleteItem.value={
                 "budgetItemId": 0,
                  "budgetItemDetail": "",
@@ -276,25 +293,49 @@ import { ref ,computed, watchEffect} from 'vue';
             await loadBudgetItemsSort();
         }
         else{
-            alert("資料刪除失敗");
+                alertShow.value=true;
+                alertType.value='danger';
+                alertMessage.value='刪除失敗';
         }
         }
         else{
-            alert("請登入以獲得完整服務。")
+                alertShow.value=true;
+                alertType.value='warning';
+                alertMessage.value='請登入以獲得完整服務。';
         }
         
 
     }
+
+
+    //alert
+    const alertShow = ref(false);
+    const alertType = ref('success'); // 或 'error', 'warning', 'info'
+    const alertMessage=ref('請登入以獲得完整服務。')
+   
 </script>
 
 <template>
     <div>
     <header>
-        <HeaderComponent></HeaderComponent>
         <SampleComponent></SampleComponent>
     </header>
     <main>
         <article>
+            <v-alert
+      v-model="alertShow"
+      :type="alertType"
+      border="start"
+      close-label="Close Alert"
+      :title="alertMessage"
+      variant="tonal"
+      closable
+      class="alert-center"
+      dismissable
+    >
+      點擊提示框右上角可關閉此提示
+    </v-alert>
+
      <!-- AddModal -->
         <div class="modal fade" id="AddModal" tabindex="-1"         aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -564,5 +605,11 @@ import { ref ,computed, watchEffect} from 'vue';
     .listContainRow{
         margin:20px 150px 100px 150px;
     }
-    
+    .alert-center {
+        position: fixed;
+         top: 20%;
+         left: 80%;
+         transform: translate(-50%, -50%);
+         z-index: 1000; /* 确保在最上层 */
+        }
 </style>

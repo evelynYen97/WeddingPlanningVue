@@ -19,6 +19,7 @@
     "jquery": "^3.7.1",
     "pinia": "^2.1.7",
     "plugin": "^0.0.15",
+    "quill": "^2.0.2",
     "slick": "^1.12.2",
     "slick-carousel": "^1.8.1",
     "swiper": "^11.1.14",
