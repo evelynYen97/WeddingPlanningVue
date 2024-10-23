@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-12 col-md-12 mb-3 mt-5">
         <h2>婚禮企劃書</h2>
-        <button @click="generatePDF">生成 PDF</button>
+        <button ref="generateButton">生成 PDF</button>
       </div>
     </div>
     <div class="row">
@@ -11,7 +11,7 @@
         <button class="closeBtn mb-3">x</button>
         <button class="upBtn rounded">↑</button>
         <button class="downBtn rounded">↓</button>
-        <div id="quill-1" ref="pdfContent1">
+        <div id="quill-1" class="pdfContent">
             <h1 style="color: white; font-weight: bold;" id="edit1">xxx 與 xxx 的 婚禮主題</h1>
         
             <div style="position: absolute;width: 1140px;height: 140px;bottom:0px;background: #001733;"  ></div>
@@ -23,8 +23,8 @@
         </div>
     <div class="block">
         <button class="closeBtn">×</button>
-        <div style="width: 1200px;height:800px;background-color: #001733;" ref="pdfContent2">
-             <div class="quill-editor" id="edit2">
+        <div style="width: 1200px;height:800px;background-color: #001733;" class="pdfContent">
+             <div class="quill-editor " id="edit2">
                 <p>
                 <img src="@/assets/images/weddingPlanImg/male.jpg" alt="男方" style="width:250px;">
                 </p>
@@ -53,7 +53,7 @@
     </div>
     <div class="block">
         <button class="closeBtn">×</button>
-        <div id="blackUp"  ref="pdfContent3">
+        <div id="blackUp" class="pdfContent">
             <div class="quill-editor" style="position:absolute; top: 100px;left: 700px;height: 80px;width: 300px;">
             <h2 style="color: white;font-weight: bold; position:absolute; top: 100px;left: 700px;">婚禮預算分配比例</h2>
         </div>
@@ -111,12 +111,13 @@
   import Quill from 'quill'; 
 
   //pdf
-   const pdfContent1 = ref(null);
-   const pdfContent2 = ref(null);
-   const pdfContent3 = ref(null);
-
    const generatePDF = () => {
-  const elements = [pdfContent1.value, pdfContent2.value, pdfContent3.value];
+    const elements = Array.from(document.querySelectorAll('.block')).map(block => block.querySelector('.pdfContent')).filter(el => el !== null);
+
+if (elements.length === 0) {
+    alert('沒有可生成的內容！');
+    return;
+}
   const promises = elements.map(element => html2canvas(element));
 
   Promise.all(promises).then(canvases => {
@@ -147,8 +148,10 @@
   });
 };
 
-
+const generateButton = ref(null);
   onMounted(()=>{
+    generateButton.value.addEventListener('click', generatePDF);
+
     const editors = document.querySelectorAll('.quill-editor');
         editors.forEach(editor => {
             const quill = new Quill(editor, {
@@ -191,9 +194,11 @@
         // 關閉按鈕事件
         document.querySelectorAll('.closeBtn').forEach(button => {
             button.addEventListener('click', function () {
-                const block = this.closest('.block');
-                block.remove(); // 移除 block
-            });
+    if (confirm('確定要移除這個區塊嗎？')) {
+        const block = this.closest('.block');
+        block.remove(); // 移除區塊
+    }
+});
         });
   })
   
