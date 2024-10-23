@@ -22,9 +22,12 @@
             <button @click="deleteImage" style="background-color: red;" class="btn red">刪除</button>
             <button @click="captureScreenshot" style="background-color:yellowgreen;" class="btn">保存</button>
             <button class="btn">會員上傳圖片</button>
+            <input type="text" v-model="memberID" style="width: 100px; border: 2px solid #4CAF50; padding: 8px;"/>
+            <button @click="fetchEditingID" class="btn">搜尋圖層資訊</button>
+            <button @click="putsql" class="btn">測試資訊</button>
         </div>
         <div class="wrapper">
-
+            <p>說明之後放這</p>
         </div>
     </div>
 </template>
@@ -34,9 +37,8 @@ import MImgMComponent from '@/components/MImgMComponent.vue';
 import WImgMComponent from '@/components/WImgMComponent.vue';
 import html2canvas from 'html2canvas';
 import interact from 'interactjs';
-    
-//const materialId = newImageContainer.getAttribute('data-material-id'); 素材的專屬id
-    
+
+const BASE_URL = import.meta.env.VITE_API_BASEURL;
 export default {
     components: {// 在這裡註冊子組件
         WImgMComponent,
@@ -52,6 +54,9 @@ export default {
                 width: 0,
                 height: 0,
             },
+            memberID: '',
+            editingID: null,
+            ImgUsings:'',
         };
     },
     mounted() {
@@ -59,310 +64,439 @@ export default {
         this.addContainerClickListener();
     },
     methods: {
-    handleDataSent(imagePath,materialId,width,height) {
-        this.addImage(imagePath, width, height,materialId);
-    },
-    MemhandleDataSent(imagePath,materialId,width,height,memberid) {
-        console.log(imagePath, materialId, width, height,memberid);
-        this.addImage(imagePath, width, height,materialId);
-    },
-    //添加圖片的method
-    addImage(imagePath,width,height,materialId) {
-        if (imagePath) {
-        const newImageContainer = document.createElement('div');//創建一个容器来包裹图片和锁图标
-        newImageContainer.style.position = 'absolute';
-        newImageContainer.style.left = '0';
-        newImageContainer.style.top = '0';
-        newImageContainer.setAttribute('data-material-id', materialId); // 使用 materialId 標記容器
-
-        const newImage = document.createElement('img');
-        newImage.src = imagePath;//圖片路徑
-        newImage.classList.add('movable-image');
-        newImage.style.transform = `translate(0px, 0px)`;
-        newImage.style.width = `${width*1.5}px`;
-        newImage.style.height = `${height*1.5}px`;
-        newImage.setAttribute('data-x', 0);
-        newImage.setAttribute('data-y', 0);
-
-        // 添加其餘方向的縮放句柄
-        const leftHandle = document.createElement('div');
-        leftHandle.className = 'resize-handle left';
-        newImageContainer.appendChild(leftHandle);
-
-        const rightHandle = document.createElement('div');
-        rightHandle.className = 'resize-handle right';
-        newImageContainer.appendChild(rightHandle);
-
-        const topHandle = document.createElement('div');
-        topHandle.className = 'resize-handle top';
-        newImageContainer.appendChild(topHandle);
-
-        const bottomHandle = document.createElement('div');
-        bottomHandle.className = 'resize-handle bottom';
-        newImageContainer.appendChild(bottomHandle);
-
-        const lockIcon = document.createElement('div');
-        lockIcon.className = 'lock-icon';
-        lockIcon.innerText = '🔓';
-        lockIcon.style.position = 'absolute';
-        lockIcon.style.top = '5px';
-        lockIcon.style.left = '5px';
-        lockIcon.style.cursor = 'pointer';
-        lockIcon.style.display = 'none';
-
-        newImageContainer.appendChild(newImage);
-        newImageContainer.appendChild(lockIcon);
-        this.$refs.container.appendChild(newImageContainer);
-
-        newImage.addEventListener('click', (event) => {
-            this.selectedImage = newImage;
-            this.sizeInfo = `Width: ${newImage.clientWidth}px, Height: ${newImage.clientHeight}px`;
-            this.hideAllLockIcons();
-            lockIcon.style.display = 'block';
-            this.highlightSelectedImage(newImage);
-            event.stopPropagation();
-        });
-        //鎖圖標點的點擊事件
-        lockIcon.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const isLocked = lockIcon.innerText === '🔒';
-            lockIcon.innerText = isLocked ? '🔓' : '🔒';
-            interact(newImage).draggable(isLocked).resizable(isLocked);
-        });
-
-        this.setupInteract([newImage]);
-        } else {
-        alert('請先選擇一張圖片！');
-        }
-    },
-    // 更改 container 的寬度和高度
-    changeContainerSize(newWidth, newHeight) {
-        this.containerSize.width = newWidth;
-        this.containerSize.height = newHeight;
-        this.$refs.container.style.width = `${newWidth}px`;
-        this.$refs.container.style.height = `${newHeight}px`;
-        this.adjustImagesToNewContainer();
-    },
-    // 调用 html2canvas 来截取 container 的截图
-    captureScreenshot() {
-        const container = this.$refs.container;
-        html2canvas(container).then(canvas => {
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = 'screenshot.png';
-        link.click();
-        });
-    },
-    // 重新調整所有圖片的位置，防止超出新的容器範圍
-    adjustImagesToNewContainer() {
-        const container = this.$refs.container;
-        const containerRect = container.getBoundingClientRect();
-        const images = container.querySelectorAll('.movable-image');
-
-        images.forEach((image) => {
-        const imgRect = image.getBoundingClientRect();
-
-        // 取得當前圖片的 x 和 y 座標
-        let x = parseFloat(image.getAttribute('data-x')) || 0;
-        let y = parseFloat(image.getAttribute('data-y')) || 0;
-
-        // 限制 x 和 y 在新的容器範圍內
-        x = Math.max(0, Math.min(x, containerRect.width - imgRect.width));
-        y = Math.max(0, Math.min(y, containerRect.height - imgRect.height));
-
-        // 更新圖片位置
-        image.style.transform = `translate(${x}px, ${y}px)`;
-        image.setAttribute('data-x', x);
-        image.setAttribute('data-y', y);
-
-        // 更新锁图标的位置
-        const lockIcon = image.parentNode.querySelector('.lock-icon');
-        if (lockIcon) {
-            lockIcon.style.transform = `translate(${x}px, ${y}px)`;
-        }
-        });
-    },
-    // 上下移動功能
-    moveLayer(direction) {
-        if (this.selectedImage) {
-        const container = this.$refs.container;
-        const imageContainer = this.selectedImage.parentNode;
-        const containers = Array.from(container.children);
-        const index = containers.indexOf(imageContainer);
-
-        if (direction === 'up' && index > 0) {// 在DOM樹中把當前容器插入到前一個容器之前
-            container.insertBefore(imageContainer, containers[index - 1]);
-        } else if (direction === 'down' && index < containers.length - 1) {// 在DOM樹中把當前容器插入到下一個容器之後
-            container.insertBefore(containers[index + 1], imageContainer);
-        }
-        } else {
-        alert('請先選擇一個圖片！');
-        }
-    },
-    // 點擊刪除按鈕時的處理邏輯
-    deleteImage() {
-        if (this.selectedImage) {
-        const imageContainer = this.selectedImage.parentNode;
-        imageContainer.remove();
-        this.selectedImage = null;
-        this.sizeInfo = '';
-        } else {
-        alert('請先選擇一個圖片！');
-        }
-    },
-    //回復功能
-    undoLastAction(target) {
-        if (this.stateHistory.length > 1) {
-        this.stateHistory.pop(); // 移除當前狀態
-        this.stateHistory.pop(); 
-        this.stateHistory.pop();
-        this.stateHistory.pop();
-        this.stateHistory.pop();
-
-        const lastState = this.stateHistory[this.stateHistory.length - 1]; // 取得最後一個狀態
-
-        // 應用到圖片上
-        target.style.transform = `translate(${lastState.x}px, ${lastState.y}px)`;
-        // 更新圖片的座標數據
-        target.dataset.x = lastState.x;
-        target.dataset.y = lastState.y;
-        // 還原鎖頭圖示的位置
-        const lockIcon = target.parentNode.querySelector('.lock-icon');
-        if (lockIcon) {
-            lockIcon.style.left = `${lastState.lockX}px`;
-            lockIcon.style.top = `${lastState.lockY}px`;
-            lockIcon.style.transform = `translate(${lastState.x}px, ${lastState.y}px)`; // 跟隨圖片的位移
-        }
-        } else {
-        alert('無法再進行撤銷操作');
-        }
-    },
-    // 設置拖動和縮放功能
-    setupInteract(elements = document.querySelectorAll('.movable-image')) {
-        const container = this.$refs.container; // 確保 container 正確指向
-        elements.forEach(element => {
-        interact(element)
-            .draggable({
-            listeners: {
-                move: (event) => { 
-                const containerRect = container.getBoundingClientRect(); // 在這裡計算 containerRect
-                const target = event.target;
-                const imgRect = target.getBoundingClientRect(); // 取得圖片的邊界
-                let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-                // 限制 x 和 y 在容器內
-                x = Math.max(0, Math.min(x, containerRect.width - imgRect.width));
-                y = Math.max(0, Math.min(y, containerRect.height - imgRect.height));
-
-                // 更新圖片的位置
-                target.style.transform = `translate(${x}px, ${y}px)`;
-                target.setAttribute('data-x', x);
-                target.setAttribute('data-y', y);
-                this.saveDragState(target, x, y); // 儲存縮放後的狀態
-
-                // 更新锁图标的位置
-                const lockIcon = target.parentNode.querySelector('.lock-icon');
-                if (lockIcon) {
-                    lockIcon.style.transform = `translate(${x}px, ${y}px)`; // 锁图标跟随图片移动
+        handleDataSent(imagePath,materialId,width,height) {
+            this.addImage(imagePath, width, height,materialId);
+        },
+        MemhandleDataSent(imagePath,materialId,width,height,memberid) {
+            this.addImage(imagePath, width, height,materialId);
+        },
+        // 用會員id查詢圖層id的 methods
+        async fetchEditingID() {
+            try {
+                const FindID_URL = `${BASE_URL}/EditingImgFiles/FindID/${this.memberID}`
+                const response = await fetch(FindID_URL);
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
                 }
-                },
-            },
-            })
-            .resizable({
-            edges: { left: true, right: true, bottom: true, top: true },
-            listeners: {
-                move: (event) => {
-                const target = event.target;
-                const containerRect = this.$refs.container.getBoundingClientRect();
-
-                // 取得圖片縮放前的數據
-                const prevWidth = parseFloat(target.style.width) || target.offsetWidth;
-                const prevHeight = parseFloat(target.style.height) || target.offsetHeight;
-
-                // 新的寬度和高度
-                const newWidth = event.rect.width;
-                const newHeight = event.rect.height;
-
-                // 計算寬高的變化
-                const deltaX = (newWidth - prevWidth) / 2;
-                const deltaY = (newHeight - prevHeight) / 2;
-
-                // 更新圖片的大小
-                target.style.width = `${newWidth}px`;
-                target.style.height = `${newHeight}px`;
-
-                // 更新位置，確保縮放後圖片不溢出容器
-                let x = (parseFloat(target.getAttribute('data-x')) || 0) - deltaX;
-                let y = (parseFloat(target.getAttribute('data-y')) || 0) - deltaY;
-
-                // 防止圖片左邊和上邊溢出
-                x = Math.max(0, Math.min(x, containerRect.width - newWidth));
-                y = Math.max(0, Math.min(y, containerRect.height - newHeight));
-
-                target.style.transform = `translate(${x}px, ${y}px)`;
-                target.setAttribute('data-x', x);
-                target.setAttribute('data-y', y);
-
-                // 儲存狀態
-                this.saveDragState(target, x, y);
-
-                // 更新锁图标的位置
-                const lockIcon = target.parentNode.querySelector('.lock-icon');
-                if (lockIcon) {
-                    lockIcon.style.transform = `translate(${x}px, ${y}px)`; // 锁图标跟随图片移动
+                const EditingID = await response.json();
+                this.editingID = EditingID;  // 將ID存儲到 data 中
+                this.fetchImgUsings();//呼叫圖層資訊
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        },
+        // 用圖層id查詢圖層所用之圖的 methods
+        async fetchImgUsings() {
+            try {
+                const FindID_URL = `${BASE_URL}/ImgUsings/${this.editingID}`
+                const response = await fetch(FindID_URL);
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
                 }
-                }
+                const Img = await response.json();
+                this.ImgUsings = Img;  // 將ID存儲到 data 中
+                this.defaultImg();
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        },
+        //更新舊素材回資料庫
+        putsql(){
+            const container = this.$refs.container;
+            const elements = container.querySelectorAll('[default-material-id][websource][memsource]');
+            
+            elements.forEach(element => {
+                const imgElement = element.querySelector('img');
+                console.log('imgUsingId', element.getAttribute('default-material-id'));
+                console.log('imageName', element.getAttribute('imageName'));
+                console.log('webSource:', element.getAttribute('websource'));
+                console.log('memSource:', element.getAttribute('memsource'));
+                console.log('Image Width', imgElement.clientWidth);
+                console.log('Image Height', imgElement.clientHeight);
+                console.log('x',imgElement.getAttribute('data-x'));
+                console.log('y',imgElement.getAttribute('data-y'));
+            });
+            // const terms = ref({
+            //     "imgUsingId": 0,
+            //     "imageName": "string",
+            //     "memSource": 0,
+            //     "webSource": 0,
+            //     "imgHeight": "string",
+            //     "imgWidth": "string",
+            //     "imgX": 0,
+            //     "imgY": 0
+            // })
+        },
+        //加入新素材更新回資料庫
+        postsql(){
+            const images = this.$refs.container.querySelectorAll('.data-material-id');
+            // const terms = ref({
+            //     "imgUsingId": 0,
+            //     "imageName": "string",
+            //     "memSource": 0,
+            //     "webSource": 0,
+            //     "imgHeight": "string",
+            //     "imgWidth": "string",
+            //     "imgX": 0,
+            //     "imgY": 0
+            // })
+        },
+        //圖層所有元素順序添加進畫面
+        defaultImg(){
+            let i = 0;
+            for(i = 0;i<this.ImgUsings.length;i++)
+            {
+                this.AddDefaultImage(this.ImgUsings[i].imgUsingId,this.ImgUsings[i].imageName,this.ImgUsings[i].webSource,this.ImgUsings[i].imgWidth,this.ImgUsings[i].imgHeight,this.ImgUsings[i].imgX,this.ImgUsings[i].imgY);
+            }
+        },
+        //添加圖片的method(1)
+        addImage(imagePath,width,height,materialId) {
+            if (imagePath) {
+            const newImageContainer = document.createElement('div');//創建一个容器来包裹图片和锁图标
+            newImageContainer.style.position = 'absolute';
+            newImageContainer.style.left = '0';
+            newImageContainer.style.top = '0';
+            newImageContainer.setAttribute('data-material-id', materialId); // 使用 materialId 標記容器
+
+            const newImage = document.createElement('img');
+            newImage.src = imagePath;//圖片路徑
+            newImage.classList.add('movable-image');
+            newImage.style.transform = `translate(0px, 0px)`;
+            newImage.style.width = `${width*1.5}px`;
+            newImage.style.height = `${height*1.5}px`;
+            newImage.setAttribute('data-x', 0);
+            newImage.setAttribute('data-y', 0);
+
+            const lockIcon = document.createElement('div');
+            lockIcon.className = 'lock-icon';
+            lockIcon.innerText = '🔓';
+            lockIcon.style.position = 'absolute';
+            lockIcon.style.top = '5px';
+            lockIcon.style.left = '5px';
+            lockIcon.style.cursor = 'pointer';
+            lockIcon.style.display = 'none';
+
+            newImageContainer.appendChild(newImage);
+            newImageContainer.appendChild(lockIcon);
+            this.$refs.container.appendChild(newImageContainer);
+
+            newImage.addEventListener('click', (event) => {
+                this.selectedImage = newImage;
+                this.sizeInfo = `Width: ${newImage.clientWidth}px, Height: ${newImage.clientHeight}px`;
+                this.hideAllLockIcons();
+                lockIcon.style.display = 'block';
+                this.highlightSelectedImage(newImage);
+                event.stopPropagation();
+            });
+            //鎖圖標點的點擊事件
+            lockIcon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const isLocked = lockIcon.innerText === '🔒';
+                lockIcon.innerText = isLocked ? '🔓' : '🔒';
+                interact(newImage).draggable(isLocked).resizable(isLocked);
+            });
+
+            this.setupInteract([newImage]);
+            } else {
+            alert('請先選擇一張圖片！');
+            }
+        },
+        //載入圖片的method(2)
+        AddDefaultImage(imgUsingId,imageName,webSource,width,height,imgX,imgY) {
+            const newImageContainer = document.createElement('div');//創建一个容器来包裹图片和锁图标
+            newImageContainer.style.position = 'absolute';
+            newImageContainer.style.left = `${imgX}px`;
+            newImageContainer.style.top = `${imgY}px`;
+            newImageContainer.setAttribute('default-material-id', imgUsingId);//添加素材屬性,方便之後做put跟post
+            newImageContainer.setAttribute('imageName', imageName);
+
+            const newImage = document.createElement('img');
+            if(webSource){//判斷素材的出處是會員還是本網站提供
+                newImage.src = `/src/assets/images/Layer_WebImg/${imageName}`;//圖片路徑
+                newImageContainer.setAttribute('websource',1);
+                newImageContainer.setAttribute('memsource',0);
+            }else{
+                newImage.src = `/src/assets/images/Layer_MemImg/${imageName}`;
+                newImageContainer.setAttribute('websource',0);
+                newImageContainer.setAttribute('memsource',1);
+            }
+            newImage.classList.add('movable-image');
+            newImage.style.transform = `translate(0px, 0px)`;
+            newImage.style.width = `${width*1.5}px`;
+            newImage.style.height = `${height*1.5}px`;
+            newImage.setAttribute('data-x',0);
+            newImage.setAttribute('data-y',0);
+
+            const lockIcon = document.createElement('div');
+            lockIcon.className = 'lock-icon';
+            lockIcon.innerText = '🔓';
+            lockIcon.style.position = 'absolute';
+            lockIcon.style.top = '5px';
+            lockIcon.style.left = '5px';
+            lockIcon.style.cursor = 'pointer';
+            lockIcon.style.display = 'none';
+
+            newImageContainer.appendChild(newImage);
+            newImageContainer.appendChild(lockIcon);
+            this.$refs.container.appendChild(newImageContainer);
+
+            newImage.addEventListener('click', (event) => {
+                this.selectedImage = newImage;
+                this.sizeInfo = `Width: ${newImage.clientWidth}px, Height: ${newImage.clientHeight}px`;
+                this.hideAllLockIcons();
+                lockIcon.style.display = 'block';
+                this.highlightSelectedImage(newImage);
+                event.stopPropagation();
+            });
+            //鎖圖標點的點擊事件
+            lockIcon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const isLocked = lockIcon.innerText === '🔒';
+                lockIcon.innerText = isLocked ? '🔓' : '🔒';
+                interact(newImage).draggable(isLocked).resizable(isLocked);
+            });
+            this.setupInteract([newImage]);
+        },
+        // 更改 container 的寬度和高度
+        changeContainerSize(newWidth, newHeight) {
+            this.containerSize.width = newWidth;
+            this.containerSize.height = newHeight;
+            this.$refs.container.style.width = `${newWidth}px`;
+            this.$refs.container.style.height = `${newHeight}px`;
+            this.adjustImagesToNewContainer();
+        },
+        // 调用 html2canvas 来截取 container 的截图
+        captureScreenshot() {
+            const container = this.$refs.container;
+            html2canvas(container).then(canvas => {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'screenshot.png';
+            link.click();
+            });
+        },
+        // 重新調整所有圖片的位置，防止超出新的容器範圍
+        adjustImagesToNewContainer() {
+            const container = this.$refs.container;
+            const containerRect = container.getBoundingClientRect();
+            const images = container.querySelectorAll('.movable-image');
+
+            images.forEach((image) => {
+            const imgRect = image.getBoundingClientRect();
+
+            // 取得當前圖片的 x 和 y 座標
+            let x = parseFloat(image.getAttribute('data-x')) || 0;
+            let y = parseFloat(image.getAttribute('data-y')) || 0;
+
+            // 限制 x 和 y 在新的容器範圍內
+            x = Math.max(0, Math.min(x, containerRect.width - imgRect.width));
+            y = Math.max(0, Math.min(y, containerRect.height - imgRect.height));
+
+            // 更新圖片位置
+            image.style.transform = `translate(${x}px, ${y}px)`;
+            image.setAttribute('data-x', x);
+            image.setAttribute('data-y', y);
+
+            // 更新锁图标的位置
+            const lockIcon = image.parentNode.querySelector('.lock-icon');
+            if (lockIcon) {
+                lockIcon.style.transform = `translate(${x}px, ${y}px)`;
             }
             });
-        });
-    },
-    //點擊空白處,取消其他鎖頭
-    addContainerClickListener() {
-        const container = this.$refs.container;
-        container.addEventListener('click', (event) => {
-        if (event.target === container) {
-            this.selectedImage = null;
-            this.hideAllLockIcons(); // 隐藏所有锁图标
-            this.removeHighlightFromImages(); // 取消所有圖片的高光
-        }
-        });
-    },
-    // 隐藏所有锁图标的函数
-    hideAllLockIcons() {
-        const lockIcons = document.querySelectorAll('.lock-icon');
-        lockIcons.forEach(icon => {
-        icon.style.display = 'none';
-        });
-    },
-    //將所有圖片的邊框樣式重置
-    removeHighlightFromImages() {
-        const images = document.querySelectorAll('.movable-image');
-        images.forEach(img => {
-        img.style.border = ''; // 清除所有圖片的邊框
-        });
-    },
-    // 當前選中圖片高亮
-    highlightSelectedImage(image) {
-        const images = document.querySelectorAll('.movable-image');
-        images.forEach(img => {
-        img.style.border = '';
-        });
-        image.style.border = '2px solid red';
-    },
-    // 儲存每次拖動後的狀態
-    saveDragState(target, x, y) {
-        const lockIcon = target.parentNode.querySelector('.lock-icon');
-        const lockX = lockIcon ? parseFloat(lockIcon.style.left) || 0 : 0;
-        const lockY = lockIcon ? parseFloat(lockIcon.style.top) || 0 : 0;
-        const state = { x, y };
-        this.stateHistory.push(state);
+        },
+        // 上下移動功能
+        moveLayer(direction) {
+            if (this.selectedImage) {
+            const container = this.$refs.container;
+            const imageContainer = this.selectedImage.parentNode;
+            const containers = Array.from(container.children);
+            const index = containers.indexOf(imageContainer);
 
-        // 限制儲存的歷史狀態數量
-        if (this.stateHistory.length > this.maxHistory) {
-        this.stateHistory.shift();
+            if (direction === 'up' && index > 0) {// 在DOM樹中把當前容器插入到前一個容器之前
+                container.insertBefore(imageContainer, containers[index - 1]);
+            } else if (direction === 'down' && index < containers.length - 1) {// 在DOM樹中把當前容器插入到下一個容器之後
+                container.insertBefore(containers[index + 1], imageContainer);
+            }
+            } else {
+            alert('請先選擇一個圖片！');
+            }
+        },
+        // 點擊刪除按鈕時的處理邏輯
+        deleteImage() {
+            if (this.selectedImage) {
+            const imageContainer = this.selectedImage.parentNode;
+            imageContainer.remove();
+            this.selectedImage = null;
+            this.sizeInfo = '';
+            } else {
+            alert('請先選擇一個圖片！');
+            }
+        },
+        //回復功能
+        undoLastAction(target) {
+            if (this.stateHistory.length > 1) {
+            this.stateHistory.pop(); // 移除當前狀態
+            this.stateHistory.pop(); 
+            this.stateHistory.pop();
+            this.stateHistory.pop();
+            this.stateHistory.pop();
+
+            const lastState = this.stateHistory[this.stateHistory.length - 1]; // 取得最後一個狀態
+
+            // 應用到圖片上
+            target.style.transform = `translate(${lastState.x}px, ${lastState.y}px)`;
+            // 更新圖片的座標數據
+            target.dataset.x = lastState.x;
+            target.dataset.y = lastState.y;
+            // 還原鎖頭圖示的位置
+            const lockIcon = target.parentNode.querySelector('.lock-icon');
+            if (lockIcon) {
+                lockIcon.style.left = `${lastState.lockX}px`;
+                lockIcon.style.top = `${lastState.lockY}px`;
+                lockIcon.style.transform = `translate(${lastState.x}px, ${lastState.y}px)`; // 跟隨圖片的位移
+            }
+            } else {
+            alert('無法再進行撤銷操作');
+            }
+        },
+        // 設置拖動和縮放功能
+        setupInteract(elements = document.querySelectorAll('.movable-image')) {
+            const container = this.$refs.container; // 確保 container 正確指向
+            elements.forEach(element => {
+            interact(element)
+                .draggable({
+                listeners: {
+                    move: (event) => { 
+                    const containerRect = container.getBoundingClientRect(); // 在這裡計算 containerRect
+                    const target = event.target;
+                    const imgRect = target.getBoundingClientRect(); // 取得圖片的邊界
+                    let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                    let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+                    // 取得容器位置
+                    const containerOffsetX = parseFloat(target.parentNode.style.left) || 0; // 取得 newImageContainer 的 left
+                    const containerOffsetY = parseFloat(target.parentNode.style.top) || 0; // 取得 newImageContainer 的 top
+                    // 限制 x 和 y 在容器內
+                    x = Math.max(0 - containerOffsetX, Math.min(x, containerRect.width - imgRect.width- containerOffsetX));
+                    y = Math.max(0 - containerOffsetY, Math.min(y, containerRect.height - imgRect.height- containerOffsetY));
+
+                    // 更新圖片的位置
+                    target.style.transform = `translate(${x}px, ${y}px)`;
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
+                    this.saveDragState(target, x, y); // 儲存縮放後的狀態
+
+                    // 更新锁图标的位置
+                    const lockIcon = target.parentNode.querySelector('.lock-icon');
+                    if (lockIcon) {
+                        lockIcon.style.transform = `translate(${x}px, ${y}px)`; // 锁图标跟随图片移动
+                    }
+                    },
+                },
+                })
+                .resizable({
+                edges: { left: true, right: true, bottom: true, top: true },
+                listeners: {
+                    move: (event) => {
+                    const target = event.target;
+                    const containerRect = this.$refs.container.getBoundingClientRect();
+
+                    // 取得圖片縮放前的數據
+                    const prevWidth = parseFloat(target.style.width) || target.offsetWidth;
+                    const prevHeight = parseFloat(target.style.height) || target.offsetHeight;
+
+                    // 新的寬度和高度
+                    const newWidth = event.rect.width;
+                    const newHeight = event.rect.height;
+
+                    // 計算寬高的變化
+                    const deltaX = (newWidth - prevWidth) / 2;
+                    const deltaY = (newHeight - prevHeight) / 2;
+
+                    // 更新圖片的大小
+                    target.style.width = `${newWidth}px`;
+                    target.style.height = `${newHeight}px`;
+
+                    // 更新位置，確保縮放後圖片不溢出容器
+                    let x = (parseFloat(target.getAttribute('data-x')) || 0) - deltaX;
+                    let y = (parseFloat(target.getAttribute('data-y')) || 0) - deltaY;
+                    
+                    // 取得容器位置
+                    const containerOffsetX = parseFloat(target.parentNode.style.left) || 0;
+                    const containerOffsetY = parseFloat(target.parentNode.style.top) || 0;
+                    // 防止圖片左邊和上邊溢出
+                    x = Math.max(0-containerOffsetX, Math.min(x, containerRect.width - newWidth- containerOffsetX));
+                    y = Math.max(0-containerOffsetY, Math.min(y, containerRect.height - newHeight- containerOffsetY));
+
+                    target.style.transform = `translate(${x}px, ${y}px)`;
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
+
+                    // 儲存狀態
+                    this.saveDragState(target, x, y);
+
+                    // 更新锁图标的位置
+                    const lockIcon = target.parentNode.querySelector('.lock-icon');
+                    if (lockIcon) {
+                        lockIcon.style.transform = `translate(${x}px, ${y}px)`; // 锁图标跟随图片移动
+                    }
+                    }
+                }
+                });
+            });
+        },
+        //點擊空白處,取消其他鎖頭
+        addContainerClickListener() {
+            const container = this.$refs.container;
+            container.addEventListener('click', (event) => {
+            if (event.target === container) {
+                this.selectedImage = null;
+                this.hideAllLockIcons(); // 隐藏所有锁图标
+                this.removeHighlightFromImages(); // 取消所有圖片的高光
+            }
+            });
+        },
+        // 隐藏所有锁图标的函数
+        hideAllLockIcons() {
+            const lockIcons = document.querySelectorAll('.lock-icon');
+            lockIcons.forEach(icon => {
+            icon.style.display = 'none';
+            });
+        },
+        //將所有圖片的邊框樣式重置
+        removeHighlightFromImages() {
+            const images = document.querySelectorAll('.movable-image');
+            images.forEach(img => {
+            img.style.border = ''; // 清除所有圖片的邊框
+            });
+        },
+        // 當前選中圖片高亮
+        highlightSelectedImage(image) {
+            const images = document.querySelectorAll('.movable-image');
+            images.forEach(img => {
+            img.style.border = '';
+            });
+            image.style.border = '2px solid red';
+        },
+        // 儲存每次拖動後的狀態
+        saveDragState(target, x, y) {
+            const lockIcon = target.parentNode.querySelector('.lock-icon');
+            const lockX = lockIcon ? parseFloat(lockIcon.style.left) || 0 : 0;
+            const lockY = lockIcon ? parseFloat(lockIcon.style.top) || 0 : 0;
+            const state = { x, y };
+            this.stateHistory.push(state);
+
+            // 限制儲存的歷史狀態數量
+            if (this.stateHistory.length > this.maxHistory) {
+            this.stateHistory.shift();
+            }
+        },
+        props: {
+            memberId: {
+            type: Number,
+            required: true
+            }
         }
-    },
     },
 };
 </script>
@@ -528,6 +662,7 @@ export default {
     }
     /* 調整尺寸的框 */
     .menu {
+        gap: 10px;
         border-top-left-radius: 10px;
         border-bottom-left-radius: 10px;
         margin-left: 127px;
