@@ -63,12 +63,12 @@ const validate = async() =>{
     if(validity.value.isValid){
         // 準備 JSON 資料
         const requestBody = JSON.stringify({
-            Name: userData.value.username,
+            MemberName: userData.value.username,
             Email: userData.value.useremail,
             Password: userData.value.password1,
-            Phonenumber:userData.value.phonenumber,
+            PhoneNumber:userData.value.phonenumber,
             Address:userData.value.address,
-            Gender:userData.value.gender
+            Sex:userData.value.gender
         });
         try {
             // 發送 API 請求
@@ -82,6 +82,7 @@ const validate = async() =>{
 
             if (response.ok) {
                 alert('註冊成功！');
+                window.location.href = '/login'
             } else {
                 alert('註冊失敗，請重試');
             }
