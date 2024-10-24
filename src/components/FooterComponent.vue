@@ -1,6 +1,4 @@
 <script setup>
-import '@fortawesome/fontawesome-free/css/all.css';
-
 </script>
 
 <template>
@@ -91,9 +89,9 @@ import '@fortawesome/fontawesome-free/css/all.css';
                                 <!-- 社交媒體連結 start-->
                                 <div>
                                     <ul class="social-links d-flex align-items-center justify-content-center mt-4">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-instagram"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-youtube"></i></a></li>
+                                        <li><a href="#"><i class="bi bi-facebook"></i></a></li>
+                                        <li><a href="#"><i class="bi bi-youtube"></i></a></li>
+                                        <li><a href="#"><i class="bi bi-instagram"></i></a></li>
                                     </ul>
                                 </div>
                                 <!-- 社交媒體連結 end-->
@@ -106,7 +104,7 @@ import '@fortawesome/fontawesome-free/css/all.css';
                     <!-- 頁尾 logo start-->
                     <div class="col-lg-4 col-md-4 col-sm-6 col-12 mb-6">
                         <div class="footer-logo">
-                            <a href="index.html"><img src="../assets/images/logo/weddingLogo.png" alt="Logo"></a>
+                            <a href="index.html"><img src="../assets/images/weddingLogo02.png" alt="Logo"></a>
                         </div>
                     </div>
                     <!-- 頁尾 logo end-->

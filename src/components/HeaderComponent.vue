@@ -23,6 +23,22 @@ const textColor = computed(() => {
 // 監聽和解除滾動事件
 onMounted(() => window.addEventListener('scroll', handleScroll));
 onUnmounted(() => window.removeEventListener('scroll', handleScroll));
+
+
+const scrollToContactUs = () => {
+  const contactSection = document.getElementById('contact-us');
+  if (contactSection) {
+    const offset = 111; // 導覽列的高度
+    const elementPosition = contactSection.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+  }
+};
+
 </script>
 
 <template>
@@ -47,7 +63,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
           <div class="navbar-collapse collapse" id="slide-navbar-collapse">
             <ul class="navbar-nav list-inline light text-uppercase align-items-center w-100 d-flex justify-content-between">
               <li class="nav-item">
-                <a href="#" :style="{ color: textColor }" class="nav-link fontSize hover-1">首頁</a>
+                <RouterLink :style="{ color: textColor }" class="nav-link fontSize hover-1" :to="{name:'home'}">首頁</RouterLink>
               </li>
               <li class="nav-item dropdown">
                 <a
@@ -98,7 +114,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
               </li>
 
               <li class="nav-item nav-link">
-                <RouterLink :style="{ color: textColor }" class="nav-link fontSize hover-1" :to="{name:'cake'}">聯絡我們</RouterLink>
+                <a href="javascript:void(0)" @click="scrollToContactUs" :style="{ color: textColor }" class="nav-link fontSize hover-1">聯絡我們</a>
               </li>
 
               <li class="nav-item dropdown">
@@ -114,7 +130,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
                   會員中心
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  <li><RouterLink class="dropdown-item" :to="{name:'shop'}">代辦事項</RouterLink></li>
+                  <!-- <li><RouterLink class="dropdown-item" :to="{name:'todo'}">待辦事項</RouterLink></li> -->
                   <li><RouterLink class="dropdown-item" :to="{name:'shop'}">會員資料</RouterLink></li>
                   <li><RouterLink class="dropdown-item" :to="{name:'shop'}">登入/登出</RouterLink></li>
                 </ul>

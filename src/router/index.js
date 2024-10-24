@@ -1,7 +1,9 @@
 import BudgetChartComponent from '@/components/BudgetChartComponent.vue'
 import CakeView from '@/views/CakeView.vue'
 import ShopView from '@/views/ShopView.vue'
+import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+// import ToDoView from '@/views/ToDoView.vue'
 
 
 const router = createRouter({
@@ -20,6 +22,16 @@ const router = createRouter({
     //   // which is lazy-loaded when the route is visited.
     //   component: () => import('../views/AboutView.vue')
     // }
+    { //首頁
+      path: '/',
+      name: 'home',
+      component: HomeView
+    },
+    // { //待辦事項
+    //   path: '/todo',
+    //   name: 'todo',
+    //   component: ToDoView
+    // },
     { //預算
       path: '/budgetplan',
       name: 'budgetplan',
