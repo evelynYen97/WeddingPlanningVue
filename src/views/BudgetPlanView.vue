@@ -317,7 +317,7 @@ import { VAlert} from 'vuetify/components';
 <template>
     <div>
     <header>
-        <SampleComponent></SampleComponent>
+        <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
     </header>
     <main>
         <article>

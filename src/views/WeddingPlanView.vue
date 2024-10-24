@@ -1,4 +1,5 @@
 <template>
+    <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
   <div class="container">
     <div class="row">
       <div class="col-12 col-md-12 mb-3 mt-5">
@@ -200,6 +201,7 @@
     import html2canvas from 'html2canvas';
     import Quill from 'quill'; 
     import ClickButtonAComponent from '@/share_components/ClickButtonAComponent.vue';
+import SampleComponent from '@/components/SampleComponent.vue';
 
     //載入企劃書數據
     // const allData=ref([]);

@@ -1,4 +1,5 @@
 <script setup>
+import SampleComponent from '@/components/SampleComponent.vue';
 import { ref, onMounted } from 'vue';
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
@@ -48,6 +49,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
   <div>
     <h1>會員中心</h1>
     <div v-if="member">

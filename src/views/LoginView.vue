@@ -1,4 +1,5 @@
 <script setup>
+import SampleComponent from '@/components/SampleComponent.vue';
 import { ref } from 'vue'; // 使用 ref 來進行雙向綁定
 
 // 從環境變數獲取 BASE_URL
@@ -64,6 +65,7 @@ async function handleLogin(event) {
 </script>
 
 <template>
+  <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col col-xl-10">

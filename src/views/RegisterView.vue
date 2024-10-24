@@ -1,4 +1,5 @@
 <script setup>
+import SampleComponent from '@/components/SampleComponent.vue';
 import { ref } from 'vue';
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL
@@ -102,6 +103,7 @@ const validate = async() =>{
 </script>
 
 <template>
+    <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
     <div>
         <form id="registerForm" novalidate @submit.prevent="validate()">
         <div class="container">

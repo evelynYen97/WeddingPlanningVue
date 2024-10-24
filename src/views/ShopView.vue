@@ -1,4 +1,6 @@
 <script setup>
+import SampleComponent from '@/components/SampleComponent.vue';
+
 //import FooterComponent from '@/components/FooterComponent.vue';
 //import HeaderComponent from '@/components/HeaderComponent.vue';
 //import SampleComponent from '@/components/SampleComponent.vue';
@@ -7,7 +9,7 @@
 </script>
 
 <template>
-
+    <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
     
     <div class="container">
       

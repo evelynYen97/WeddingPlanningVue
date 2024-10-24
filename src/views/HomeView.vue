@@ -1,5 +1,6 @@
 <script setup>
-    import { onMounted } from 'vue';
+    import SampleComponent from '@/components/SampleComponent.vue';
+import { onMounted } from 'vue';
 
     onMounted(() => {
     // You can add any JS logic here if needed
@@ -7,6 +8,7 @@
 </script>
 
 <template>
+    <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
   <div class="main-container">
 
     

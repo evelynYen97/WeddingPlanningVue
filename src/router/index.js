@@ -75,7 +75,7 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: ProfileView
-    }
+    },
     { //桌菜頁面
       path: '/dish',
       name: 'dish',
