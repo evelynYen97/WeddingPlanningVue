@@ -11,6 +11,8 @@ import 'slick-carousel/slick/slick-theme.css'
 import HeaderComponent from './components/HeaderComponent.vue'
 import SampleComponent from './components/SampleComponent.vue'
 import FooterComponent from './components/FooterComponent.vue'
+import ContactUsComponent from './components/ContactUsComponent.vue'
+
 
 
     
@@ -22,6 +24,10 @@ import FooterComponent from './components/FooterComponent.vue'
 <HeaderComponent></HeaderComponent>
 <SampleComponent></SampleComponent>
 <RouterView></RouterView>
+
+ <div id="contact-us">
+    <ContactUsComponent></ContactUsComponent>
+  </div>
 <FooterComponent></FooterComponent>
 </template>
 
