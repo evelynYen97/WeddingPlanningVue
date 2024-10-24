@@ -149,7 +149,6 @@
 </template>
 
 <style lang="css" scoped>
-
 @import '../assets/css/FooterStyle.css';
 
 .footer-widget-title {

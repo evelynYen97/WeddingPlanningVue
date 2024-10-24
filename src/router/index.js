@@ -7,6 +7,7 @@ import DishesView from '@/views/DishesView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import RegisterView from '@/views/RegisterView.vue'
+import ImageLayerManager from '@/views/ImageLayerManager.vue'
 import ShopView from '@/views/ShopView.vue'
 import WeddingPlanView from '@/views/WeddingPlanView.vue'
 import HomeView from '@/views/HomeView.vue'
@@ -91,6 +92,11 @@ const router = createRouter({
       component: AllShopView
     },
 
+    {//圖層頁面
+      path: '/LayerSimulation',
+      name: 'layers',
+      component: ImageLayerManager
+    }
   ]
 })
 
