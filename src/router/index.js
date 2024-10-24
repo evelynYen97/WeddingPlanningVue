@@ -1,6 +1,9 @@
 
 import BudgetPlanView from '@/views/BudgetPlanView.vue'
 import CakeView from '@/views/CakeView.vue'
+import LoginView from '@/views/LoginView.vue'
+import ProfileView from '@/views/ProfileView.vue'
+import RegisterView from '@/views/RegisterView.vue'
 import ShopView from '@/views/ShopView.vue'
 import WeddingPlanView from '@/views/WeddingPlanView.vue'
 import HomeView from '@/views/HomeView.vue'
@@ -54,6 +57,21 @@ const router = createRouter({
       name: 'cake',
       component: CakeView
     },
+    { //登入頁面
+      path: '/login',
+      name: 'login',
+      component: LoginView
+    },
+    { //註冊頁面
+      path: '/register',
+      name: 'register',
+      component: RegisterView
+    },
+    { //我的檔案
+      path: '/profile',
+      name: 'profile',
+      component: ProfileView
+    }
   ]
 })
 

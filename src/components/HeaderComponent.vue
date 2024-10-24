@@ -7,6 +7,34 @@ const scrollY = ref(0); // 追蹤滾動高度
 const defaultColor = 'white'; // 預設顏色在此設定
 const finalColor = 'black'; // 滾動後的最終顏色
 
+const getMemberIdFromCookie = () => {
+  return document.cookie
+    .split('; ')
+    .find(row => row.startsWith('memberID='))
+    ?.split('=')[1];
+};
+
+const getMemberNameFromCookie = () => {
+  return document.cookie
+    .split('; ')
+    .find(row => row.startsWith('memberName='))
+    ?.split('=')[1];
+};
+
+const memberId = ref(getMemberIdFromCookie());
+const memberName = ref(getMemberNameFromCookie());
+
+//登出
+async function handleLogout() {
+  // 清除所有相關的 cookie
+  document.cookie = "memberID=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  document.cookie = "memberName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  
+  // 如果還有其他的 cookie 需要清理，請在這裡添加
+
+  // 可以在這裡進行跳轉或其他登出邏輯
+  window.location.href = '/login'; // 跳轉到登入頁面
+}
 
 // 滾動事件處理器
 const handleScroll = () => {
@@ -130,17 +158,33 @@ const scrollToContactUs = () => {
                   會員中心
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  <!-- <li><RouterLink class="dropdown-item" :to="{name:'todo'}">待辦事項</RouterLink></li> -->
-                  <li><RouterLink class="dropdown-item" :to="{name:'shop'}">會員資料</RouterLink></li>
-                  <li><RouterLink class="dropdown-item" :to="{name:'shop'}">登入/登出</RouterLink></li>
+                  <li><RouterLink class="dropdown-item" :to="{name:'shop'}">待辦事項</RouterLink></li>
+                  <li><RouterLink class="dropdown-item" :to="{name:'profile'}">會員資料</RouterLink></li>
                 </ul>
               </li>
 
               <li class="nav-item user ">
-                <div class="user-container fontSize hover-1">
+                <div>
+                <RouterLink
+                  v-if="!memberId" 
+                  class="nav-item user"
+                  :to="{ name: 'login' }" 
+                >
+                  登入/
+                </RouterLink>
+                <RouterLink
+                  v-if="!memberId" 
+                  class="nav-item user"
+                  :to="{ name: 'register' }" 
+                >
+                  註冊會員
+                </RouterLink>
+                <div v-else class="user-container fontSize hover-1">
                   <img src="/src/assets/images/PAREO.jpg" alt="User Icon" class="user-icon" />
-                  <span :style="{ color: textColor }" class="nav-link">使用者: 惠惠</span>
+                  <span :style="{ color: textColor }" class="nav-link">使用者: {{ memberName }}</span>
+                  <button @click="handleLogout" class="btn btn-outline-danger btn-sm ms-2">登出</button>
                 </div>
+              </div>
               </li>
 
 
