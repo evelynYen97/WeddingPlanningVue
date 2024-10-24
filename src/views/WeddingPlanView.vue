@@ -13,7 +13,7 @@
     <div class="block" >
         <div id="quill-1" class="pdfContent">
             <div id="edit1" class="quill-editor"> 
-                <h2 style="color: white; font-weight: bold;">xxx 與 xxx 的</h2>
+                <h2 style="color: white; font-weight: bold;">_______ 與_______的</h2>
             </div>
             <h2 class="whiteBoldFont" id="weddingName">婚禮主題</h2>
         
@@ -60,8 +60,11 @@
         <button class="upBtn rounded">↑</button>
         <button class="downBtn rounded">↓</button>
         <div id="weddingPlace" class="pdfContent">
-            <h1 id="weddingSpot">婚禮殿堂：</h1>
-            <h2 id="weddingTime">婚禮時間:&nbsp;2024.10.24 18:00</h2>
+            <h2 id="weddingSpot">婚禮殿堂：</h2>
+            <div class="quill-editor" id="weddingTime">
+                <h4 style=" font-weight: bold;color:#353637;">桌數:&nbsp;</h4>
+                <h4 style=" font-weight: bold;color:#353637;">賓客人數:&nbsp;</h4>
+            </div>
             <img src="@/assets/images/weddingPlanImg/venue1.jpg" alt="venue1" id="venue1Img">
             <img src="@/assets/images/weddingPlanImg/venue2.jpg" alt="venue2" id="venue2Img">
              <div class="quill-editor" id="firstPageHeader">
@@ -388,10 +391,11 @@ const generateButton = ref(null);
 
       #weddingTime{
         position: absolute;
+        height: 130px;
+        width: 500px;
         top: 100px;
         left:80px;
-        font-weight: bold;
-        color:#353637;
+       
       }
 
       #simulateImg{
