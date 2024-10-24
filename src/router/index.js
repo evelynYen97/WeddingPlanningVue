@@ -1,6 +1,9 @@
 
 import BudgetPlanView from '@/views/BudgetPlanView.vue'
+import AllShopView from '@/views/AllShopView.vue'
 import CakeView from '@/views/CakeView.vue'
+import CarView from '@/views/CarView.vue'
+import DishesView from '@/views/DishesView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import RegisterView from '@/views/RegisterView.vue'
@@ -72,6 +75,22 @@ const router = createRouter({
       name: 'profile',
       component: ProfileView
     }
+    { //桌菜頁面
+      path: '/dish',
+      name: 'dish',
+      component: DishesView
+    },
+    { //車輛頁面
+      path: '/car',
+      name: 'car',
+      component: CarView
+    },
+    { //所有商家頁面
+      path: '/allshop',
+      name: 'allShop',
+      component: AllShopView
+    },
+
   ]
 })
 

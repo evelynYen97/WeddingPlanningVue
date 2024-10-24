@@ -2,29 +2,33 @@
 import {ref, computed} from 'vue'
 import ShopView from './ShopView.vue';
 
-const API_URL = 'https://localhost:7048/api/Cakes'
+const API_URL =   'https://localhost:7048/api/Cars'
 
-const cakes = ref([]) //宣告放在名為cakes的陣列中
-const selectedCategory = ref('all') //讀取目前篩選的資料
+const cars = ref([]) //宣告放在名為cars的陣列中
+const selectedCategory = ref('all'); // 存放目前選中的分類
+
 
 //讀取API資料
-const loadcakes = async() => {
+const  loadCars = async() => {
   const response = await fetch(API_URL)
   const datas = await response.json()
   console.log(datas)
-  cakes.value = datas
+  cars.value = datas
 }
 
-//根據中西式選擇資料
-const filteredStyle = computed(() => {
+// 根據選擇的分類過濾商家(幾人座)
+const filtered = computed(() => {
   if (selectedCategory.value === 'all') {
-    return cakes.value; // 顯示全部商家
+    return cars.value; // 顯示全部商家
   }
-  // 根據 `cakeStyles` 過濾商家
-  return cakes.value.filter(cake => cake.cakeStyles === selectedCategory.value);
+
+  // 根據 `passengerCapacity` 過濾商家
+  return cars.value.filter(car => car.
+  passengerCapacity === selectedCategory.value);
 });
 
-loadcakes()
+
+loadCars()
 
 </script>
 
@@ -37,7 +41,7 @@ loadcakes()
           <div class="bootstrap-tabs product-tabs">
             <!-- Tabs Header -->
             <div class="tabs-header d-flex justify-content-between border-bottom my-5">
-              <h3>喜餅列表</h3>
+              <h3>禮車列表</h3>
               <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                   <a 
@@ -50,23 +54,30 @@ loadcakes()
                   <a 
                     href="#" 
                     class="nav-link text-uppercase fs-6" 
-                    :class="{ active: selectedCategory === '中式' }"
-                    @click.prevent="selectedCategory = '中式'">
-                    中式
+                    :class="{ active: selectedCategory === '2' }"
+                    @click.prevent="selectedCategory = '2'">
+                    二人座
                   </a>
                   <a 
                     href="#" 
                     class="nav-link text-uppercase fs-6" 
-                    :class="{ active: selectedCategory === '西式' }"
-                    @click.prevent="selectedCategory = '西式'">
-                    西式
+                    :class="{ active: selectedCategory === '4' }"
+                    @click.prevent="selectedCategory = '4'">
+                    四人座
                   </a>
                   <a 
                     href="#" 
                     class="nav-link text-uppercase fs-6" 
-                    :class="{ active: selectedCategory === '中西式' }"
-                    @click.prevent="selectedCategory = '中西式'">
-                    中西式
+                    :class="{ active: selectedCategory === '5' }"
+                    @click.prevent="selectedCategory = '5'">
+                    五人座
+                  </a>
+                  <a 
+                    href="#" 
+                    class="nav-link text-uppercase fs-6" 
+                    :class="{ active: selectedCategory === '7' }"
+                    @click.prevent="selectedCategory = '7'">
+                    七人座
                   </a>
 
                 </div>
@@ -81,20 +92,22 @@ loadcakes()
                    aria-labelledby="nav-all-tab">
 
                 <div class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 
-                            row-cols-lg-4 row-cols-xl-5">
+                            row-cols-lg-4 row-cols-xl-5"
+                            
+                            >
                   
                   <!-- Product Item -->
-                  <div class="col" v-for="cake in filteredStyle" >
+                  <div class="col" v-for="car in filtered" >
                     <div class="product-item">
                       <figure>
                         <a href="index.html" title="Product Title">
                           <img src="../assets/images/thumb-bananas.png" class="tab-image" />
                         </a>
                       </figure>
-                      <h3>{{ cake.cakeName }}</h3>
-                      <span class="flavor">{{ cake.cakeStyles }}</span><br>
-                      <span class="qty">一盒</span>
-                      <span class="price">{{ cake.cakePrice }}</span>
+                      <h3>{{ car.carName }}</h3>
+                      <span class="flavor">{{ car.carDetail }}</span><br>
+                      <span class="qty">{{ car.passengerCapacity }}人座</span>
+                      <span class="price">{{ car.rentalPerDay }}</span>
                       <div class="d-flex align-items-center justify-content-between">
                         <div class="input-group product-qty">
                           <span class="input-group-btn">
