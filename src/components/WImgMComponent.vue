@@ -43,10 +43,11 @@ loadImg()
 const emit = defineEmits(['data-sent']); // 定義 emit
 const sendData = (term) => {
     const imagePath = `/src/assets/images/Layer_WebImg/${term.imageName}`;
+    const name = term.imageName;
     const materialId = term.materialId; // 假設你還想傳送 materialId
     const width = term.estimatedW
     const height = term.estimatedL
-    emit('data-sent', imagePath,materialId,width,height); // 觸發自定義事件並傳送數據
+    emit('data-sent', imagePath,materialId,width,height,name); // 觸發自定義事件並傳送數據
 };
 
 </script>

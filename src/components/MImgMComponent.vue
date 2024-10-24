@@ -45,11 +45,12 @@ loadImg()
 const emit = defineEmits(['Memdata-sent']); // 定義 emit
 const sendMemData = (term) => {
     const imagePath = `/src/assets/images/Layer_MemImg/${term.memberImgName}`;
+    const name = term.memberImgName;
     const memberid = term.memberid;
     const materialId = term.memberMaterialId;
     const width = term.estimatedWidth;
     const height = term.estimatedLength;
-    emit('Memdata-sent', imagePath,materialId,width,height,memberid); // 觸發自定義事件並傳送數據
+    emit('Memdata-sent', imagePath,materialId,width,height,memberid,name); // 觸發自定義事件並傳送數據
 };
 
 </script>

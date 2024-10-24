@@ -64,11 +64,11 @@ export default {
         this.addContainerClickListener();
     },
     methods: {
-        handleDataSent(imagePath,materialId,width,height) {
-            this.addImage(imagePath, width, height,materialId);
+        handleDataSent(imagePath,materialId,width,height,name) {
+            this.addImage(imagePath, width, height,materialId,name,1);
         },
-        MemhandleDataSent(imagePath,materialId,width,height,memberid) {
-            this.addImage(imagePath, width, height,materialId);
+        MemhandleDataSent(imagePath,materialId,width,height,memberid,name) {//memberid 未用到
+            this.addImage(imagePath, width, height,materialId,name,0);
         },
         // 用會員id查詢圖層id的 methods
         async fetchEditingID() {
@@ -106,30 +106,53 @@ export default {
             const elements = container.querySelectorAll('[default-material-id][websource][memsource]');
             
             elements.forEach(element => {
+                console.log(element);
+                const API_URL = `${BASE_URL}/ImgUsings/${element.getAttribute('default-material-id')}`
                 const imgElement = element.querySelector('img');
-                console.log('imgUsingId', element.getAttribute('default-material-id'));
-                console.log('imageName', element.getAttribute('imageName'));
-                console.log('webSource:', element.getAttribute('websource'));
-                console.log('memSource:', element.getAttribute('memsource'));
-                console.log('Image Width', imgElement.clientWidth);
-                console.log('Image Height', imgElement.clientHeight);
-                console.log('x',imgElement.getAttribute('data-x'));
-                console.log('y',imgElement.getAttribute('data-y'));
+                const width = imgElement.style.width;
+                const widthWithoutPx = width.replace('px', '');
+                const height = imgElement.style.height;
+                const heightWithoutPx = height.replace('px', '');
+                let terms = {
+                    "imgUsingId": parseInt(element.getAttribute('default-material-id')),//parseInt是轉成整數
+                    "imageName": element.getAttribute('imageName'),
+                    "memSource": parseInt(element.getAttribute('websource')),
+                    "webSource": parseInt(element.getAttribute('memsource')),
+                    "imgHeight": heightWithoutPx,
+                    "imgWidth": widthWithoutPx,
+                    "imgX": parseFloat(parseFloat(imgElement.getAttribute('data-x')).toFixed(2)),
+                    "imgY": parseFloat(parseFloat(imgElement.getAttribute('data-y')).toFixed(2))//toFixed(2)會將數字四捨五入到小數點後兩位，返回的是一個字串。如果你需要它是數字型態而不是字串，可以再使用 parseFloat()
+                    
+                }
+                const put = async()=>{
+                    const response = await fetch(API_URL,{
+                        method:'PUT',
+                        body:JSON.stringify(terms),
+                        headers:{'Content-Type': 'application/json'}
+                    }); 
+                    // alert("Operation started");
+                    // await this.sleep(3000);
+                }
+                put();
+                // console.log("Operation resumed after 3 seconds");
             });
-            // const terms = ref({
-            //     "imgUsingId": 0,
-            //     "imageName": "string",
-            //     "memSource": 0,
-            //     "webSource": 0,
-            //     "imgHeight": "string",
-            //     "imgWidth": "string",
-            //     "imgX": 0,
-            //     "imgY": 0
-            // })
+            
+        },
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         },
         //加入新素材更新回資料庫
         postsql(){
-            const images = this.$refs.container.querySelectorAll('.data-material-id');
+            const container = this.$refs.container;
+            const elements = container.querySelectorAll('[data-material-id][websource][memsource]');
+            
+            elements.forEach(element => {
+                const imgElement = element.querySelector('img');
+                const width = imgElement.style.width;
+                const widthWithoutPx = width.replace('px', '');
+                const height = imgElement.style.height;
+                const heightWithoutPx = height.replace('px', '');
+            });
             // const terms = ref({
             //     "imgUsingId": 0,
             //     "imageName": "string",
@@ -150,13 +173,22 @@ export default {
             }
         },
         //添加圖片的method(1)
-        addImage(imagePath,width,height,materialId) {
+        addImage(imagePath,width,height,materialId,name,source) {
             if (imagePath) {
             const newImageContainer = document.createElement('div');//創建一个容器来包裹图片和锁图标
             newImageContainer.style.position = 'absolute';
             newImageContainer.style.left = '0';
             newImageContainer.style.top = '0';
             newImageContainer.setAttribute('data-material-id', materialId); // 使用 materialId 標記容器
+            newImageContainer.setAttribute('imageName',name);
+            if(source==1){
+                newImageContainer.setAttribute('websource',1);
+                newImageContainer.setAttribute('memsource',0);
+            }
+            else{
+                newImageContainer.setAttribute('memsource',1);
+                newImageContainer.setAttribute('websource',0);
+            }
 
             const newImage = document.createElement('img');
             newImage.src = imagePath;//圖片路徑
@@ -222,10 +254,10 @@ export default {
             }
             newImage.classList.add('movable-image');
             newImage.style.transform = `translate(0px, 0px)`;
-            newImage.style.width = `${width*1.5}px`;
-            newImage.style.height = `${height*1.5}px`;
-            newImage.setAttribute('data-x',0);
-            newImage.setAttribute('data-y',0);
+            newImage.style.width = `${width}px`;
+            newImage.style.height = `${height}px`;
+            newImage.setAttribute('data-x',imgX);
+            newImage.setAttribute('data-y',imgY);
 
             const lockIcon = document.createElement('div');
             lockIcon.className = 'lock-icon';
