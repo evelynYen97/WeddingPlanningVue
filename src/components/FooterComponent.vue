@@ -1,5 +1,5 @@
 <script setup>
-import '@fortawesome/fontawesome-free/css/all.css';
+
 
 </script>
 
@@ -106,7 +106,7 @@ import '@fortawesome/fontawesome-free/css/all.css';
                     <!-- 頁尾 logo start-->
                     <div class="col-lg-4 col-md-4 col-sm-6 col-12 mb-6">
                         <div class="footer-logo">
-                            <a href="index.html"><img src="../assets/images/logo/weddingLogo.png" alt="Logo"></a>
+                            <a href="index.html"><img src="../assets/images/weddingLogo02.png" alt="Logo"></a>
                         </div>
                     </div>
                     <!-- 頁尾 logo end-->

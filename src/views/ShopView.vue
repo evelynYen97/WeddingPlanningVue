@@ -22,35 +22,35 @@
         <div>
           <div class="category-carousel d-flex flex-wrap justify-content-around">
             <div class="col-sm-6  col-lg-3 mb-4">
-              <a href="index.html" class="nav-link category-item text-center">
+              <RouterLink class="nav-link category-item text-center" :to="{name:'cake'}">
                 <img src="../assets/images/icon-vegetables-broccoli.png" 
                      alt="Category Thumbnail" class="category-img img-fluid">
                 <h3 class="category-title">婚宴會場</h3>
-              </a>
+              </RouterLink>
             </div>
   
             <div class="col-sm-6  col-lg-3 mb-4">
-              <a href="index.html" class="nav-link category-item text-center">
+              <RouterLink class="nav-link category-item text-center" :to="{name:'dish'}">
                 <img src="../assets/images/icon-vegetables-broccoli.png" 
                      alt="Category Thumbnail" class="category-img img-fluid">
                 <h3 class="category-title">婚宴菜餚</h3>
-              </a>
+              </RouterLink>
             </div>
   
             <div class="col-sm-6  col-lg-3 mb-4">
-              <a href="index.html" class="nav-link category-item text-center">
+              <RouterLink class="nav-link category-item text-center" :to="{name:'car'}">
                 <img src="../assets/images/icon-vegetables-broccoli.png" 
                      alt="Category Thumbnail" class="category-img img-fluid">
                 <h3 class="category-title">婚宴禮車</h3>
-              </a>
+              </RouterLink>
             </div>
   
             <div class="col-sm-6  col-lg-3 mb-4">
-              <a href="index.html" class="nav-link category-item text-center">
+              <RouterLink class="nav-link category-item text-center" :to="{name:'cake'}">
                 <img src="../assets/images/icon-vegetables-broccoli.png" 
                      alt="Category Thumbnail" class="category-img img-fluid">
                 <h3 class="category-title">送禮喜餅</h3>
-              </a>
+              </RouterLink>
             </div>
           </div>
         </div>
