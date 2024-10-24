@@ -4,7 +4,7 @@ import SampleComponent from '@/components/SampleComponent.vue';
 import { ref ,computed, watchEffect} from 'vue';
 import { VAlert} from 'vuetify/components';
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
-    const memberId=7;  //待改成當前會員ID
+    const memberId=1;  //待改成當前會員ID
     const API_URL=`${BaseUrl}/MemberBudgetItems`;
     const initialItemsURL=`${API_URL}/${memberId}`;
     const API_URL_Sort=`${API_URL}/ItemsSort/${memberId}`; 
@@ -26,7 +26,7 @@ import { VAlert} from 'vuetify/components';
     //宣告變數接當前預算總金額
     const totalNow=ref(0);
     const loadBudgetNow=async()=>{
-        const responseBudgetNow=await fetch(`${API_URL}/BudgetNowTotal/${memberId}`)
+        const responseBudgetNow=await fetch(`${API_URL}/BudgetNowTotal/${memberId}`);
         const data=await responseBudgetNow.json();
         totalNow.value=data.budgetNowTotal;
     }
@@ -77,7 +77,6 @@ import { VAlert} from 'vuetify/components';
         if (budgetData.length === 0) {
           try{
           const defaults = await fetch(`${BaseUrl}/MemberBudgetItems/1`)
-          console.log(defaults)
           const defaultBudgetData = await defaults.json();
           const returnData= defaultBudgetData.map(item => {
             const { budgetItemId, ...rest } = item; // 解構賦值，去掉 budgetItemId

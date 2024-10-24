@@ -4,6 +4,7 @@
             <div class="row">
                 <div class="mt-5 col-12 col-lg-3" id="piechartOuterContain">
                     <div id="piechartContain" class="position-relative">
+                        <button @click="downloadAndSavePieChart" class="position-absolute top-0 end-0 mt-3 me-3 downloadButton rounded">將預算圖加入</button>
                         <button @click="downloadPieChart" class="position-absolute top-0 end-0 mt-3 me-3 downloadButton rounded"><i class="bi bi-download  "></i></button>
                         <div ref="pieChart" style="width: 100%; height: 450px;"></div>
                     </div>
@@ -86,7 +87,7 @@ const updatePieChart = () => {
                 }
             },
             label:{
-                fontSize:14
+                fontSize:14,
             },
             bottom: '20%',
             top:'10%'

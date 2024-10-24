@@ -1,10 +1,13 @@
 <script setup>
-    
+    const emit = defineEmits(['ButtonAClick']);
+    const clickHandler=()=>{
+        emit('ButtonAClick')
+    }
 </script>
 
 <template>
     <div class="container">
-        <a href="#" class="button type--A">
+        <a class="button type--A" @click="clickHandler()">
         <div class="button__line"></div>
         <div class="button__line"></div>
         <span class="button__text"><slot></slot></span>
