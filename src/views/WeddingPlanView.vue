@@ -1,5 +1,5 @@
 <template>
-    <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
+    <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
   <div class="container">
     <div class="row">
       <div class="col-12 col-md-12 mb-3 mt-5">
@@ -16,13 +16,13 @@
             <div id="edit1" class="quill-editor"> 
                 <h2 style="color: white; font-weight: bold;">_______ 與_______的</h2>
             </div>
-            <h2 class="whiteBoldFont" id="weddingName">婚禮主題</h2>
+            <h2 class="whiteBoldFont" id="weddingName">{{weddingplanData.weddingName}}</h2>
         
             <div id="firstpageBackground"></div>
              <div class="quill-editor" id="firstPageHeader">
                 <h1 style="color: white; font-weight: bold;">愛的旅程，從此啟程。</h1>
              </div>
-                <h2 id="weddingDate" class="mb-0 whiteBoldFont">xxx大飯店&nbsp;&nbsp;2024.10.24(婚禮日期)</h2>
+                <h2 id="weddingDate" class="mb-0 whiteBoldFont"> {{weddingplanData.weddingLocation}} &nbsp;&nbsp;{{ formattedTime}}</h2>
             </div>
         </div>
       
@@ -48,9 +48,7 @@
              <img src="@/assets/images/weddingPlanImg/ring.png" alt="ring" id="ringImg">
              <div id="edit4">
                 <h4 style="color: white;">婚禮雙方介紹：</h4>
-                <h6 style="color: white;">&nbsp;尊敬的各位來賓，大家好！今天我們聚集在這裡，共同見證一對新人邁向人生新篇章的美好時刻。</h6>
-                <h6 style="color: white;">今天的男主角——張偉。他是一位才華洋溢的工程師，擁有穩定的職業和無限的創意。在生活中，他熱愛戶外運動，喜歡旅行，經常與朋友們分享他的冒險故事。他的善良和幽默感總能帶給周圍的人無限的快樂。</h6>
-                <h6 style="color: white;">今天的女主角——李娜。李娜是一位優雅的設計師，對藝術和時尚有著獨特的見解。她的工作總是充滿創意和熱情，無論是設計還是生活，她都能把每一個細節做到極致。她熱愛烹飪，常常為家人和朋友準備美味的佳餚，讓每一個聚會都充滿溫馨的氣氛。</h6>
+                <h6 style="color: white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{weddingplanData.weddingIntroduction}}</h6>
              </div>
         </div>
         <button class="upBtn rounded">↑</button>
@@ -61,13 +59,14 @@
         <button class="upBtn rounded">↑</button>
         <button class="downBtn rounded">↓</button>
         <div id="weddingPlace" class="pdfContent">
-            <h2 id="weddingSpot">婚禮殿堂：</h2>
+            <h3 id="weddingSpot">婚禮殿堂：{{weddingplanData.venueName
+            }}</h3>
             <div class="quill-editor" id="weddingTime">
                 <h4 style=" font-weight: bold;color:#353637;">桌數:&nbsp;</h4>
                 <h4 style=" font-weight: bold;color:#353637;">賓客人數:&nbsp;</h4>
             </div>
-            <img src="@/assets/images/weddingPlanImg/venue1.jpg" alt="venue1" id="venue1Img">
-            <img src="@/assets/images/weddingPlanImg/venue2.jpg" alt="venue2" id="venue2Img">
+            <img :src="venueImgPath1" alt="venue1" id="venue1Img">
+            <img :src="venueImgPath2" alt="venue2" id="venue2Img">
              <div class="quill-editor" id="firstPageHeader">
                 <h1 style="color: white; font-weight: bold;">Forever starts today.</h1>
              </div>
@@ -79,7 +78,8 @@
         <button class="downBtn rounded">↓</button>
         <div id="handBackground" class="pdfContent">
             <div style="position:absolute;height: 550px;width: 1100px;background-color:#CECDCD; border-radius: 25px; left: 55px; z-index: 0;" ></div>
-            <img src="@/assets/images/weddingPlanImg/Simulated.png" alt="simulate" id="simulateImg" >
+            <img :src="imageSrc" alt="simulate" id="simulateImg" >
+            <!-- <img src="`@/assets/images/weddingPlanImg/Simulated.png`" alt="simulate" id="simulateImg" > -->
             <div class="quill-editor" id="simulateEdit">
                 <h2 style="color: #AC929E; font-weight: bold;">場景模擬圖</h2>
              </div>
@@ -97,7 +97,7 @@
             <div class="quill-editor" id="simulateEdit">
                 <h2 style="color: #ffffff; font-weight: bold;">婚禮活動時程</h2>
              </div>
-            <img src="@/assets/images/weddingPlanImg/event.png" alt="events" id="eventImg">
+            <img :src="eventTimeLinePath" alt="events" id="eventImg">
              <div class="quill-editor" id="simulateSlogan">
                 <h1 style="color: white; font-weight: bold;">Celebrating love in every corner!</h1>
              </div>
@@ -151,7 +151,7 @@
             <h1 id="edit1" style="color:white">婚禮活動詳細排程</h1>
             <div style="position:absolute;height: 1400px;width: 1000px;margin: 100px;background-color:#F1F1F1; border-radius: 25px">
                 <ul style="left: 30px; top:30px ;" class="budgetItemsList">
-                    <li v-for="i in 46">活動名稱-排程名稱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;時間：2024.5.6 18：00：05&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;備注：</li>
+                    <li v-for="eventSchedule in eventScheduleData" :key="eventSchedule.scheduleId">{{formatScheduleTime(eventSchedule.scheduleTime)}}&nbsp;&nbsp;&nbsp;&nbsp;{{eventSchedule.eventName}}-{{eventSchedule.scheduleName}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;備注：{{ eventSchedule.scheduleNote }}</li>
                 </ul>
                 </div>
             </div>
@@ -165,7 +165,8 @@
             <h1 id="edit1" style="color:white">婚禮排程工作人員</h1>
             <div style="position:absolute;height: 1400px;width: 1000px;margin: 100px;background-color:#F1F1F1; border-radius: 25px">
                 <ul style="left: 30px; top:30px ;" class="budgetItemsList">
-                    <li v-for="i in 20" style="font-size: 20px;" class="lh-lg">排程名稱-人員: 名稱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2024.10.24 18:00&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;協助内容：</li>
+                    <li v-for="staff in ScheduleStaffData" :key="ScheduleStaffData.staffID" style="font-size: 20px;" class="lh-lg">{{formatScheduleTime(staff.staffScheduleTime)}}&nbsp;&nbsp;&nbsp;{{staff.staffScheduleName}}-人員: {{staff.staffName
+                    }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;協助内容：{{ staff.assistanceContent }}</li>
                 </ul>
                 </div>
             </div>
@@ -176,16 +177,21 @@
     <div class="block" style="height: 1600px;">
         <button class="closeBtn mb-3">x</button>
         <div id="budgetBackground" class="pdfContent">
-            <h1 id="edit1">婚禮預算項目</h1>
+            <h1 id="edit1" style="color:white">婚禮預算項目</h1>
             <div style="position:absolute;height: 1400px;width: 1000px;margin: 100px;background-color:#F1F1F1; border-radius: 25px">
                 <ul style="left: 30px; top:30px ;" class="budgetItemsList">
-                    <li v-for="i in 46">項目名稱假設某名字很長 &nbsp; &nbsp;100000&nbsp;NT$ </li>
+                    <li v-for="BudgetItem1 in budgetItems1" :key="BudgetItem1.budgetItemName">
+                        {{ BudgetItem1.budgetItemName }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{BudgetItem1.budgetItemSubtotal
+                        }}&nbsp;&nbsp;&nbsp;NT$
+                    </li>
                 </ul>
                 <ul style="left: 50%; top:30px;" class="budgetItemsList">
-                    <li v-for="i in 46">項目名稱 &nbsp; &nbsp;100000&nbsp;NT$ </li>
+                    <li v-for="BudgetItem2 in budgetItems2" :key="BudgetItem2.budgetItemName">
+                        {{ BudgetItem2.budgetItemName }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{BudgetItem2.budgetItemSubtotal
+                        }}&nbsp;&nbsp;&nbsp;NT$</li>
                 </ul>
             </div>
-                <h2 id="budgetTotal" class="whiteBoldFont">&nbsp;婚禮總預算: {{ budgetTotal}}&nbsp;&nbsp;NT$</h2>
+                <h2 id="budgetTotal" class="whiteBoldFont">&nbsp;婚禮總預算支出:&nbsp;&nbsp; {{ BudgetTotal.budgetNowTotal}}&nbsp;&nbsp;NT$</h2>
             </div>
         </div>
         <div class="block" style="height: 0px;">
@@ -202,7 +208,8 @@
     import Quill from 'quill'; 
     import ClickButtonAComponent from '@/share_components/ClickButtonAComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
-
+const BaseUrl = import.meta.env.VITE_API_BASEURL;
+const API_URL=`${BaseUrl}/WeddingPlans`;
 //取得當前memberID
 function getMemberID() {
     const cookies = document.cookie.split('; ');
@@ -220,11 +227,63 @@ function getMemberID() {
 const memberID = getMemberID();
 
     //載入企劃書數據
-    // const allData=ref([]);
-    // const loadAllData=async()=>{
-    //     const responseData=await fetch(``);
-    //     allData.value=await responseData.json();
-    // }
+    const weddingplanData=ref([]);
+    const eventScheduleData=ref([]);
+    const ScheduleStaffData=ref([]);
+    const BudgetData=ref([]);
+    const BudgetTotal=ref(0);
+    const formattedTime=ref('');
+    const budgetItems1=ref([]);
+    const budgetItems2=ref([]);
+    let imageSrc =''; 
+    let venueImgPath1='';
+    let venueImgPath2='';
+    let eventTimeLinePath='';
+    //加載數據start
+    const loadWeddingplanData=async()=>{
+        const responseData=await fetch(`${API_URL}/planData/${memberID}`);
+        weddingplanData.value=await responseData.json();
+        formattedTime.value = weddingplanData.value.weddingTime.replace('T', ' ');
+            imageSrc = `http://localhost:5173/src/assets/images/weddingPlanImg/${weddingplanData.value.editingImgName}`;
+            venueImgPath1= `https://localhost:7162/Ven1/${weddingplanData.value.venueImgName1}`;
+            venueImgPath2=`https://localhost:7162/Ven1/${weddingplanData.value.venueImgName2}`;
+            eventTimeLinePath=`https://localhost:7162/eventImg/${weddingplanData.value.eventImgName}`;
+
+    }
+    loadWeddingplanData();
+    
+    const loadEventScheduleData=async()=>{
+        const responseEventSchedule=await fetch(`${API_URL}/EventSchedules/${memberID}`)
+        eventScheduleData.value=await responseEventSchedule.json();
+    }
+    loadEventScheduleData();
+
+    const loadScheduleStaff=async()=>{
+        const responseEventSchedule=await fetch(`${API_URL}/ScheduleStaff/${memberID}`)
+        ScheduleStaffData.value=await responseEventSchedule.json();
+    }
+    loadScheduleStaff();
+
+    const loadBudgetItemsData=async()=>{
+        const responseItems=await fetch(`${API_URL}/MemberbudgetList/${memberID}`)
+        BudgetData.value=await responseItems.json();
+        budgetItems1.value =BudgetData.value.slice(0, 47);
+        budgetItems2.value = BudgetData.value.slice(47, 93);
+    }
+    loadBudgetItemsData();
+
+    const loadBudgetTotal=async()=>{
+        const responseBudgetTotal=await fetch(`${BaseUrl}/MemberBudgetItems/BudgetNowTotal/${memberID}`);
+        BudgetTotal.value=await responseBudgetTotal.json();
+    }
+    loadBudgetTotal();
+
+
+    //調整時間顯示格式的方法
+    const formatScheduleTime = (scheduleTime) => {
+        return scheduleTime.replace('T', ' ');
+    };
+    //加載數據end
 
     //總預算
     const budgetTotal=ref(0);
@@ -269,8 +328,7 @@ if (elements.length === 0) {
 
 const generateButton = ref(null);
   onMounted(()=>{
-    // generateButton.value.addEventListener('click', generatePDF);
-
+    
     const editors = document.querySelectorAll('.quill-editor');
         editors.forEach(editor => {
             const quill = new Quill(editor, {
@@ -321,11 +379,6 @@ const generateButton = ref(null);
              });
             })
             
-            //處理預算項目清單
-            // const budgetItem=ref([])
-            // const budgetItems1 = budgetItem.value.slice(0, 47);
-            // const budgetItems2 = budgetItem.value.slice(47, 93);
-            // const budgetItems3 = budgetItem.value.slice(93, 139);
   </script>
   
   <style scoped>
@@ -450,8 +503,10 @@ const generateButton = ref(null);
 
       #eventImg{
         position:absolute;
-        left: 175px;
+        left: 205px;
         top: 120px;
+        height: 500px;
+        width: 700px;
       }
 
       #edit1{
@@ -555,7 +610,9 @@ const generateButton = ref(null);
       }
 
       #budgetBackground{
-        background: url('@/assets/images/weddingPlanImg/budgetBackground.jpg') no-repeat;
+        /* background: url('@/assets/images/weddingPlanImg/budgetBackground.jpg') no-repeat;
+         */
+         background-color: #B7B0AA;
           height:1600px;
           width: 1200px;
       }
@@ -626,7 +683,7 @@ const generateButton = ref(null);
             position:absolute;
             height:70px;
             bottom:0px; 
-            right: 20%;
+            right: 5%;
         }
 
         .budgetItemsList{
