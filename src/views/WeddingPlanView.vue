@@ -203,6 +203,22 @@
     import ClickButtonAComponent from '@/share_components/ClickButtonAComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
 
+//取得當前memberID
+function getMemberID() {
+    const cookies = document.cookie.split('; ');
+    let memberID = '1'; // 默认值
+
+    for (let cookie of cookies) {
+        const [key, value] = cookie.split('=');
+        if (key === 'memberID') {
+            memberID = value;
+            break;
+        }
+    }
+    return memberID;
+}
+const memberID = getMemberID();
+
     //載入企劃書數據
     // const allData=ref([]);
     // const loadAllData=async()=>{
