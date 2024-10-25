@@ -91,7 +91,7 @@ export default {
                 console.error('Fetch error:', error);
             }
         },
-        // 用圖層id查詢圖層所用之圖的 methods
+        // 用圖層id查詢圖層所用之圖的methods
         async fetchImgUsings() {
             try {
                 const FindID_URL = `${BASE_URL}/ImgUsings/${this.editingID}`
@@ -116,22 +116,35 @@ export default {
                 const API_URL = `${BASE_URL}/ImgUsings/${element.getAttribute('default-material-id')}`;
                 const pleft = parseInt(element.style.left.replace('px', ''));//取原top left
                 const ptop = parseInt(element.style.top.replace('px', ''));
-                console.log(pleft);
-                console.log(ptop);
-                const imgElement = element.querySelector('img');
+                const imgElement = element.querySelector('img');//抓圖片物件
                 const width = imgElement.style.width;
                 const widthWithoutPx = width.replace('px', '');
                 const height = imgElement.style.height;
                 const heightWithoutPx = height.replace('px', '');
+                const revise = parseInt(element.getAttribute('isrevise'));
+                let imgX = 0;
+                let imgY = 0;
+
+                if (revise == 1) {
+                    console.log(1);
+                    imgX = parseFloat(parseFloat(imgElement.getAttribute('data-x')).toFixed(2)) + pleft;
+                    imgY = parseFloat(parseFloat(imgElement.getAttribute('data-y')).toFixed(2)) + ptop;
+                }
+                else {
+                    console.log(0);
+                    imgX = parseFloat(parseFloat(imgElement.getAttribute('data-x')).toFixed(2));
+                    imgY = parseFloat(parseFloat(imgElement.getAttribute('data-y')).toFixed(2));
+                }
                 let terms = {
                     "imgUsingId": parseInt(element.getAttribute('default-material-id')),//parseInt是轉成整數
                     "imageName": element.getAttribute('imageName'),
-                    "memSource": parseInt(element.getAttribute('websource')),
-                    "webSource": parseInt(element.getAttribute('memsource')),
+                    "webSource": parseInt(element.getAttribute('websource')),
+                    "memSource": parseInt(element.getAttribute('memsource')),
                     "imgHeight": heightWithoutPx,
                     "imgWidth": widthWithoutPx,
-                    "imgX": parseFloat(parseFloat(imgElement.getAttribute('data-x')).toFixed(2)) + pleft,
-                    "imgY": parseFloat(parseFloat(imgElement.getAttribute('data-y')).toFixed(2)) + ptop//toFixed(2)會將數字四捨五入到小數點後兩位，返回的是一個字串。如果你需要它是數字型態而不是字串，可以再使用 parseFloat()
+                    "imgX": imgX,
+                    "imgY": imgY,
+                    //toFixed(2)會將數字四捨五入到小數點後兩位，返回的是一個字串。如果你需要它是數字型態而不是字串，可以再使用 parseFloat()
                 }
                 const put = async () => {
                     const response = await fetch(API_URL, {
@@ -149,22 +162,32 @@ export default {
             const elements = container.querySelectorAll('[data-material-id][websource][memsource]');
 
             elements.forEach(element => {
+                const imageid = element.getAttribute('data-material-id');
                 const imgElement = element.querySelector('img');
                 const width = imgElement.style.width;
                 const widthWithoutPx = width.replace('px', '');
                 const height = imgElement.style.height;
                 const heightWithoutPx = height.replace('px', '');
+                let terms = {
+                    "imgUsingId": 0,
+                    "imageName": element.getAttribute('imageName'),
+                    "webSource": parseInt(element.getAttribute('websource')),
+                    "memSource": parseInt(element.getAttribute('memsource')),
+                    "imgHeight": heightWithoutPx,
+                    "imgWidth": widthWithoutPx,
+                    "imgX": parseFloat(parseFloat(imgElement.getAttribute('data-x')).toFixed(2)) + pleft,
+                    "imgY": parseFloat(parseFloat(imgElement.getAttribute('data-y')).toFixed(2)) + ptop//toFixed(2)會將數字四捨五入到小數點後兩位，返回的是一個字串。如果你需要它是數字型態而不是字串，可以再使用 parseFloat()
+                }
+                const post = async () => {
+                    const API_URL = `${BASE_URL}/ImgUsings?imageid=${imageid}&editingid=${this.editingID}`;
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(terms),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                }
+                post();
             });
-            // const terms = ref({
-            //     "imgUsingId": 0,
-            //     "imageName": "string",
-            //     "memSource": 0,
-            //     "webSource": 0,
-            //     "imgHeight": "string",
-            //     "imgWidth": "string",
-            //     "imgX": 0,
-            //     "imgY": 0
-            // })
         },
         //圖層所有元素順序添加進畫面
         defaultImg() {
@@ -242,6 +265,7 @@ export default {
             newImageContainer.style.top = `${imgY}px`;
             newImageContainer.setAttribute('default-material-id', imgUsingId);//添加素材屬性,方便之後做put跟post
             newImageContainer.setAttribute('imageName', imageName);
+            newImageContainer.setAttribute('isrevise', 0);
 
             const newImage = document.createElement('img');
             if (webSource) {//判斷素材的出處是會員還是本網站提供
@@ -402,6 +426,7 @@ export default {
                             move: (event) => {
                                 const containerRect = container.getBoundingClientRect(); // 在這裡計算 containerRect
                                 const target = event.target;
+                                target.parentNode.setAttribute('isrevise', 1);
 
                                 const imgRect = target.getBoundingClientRect(); // 取得圖片的邊界
                                 let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
