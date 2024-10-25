@@ -4,31 +4,33 @@
         </div>
     </SampleComponent>
     <div>
-        <div class="wrapper">
-            <div class="menu">
-                <div @click="changeContainerSize(600, 600)">1:1</div>
-                <div @click="changeContainerSize(750, 600)">5:4</div>
-                <div @click="changeContainerSize(900, 600)">3:2</div>
-                <div @click="changeContainerSize(1010, 625.5)">16:9</div>
-            </div>
-            <div class="container" ref="container">
-                <div class="size-info" v-if="selectedImage">{{ sizeInfo }}</div>
-            </div>
-            <div class="components-wrapper">
-                <WImgMComponent @data-sent="handleDataSent" class="Mh3" />
-                <MImgMComponent @Memdata-sent="MemhandleDataSent" class="Mh5" />
+        <div>
+            <div class="wrapper">
+                <div class="menu">
+                    <div @click="changeContainerSize(600, 600)">1:1</div>
+                    <div @click="changeContainerSize(750, 600)">5:4</div>
+                    <div @click="changeContainerSize(900, 600)">3:2</div>
+                    <div @click="changeContainerSize(1010, 625.5)">16:9</div>
+                </div>
+                <div class="container" ref="container">
+                    <div class="size-info" v-if="selectedImage">{{ sizeInfo }}</div>
+                </div>
+                <div class="components-wrapper">
+                    <WImgMComponent @data-sent="handleDataSent" class="Mh3" />
+                    <MImgMComponent @Memdata-sent="MemhandleDataSent" class="Mh5" />
+                </div>
             </div>
         </div>
+
         <div class="controls">
             <button @click="moveLayer('down')" class="btn">上移</button>
             <button @click="moveLayer('up')" class="btn">下移</button>
             <button @click="undoLastAction(selectedImage)" class="btn" style="background-color: #6A6AFF;">回復</button>
             <button @click="deleteImage" style="background-color: red;" class="btn red">刪除</button>
-            <button @click="captureScreenshot" style="background-color:yellowgreen;" class="btn">保存</button>
             <button class="btn">會員上傳圖片</button>
             <input type="text" v-model="memberID" style="width: 100px; border: 2px solid #4CAF50; padding: 8px;" />
             <button @click="fetchEditingID" class="btn">搜尋圖層資訊</button>
-            <button @click="putsql" class="btn">測試資訊</button>
+            <button @click="handleSave" class="btn" style="background-color:yellowgreen;">保存回SQL</button>
         </div>
         <div class="wrapper">
             <p>說明之後放這</p>
@@ -79,7 +81,7 @@ export default {
         // 用會員id查詢圖層id的 methods
         async fetchEditingID() {
             try {
-                const FindID_URL = `${BASE_URL}/EditingImgFiles/FindID/${this.memberID}`
+                const FindID_URL = `${BASE_URL}/EditingImgFiles/FindID/${this.memberID}`;
                 const response = await fetch(FindID_URL);
                 if (!response.ok) {
                     throw new Error(`Error: ${response.status}`);
@@ -94,8 +96,8 @@ export default {
         // 用圖層id查詢圖層所用之圖的methods
         async fetchImgUsings() {
             try {
-                const FindID_URL = `${BASE_URL}/ImgUsings/${this.editingID}`
-                const response = await fetch(FindID_URL);
+                const FindImg_URL = `${BASE_URL}/ImgUsings/${this.editingID}`
+                const response = await fetch(FindImg_URL);
                 if (!response.ok) {
                     throw new Error(`Error: ${response.status}`);
                 }
@@ -175,8 +177,8 @@ export default {
                     "memSource": parseInt(element.getAttribute('memsource')),
                     "imgHeight": heightWithoutPx,
                     "imgWidth": widthWithoutPx,
-                    "imgX": parseFloat(parseFloat(imgElement.getAttribute('data-x')).toFixed(2)) + pleft,
-                    "imgY": parseFloat(parseFloat(imgElement.getAttribute('data-y')).toFixed(2)) + ptop//toFixed(2)會將數字四捨五入到小數點後兩位，返回的是一個字串。如果你需要它是數字型態而不是字串，可以再使用 parseFloat()
+                    "imgX": parseFloat(parseFloat(imgElement.getAttribute('data-x')).toFixed(2)),
+                    "imgY": parseFloat(parseFloat(imgElement.getAttribute('data-y')).toFixed(2))//toFixed(2)會將數字四捨五入到小數點後兩位，返回的是一個字串。如果你需要它是數字型態而不是字串，可以再使用 parseFloat()
                 }
                 const post = async () => {
                     const API_URL = `${BASE_URL}/ImgUsings?imageid=${imageid}&editingid=${this.editingID}`;
@@ -188,6 +190,12 @@ export default {
                 }
                 post();
             });
+        },
+        handleSave() {
+            // 呼叫 putsql 和 postsql
+            this.putsql();
+            this.postsql();
+            this.captureScreenshot();
         },
         //圖層所有元素順序添加進畫面
         defaultImg() {
@@ -297,6 +305,7 @@ export default {
             newImageContainer.appendChild(lockIcon);
             this.$refs.container.appendChild(newImageContainer);
 
+
             newImage.addEventListener('click', (event) => {
                 this.selectedImage = newImage;
                 this.sizeInfo = `Width: ${newImage.clientWidth}px, Height: ${newImage.clientHeight}px`;
@@ -380,8 +389,30 @@ export default {
         },
         // 點擊刪除按鈕時的處理邏輯
         deleteImage() {
+            const flag = this.selectedImage.parentNode.getAttribute('default-material-id') || 0;
+            const imgusingID = parseInt(flag);
+            if (!0) {
+                const deleteImg = async () => {
+                    try {
+                        const FindID_URL = `${BASE_URL}/ImgUsings/${imgusingID}`; // 正確的URL
+                        const response = await fetch(FindID_URL, {
+                            method: 'DELETE',
+                        });
+
+                        if (response.ok) {
+                            console.log('刪除成功');
+                        } else {
+                            console.error('刪除失敗', response.status);
+                        }
+                    } catch (error) {
+                        console.error('Fetch error:', error);
+                    }
+                };
+                deleteImg();
+            }
             if (this.selectedImage) {
                 const imageContainer = this.selectedImage.parentNode;
+                console.log(imageContainer);
                 imageContainer.remove();
                 this.selectedImage = null;
                 this.sizeInfo = '';
