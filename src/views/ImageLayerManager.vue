@@ -3,22 +3,20 @@
         <div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;">
         </div>
     </SampleComponent>
-    <div>
-        <div>
-            <div class="wrapper">
-                <div class="menu">
-                    <div @click="changeContainerSize(600, 600)">1:1</div>
-                    <div @click="changeContainerSize(750, 600)">5:4</div>
-                    <div @click="changeContainerSize(900, 600)">3:2</div>
-                    <div @click="changeContainerSize(1010, 625.5)">16:9</div>
-                </div>
-                <div class="container" ref="container">
-                    <div class="size-info" v-if="selectedImage">{{ sizeInfo }}</div>
-                </div>
-                <div class="components-wrapper">
-                    <WImgMComponent @data-sent="handleDataSent" class="Mh3" />
-                    <MImgMComponent @Memdata-sent="MemhandleDataSent" class="Mh5" />
-                </div>
+    <div class="center-wrapper">
+        <div class="wrapper">
+            <div class="menu">
+                <div @click="changeContainerSize(600, 600)">1:1</div>
+                <div @click="changeContainerSize(750, 600)">5:4</div>
+                <div @click="changeContainerSize(900, 600)">3:2</div>
+                <div @click="changeContainerSize(1010, 625.5)">16:9</div>
+            </div>
+            <div class="container" ref="container">
+                <div class="size-info" v-if="selectedImage">{{ sizeInfo }}</div>
+            </div>
+            <div class="components-wrapper">
+                <WImgMComponent @data-sent="handleDataSent" class="Mh3" />
+                <MImgMComponent @Memdata-sent="MemhandleDataSent" class="Mh5" />
             </div>
         </div>
 
@@ -30,7 +28,7 @@
             <button class="btn">會員上傳圖片</button>
             <input type="text" v-model="memberID" style="width: 100px; border: 2px solid #4CAF50; padding: 8px;" />
             <button @click="fetchEditingID" class="btn">搜尋圖層資訊</button>
-            <button @click="handleSave" class="btn" style="background-color:yellowgreen;">保存回SQL</button>
+            <button @click="handleSave" class="btn" style="background-color:yellowgreen;">保存</button>
         </div>
         <div class="wrapper">
             <p>說明之後放這</p>
@@ -623,9 +621,9 @@ MimgmenuComponent {
 .wrapper {
     display: flex;
     justify-content: flex-start;
-    /* 元素從左往右排列 */
     align-items: flex-start;
     padding-top: 50px;
+    width: 100%;
 }
 
 /* .components-wrapper 緊跟在 .container 右邊 */
@@ -635,6 +633,15 @@ MimgmenuComponent {
     display: flex;
     gap: 1px;
     /* 兩個 component 之間設置 3px 的間距 */
+}
+
+.center-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    /* 使內容在整個視窗中垂直置中 */
 }
 
 body {
@@ -652,7 +659,6 @@ body {
     width: 1012px;
     height: 626px;
     background-color: #D8CAB8;
-    margin-bottom: 20px;
 }
 
 .size-info {
@@ -679,8 +685,11 @@ body {
 .controls {
     display: flex;
     justify-content: center;
-    margin-top: 10px;
+    padding-top: 20px;
+    padding-bottom: 15px;
+    border-bottom-left-radius: 10px;
     gap: 10px;
+    text-align: center;
 }
 
 .controls input {
@@ -766,13 +775,13 @@ input[type="file"] {
 /* 調整尺寸的框 */
 .menu {
     gap: 10px;
-    border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
     margin-left: 127px;
     padding-top: 10px;
     position: relative;
     width: 100px;
-    height: 90vh;
+    height: 626px;
     background-color: #F5F5DC;
     color: #6f8170;
     display: flex;
