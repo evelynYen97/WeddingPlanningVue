@@ -24,7 +24,7 @@ const filtered = computed(() => {
 
   // 根據 `passengerCapacity` 過濾商家
   return cars.value.filter(car => car.
-  passengerCapacity === selectedCategory.value);
+  passengerCapacity === parseInt (selectedCategory.value));
 });
 
 

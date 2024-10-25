@@ -24,7 +24,10 @@ const filteredStyle = computed(() => {
   return cakes.value.filter(cake => cake.cakeStyles === selectedCategory.value);
 });
 
-loadcakes()
+
+
+loadcakes() 
+
 
 </script>
 
@@ -87,11 +90,15 @@ loadcakes()
                   <div class="col" v-for="cake in filteredStyle" >
                     <div class="product-item">
                       <figure>
-                        <a href="index.html" title="Product Title">
-                          <img src="../assets/images/thumb-bananas.png" class="tab-image" />
-                        </a>
+                        <RouterLink :to="{ name: 'Cakeitem', params: { id: cake.cakeID } }">
+                          <img :src="cake.cakeImg" class="tab-image" alt="Cake Image" />                        
+                        </RouterLink>
                       </figure>
-                      <h3>{{ cake.cakeName }}</h3>
+                      <h3>
+                        <RouterLink :to="{ name: 'Cakeitem', params: { id: cake.cakeID } }">
+                          {{ cake.cakeName }}
+                        </RouterLink>
+                      </h3>                   
                       <span class="flavor">{{ cake.cakeStyles }}</span><br>
                       <span class="qty">一盒</span>
                       <span class="price">{{ cake.cakePrice }}</span>

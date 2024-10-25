@@ -137,7 +137,7 @@ const scrollToContactUs = () => {
               <!-- LOGO 區 -->
               <li class="nav-item nav-brand">
                 <a href="index.html">
-                  <img src="/src/assets/images/weddingLogo02.png" style="width:120px;" alt="Logo" />
+                  <img src="/src/assets/images/weddingLogo02.png" style="width:150px;" alt="Logo" />
                 </a>
               </li>
 
@@ -163,21 +163,21 @@ const scrollToContactUs = () => {
                 </ul>
               </li>
 
-              <li class="nav-item user ">
+              <li class="nav-item user hover-1" >
                 <div>
                 <RouterLink
                   v-if="!memberId" 
                   class="nav-item user"
                   :to="{ name: 'login' }" 
                 >
-                  登入/
+                  <a class="dropdown-toggle fontSize" :style="{ color: textColor } ">登入/</a>
                 </RouterLink>
                 <RouterLink
                   v-if="!memberId" 
                   class="nav-item user"
                   :to="{ name: 'register' }" 
                 >
-                  註冊會員
+                  <a class="dropdown-toggle fontSize" :style="{ color: textColor }">註冊會員</a>
                 </RouterLink>
                 <div v-else class="user-container fontSize hover-1">
                   <img src="/src/assets/images/PAREO.jpg" alt="User Icon" class="user-icon" />

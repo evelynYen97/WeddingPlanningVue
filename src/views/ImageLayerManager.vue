@@ -1,5 +1,6 @@
 <template>
     <div>
+        <SampleComponent></SampleComponent>
         <div class="wrapper">
             <div class="menu">
                 <div @click="changeContainerSize(600, 600)">1:1</div>
@@ -34,6 +35,7 @@
     
 <script>
 import MImgMComponent from '@/components/MImgMComponent.vue';
+import SampleComponent from '@/components/SampleComponent.vue';
 import WImgMComponent from '@/components/WImgMComponent.vue';
 import html2canvas from 'html2canvas';
 import interact from 'interactjs';
