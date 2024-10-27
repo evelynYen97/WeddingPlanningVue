@@ -4,7 +4,22 @@ import SampleComponent from '@/components/SampleComponent.vue';
 import { ref ,computed, watchEffect} from 'vue';
 import { VAlert} from 'vuetify/components';
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
-    const memberId=1;  //待改成當前會員ID
+    //取得當前memberID
+    function getMemberID() {
+    const cookies = document.cookie.split('; ');
+    let memberID = '1'; // 默认值
+
+    for (let cookie of cookies) {
+        const [key, value] = cookie.split('=');
+        if (key === 'memberID') {
+            memberID = value;
+            break;
+        }
+    }
+    return memberID;
+}
+    const memberId = getMemberID();
+
     const API_URL=`${BaseUrl}/MemberBudgetItems`;
     const initialItemsURL=`${API_URL}/${memberId}`;
     const API_URL_Sort=`${API_URL}/ItemsSort/${memberId}`; 
