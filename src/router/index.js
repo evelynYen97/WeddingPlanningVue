@@ -13,6 +13,8 @@ import WeddingPlanView from '@/views/WeddingPlanView.vue'
 import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import CakeItemView from '@/views/CakeItemView.vue'
+import CarItemView from '@/views/CarItemView.vue'
+import DishItemView from '@/views/DishItemView.vue'
 // import ToDoView from '@/views/ToDoView.vue'
 
 
@@ -103,6 +105,17 @@ const router = createRouter({
       name: 'Cakeitem',
       component: CakeItemView,
     },
+    { //車輛個別頁面
+      path: '/car/:id',
+      name: 'carItem',
+      component: CarItemView
+    },
+    { //桌菜個別頁面
+      path: '/dish/:id',
+      name: 'dishItem',
+      component: DishItemView
+    },
+
   ]
 })
 

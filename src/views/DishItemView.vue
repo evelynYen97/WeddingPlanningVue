@@ -5,14 +5,14 @@ import { ref } from 'vue';
 import { useRoute } from 'vue-router'; 
 
 const route = useRoute();
-const cakeID = route.params.id; 
-const cake = ref([]);  //用於儲存喜餅詳細資料
+const dishId = route.params.id; 
+const dish = ref([]);  //用於儲存喜餅詳細資料
 
 const initializeFunction = async () => {
   try {
-    const response = await fetch(`https://localhost:7048/api/Cakes/${cakeID}`);
-    cake.value = await response.json();
-    console.log(cake.value);
+    const response = await fetch(`https://localhost:7048/api/Dishes/${dishId}`);
+    dish.value = await response.json();
+    console.log(dish.value);
   } 
   catch (error) {
     console.error('載入失敗:', error);
@@ -40,7 +40,7 @@ initializeFunction();
           <article class="post-item card border-0 shadow-sm p-3">
             <div class="image-holder zoom-effect">
               <a href="#">
-                <img :src="`https://localhost:7162/cakesImg/${cake.cakeImg}`" alt="post" class="card-img-top">
+                <img :src="`https://localhost:7162/Dish1/${dish.dishesImg}`" alt="post" class="card-img-top">
               </a> 
             </div>
             <div class="card-body">
@@ -58,21 +58,21 @@ initializeFunction();
               </div>
               <div class="post-header">
                 <h2 class="post-title">
-                  <a href="#" class="text-decoration-none">名稱：{{ cake.cakeName }}</a>
+                  <a href="#" class="text-decoration-none">名稱：</a>
                 </h2>
                 <br>
                 <br>
                 <div class="post-header">
-                <h5>{{ cake.cakeDescription }}</h5>
+                <h5></h5>
                 </div>
                 <br>
                 <br>
                 <br>
                 <h3>內容物：</h3>
-                <h4>{{ cake.cakeContent }}</h4>
+                <h4></h4>
                 <br>
                 <h3>過敏原資訊：</h3>
-                <h4>{{ cake.allergenInfo }}</h4>      
+                <h4></h4>      
                 <br>         
               </div>
             

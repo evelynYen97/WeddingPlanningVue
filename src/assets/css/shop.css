@@ -544,6 +544,34 @@ h6 {
   color: #787878;
 }
 
+/* Search bar css */
+
+.search-sidebar {
+  border: 3px black;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.search-input {
+  border: 2px solid black;
+  /* 黑色邊框 */
+  padding: 10px;
+  /* 內邊距 */
+  border-radius: 10px;
+  /* 圓角 */
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  /* 陰影效果 */
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  /* 動畫過渡 */
+}
+
+.search-input:focus {
+  border-color: #3498db;
+  /* 當輸入框被聚焦時，邊框變成藍色 */
+  box-shadow: 3px 3px 12px rgba(52, 152, 219, 0.5);
+  /* 聚焦時的陰影效果 */
+}
+
 /* category carousel */
 .category-carousel .category-item {
   background: #FFFFFF;
@@ -648,24 +676,10 @@ h6 {
 }
 
 .product-item figure img {
-  max-height: 210px;
-  height: auto;
+  max-height: 200px;
+  height: 200px;
 }
 
-.product-item .btn-wishlist {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  border: 1px solid #d8d8d8;
-  transition: all 0.3s ease-out;
-}
 
 .product-item .btn-wishlist:hover {
   background: rgb(240, 56, 56);

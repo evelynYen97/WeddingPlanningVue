@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import ShopView from './ShopView.vue';
 
 const API_URL = 'https://localhost:7048/api/Shops'; 
+const loadImgURL = 'https://localhost:7162/ShopLogo/'
 
 const allShops = ref([]); // 存放所有商家資料
 const selectedCategory = ref('all'); // 存放目前選中的分類
@@ -15,8 +16,6 @@ const loadAllShop = async () => {
   allShops.value = datas;
 };
 
-loadAllShop();
-
 // 根據選擇的分類過濾商家
 const filteredShops = computed(() => {
   if (selectedCategory.value === 'all') {
@@ -25,6 +24,8 @@ const filteredShops = computed(() => {
   // 根據 `shopSort` 過濾商家
   return allShops.value.filter(shop => shop.shopSort === selectedCategory.value);
 });
+
+loadAllShop();
 </script>
 
 <template>
@@ -95,7 +96,7 @@ const filteredShops = computed(() => {
                       <figure>
                         <a href="#" title="Product Title">
                           <img 
-                            src="../assets/images/thumb-bananas.png"
+                            :src="`${loadImgURL}${shop.shopLogo}`"
                             class="tab-image" 
                           />
                         </a>
