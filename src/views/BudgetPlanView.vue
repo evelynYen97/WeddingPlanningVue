@@ -1,7 +1,7 @@
 <script setup>
 import BudgetChartComponent from '@/components/BudgetChartComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
-import { ref ,computed, watchEffect} from 'vue';
+import { ref ,computed, watchEffect,onMounted, onBeforeUnmount} from 'vue';
 import { VAlert} from 'vuetify/components';
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
     //取得當前memberID
@@ -246,6 +246,8 @@ import { VAlert} from 'vuetify/components';
         }
         clearData();
     }
+
+    
     //清空欄位
     const clearData=()=>{
         
@@ -327,6 +329,21 @@ import { VAlert} from 'vuetify/components';
     const alertType = ref('success'); // 或 'error', 'warning', 'info'
     const alertMessage=ref('請登入以獲得完整服務。')
    
+    
+   //table 的RWD設置
+   const isVisible = ref(window.innerWidth > 768);
+   const handleResize = () => {
+  isDesktop.value = window.innerWidth > 768;
+};
+   onMounted(() => {
+  window.addEventListener('resize', handleResize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+});
+
+
 </script>
 
 <template>
@@ -476,22 +493,22 @@ import { VAlert} from 'vuetify/components';
                  <thead>
                      <tr>
                          <th>預算項目名稱</th>
-                         <th>單價</th>
-                         <th>數量</th>
+                         <th v-if="isVisible">單價</th>
+                         <th v-if="isVisible">數量</th>
                          <th>小計</th>
-                         <th>實際支出</th>
-                         <th>已支付</th>
+                         <th v-if="isVisible">實際支出</th>
+                         <th v-if="isVisible">已支付</th>
                          <th></th>
                      </tr>
                  </thead>
                  <tbody>
                     <tr v-for="budgetItem in budgetItems" :key="budgetItem.budgetItemId">
                         <td >{{ budgetItem.budgetItemDetail }}</td>
-                        <td >{{ budgetItem.budgetItemPrice }}</td>
-                        <td >{{ budgetItem.budgetItemAmount }}</td>
+                        <td v-if="isVisible">{{ budgetItem.budgetItemPrice }}</td>
+                        <td v-if="isVisible">{{ budgetItem.budgetItemAmount }}</td>
                         <td >{{ budgetItem.budgetItemSubtotal }}</td>
-                        <td >{{ budgetItem.actualPay }}</td>
-                        <td >{{ budgetItem.alreadyPay }}</td>
+                        <td v-if="isVisible">{{ budgetItem.actualPay }}</td>
+                        <td v-if="isVisible">{{ budgetItem.alreadyPay }}</td>
                         <td>
                             <button id="EditBudgetItem" class="text-info" data-bs-toggle='modal' data-bs-target='#AddModal' @click="editData(budgetItem)"><i class="bi bi-pen"></i></button>|
                             <button id="DeleteBudgetItem" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" @click="whichItemToDelete(budgetItem.budgetItemId,budgetItem.budgetItemDetail)"><i class="bi bi-trash3"></i></button>
@@ -506,12 +523,8 @@ import { VAlert} from 'vuetify/components';
                     <!-- 預算項目分類 -->
                           <div class="col-12 col-sm-3">
                         <div id="sortListContain">
+                            <button @click="toggleDropdown" class="fs-5 fw-bold text-secondary dropbtn" >預算項目分類</button>
                             <div class="list-group">
-                                <li class="list-group-item " style="border:none;padding-bottom: 0;">
-                                    <div class="ms-2 me-auto" >
-                                      <label class="fs-5 fw-bold text-secondary" >預算項目分類</label>
-                                    </div>
-                                </li>
                                 <div style="height:3px; margin-bottom: 3px; background-color: #B4BEA7;"></div>
                                 <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort" @click="buttonClickHandler(budgetItemSort.budgetItemSort)" :class="selectedSort === budgetItemSort.budgetItemSort ? 'ActiveButton':'InActiveButton'">{{budgetItemSort.budgetItemSort}}</button>
                             </div>
@@ -626,4 +639,6 @@ import { VAlert} from 'vuetify/components';
          transform: translate(-50%, -50%);
          z-index: 1000; /* 确保在最上层 */
         }
+
+    
 </style>
