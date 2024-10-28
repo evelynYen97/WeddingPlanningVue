@@ -83,7 +83,9 @@ export default {
             selectedFile: null,
             imageUrl: null,
             isComponentRestart:true,
-            componentKey: 0
+            componentKey: 0,
+            screenshotname:'',
+            timestamp:''
         };
     },
     mounted() {
@@ -428,11 +430,50 @@ export default {
         captureScreenshot() {
             const container = this.$refs.container;
             html2canvas(container).then(canvas => {
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL('image/png');
-                link.download = 'screenshot.png';
-                link.click();
+                const imageData = canvas.toDataURL('image/png'); // 獲取 Base64 圖片數據
+                const fileName = `screenshot_${Date.now()}.png`;
+                this.screenshotname = fileName;
+                this.timestamp = new Date().toISOString().split('.')[0];// "YYYY-MM-DDTHH:MM:SS" 格式
+                this.uploadScreenshot(imageData,fileName);
             });
+        },
+        uploadScreenshot(imageData,fileName) {
+            const base64Data = imageData.replace(/^data:image\/png;base64,/, ""); // 移除 base64 前綴
+
+            // 發送 POST 請求到 Web API
+            axios.post('https://localhost:7048/api/MemberMaterials/Screenshot', {
+                imageBase64: base64Data,
+                fileName: fileName
+            })
+            .then(response => {
+                console.log('Image uploaded successfully:', response.data.filePath);
+            })
+            .catch(error => {
+                console.error('Error uploading image:', error);
+            });
+            this.screenpostsql();
+        },
+        //Screenshot存回sql
+        screenpostsql() {
+            let terms = {//之後會換
+                "editingImgFileId": 0,
+                "memberId": 1,
+                "editTime": this.timestamp,
+                "screenshot": this.screenshotname,
+                "imgEditingName": "圖層1"
+            }
+            console.log(this.timestamp);
+            console.log(this.screenshotname);
+            console.log(JSON.stringify(terms));
+            const post = async () => {
+                const API_URL = `${BASE_URL}/EditingImgFiles`;
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(terms),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
+            post();
         },
         // 重新調整所有圖片的位置，防止超出新的容器範圍
         adjustImagesToNewContainer() {
