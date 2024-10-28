@@ -16,19 +16,35 @@
             </div>
             <div class="components-wrapper">
                 <WImgMComponent @data-sent="handleDataSent" class="Mh3" />
-                <MImgMComponent @Memdata-sent="MemhandleDataSent" class="Mh5" />
+                <MImgMComponent @Memdata-sent="MemhandleDataSent" class="Mh5" v-if="isComponentRestart" :key="componentKey"/>
             </div>
         </div>
 
         <div class="controls">
-            <button @click="moveLayer('down')" class="btn">上移</button>
-            <button @click="moveLayer('up')" class="btn">下移</button>
-            <button @click="undoLastAction(selectedImage)" class="btn" style="background-color: #6A6AFF;">回復</button>
-            <button @click="deleteImage" style="background-color: red;" class="btn red">刪除</button>
-            <button class="btn">會員上傳圖片</button>
-            <input type="text" v-model="memberID" style="width: 100px; border: 2px solid #4CAF50; padding: 8px;" />
-            <button @click="fetchEditingID" class="btn">搜尋圖層資訊</button>
-            <button @click="handleSave" class="btn" style="background-color:yellowgreen;">保存</button>
+            <button @click="moveLayer('down')" class="btn" data-hover="CLICK!">
+                <div>上移</div>
+            </button>
+            <button @click="moveLayer('up')" class="btn" data-hover="CLICK!">
+                <div>下移</div>
+            </button>
+            <button @click="undoLastAction(selectedImage)" class="btn" data-hover="BACK!">
+                <div>回復</div>
+            </button>
+            <button @click="deleteImage" class="btn btn-red" data-hover="DELETE!">
+                <div>刪除</div>
+            </button>
+            <!-- <input type="text" v-model="memberID" style="width: 100px; border: 2px solid #4CAF50; padding: 8px;" />
+            <button @click="fetchEditingID" class="btn">搜尋圖層資訊</button> -->
+            <button @click="handleSave" class="btn btn-green" data-hover="SAVE!">
+                <div>保存</div>
+            </button>
+        </div>
+        <div class="controls">
+            <input type="file" @change="onFileChange" accept="image/*" />
+            <img v-if="imageUrl" :src="imageUrl" alt="Selected Image" width="50px" height="50px"/>
+            <button @click="UpLoadImage" class="btn-up" data-hover="CLICK!" >
+                <div>會員上傳圖片</div>
+            </button>
         </div>
         <div class="wrapper">
             <p>說明之後放這</p>
@@ -42,6 +58,7 @@ import WImgMComponent from '@/components/WImgMComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
 import html2canvas from 'html2canvas';
 import interact from 'interactjs';
+import axios from 'axios';
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 export default {
@@ -63,6 +80,10 @@ export default {
             memberID: '',
             editingID: null,
             ImgUsings: '',
+            selectedFile: null,
+            imageUrl: null,
+            isComponentRestart:true,
+            componentKey: 0
         };
     },
     mounted() {
@@ -105,6 +126,80 @@ export default {
             } catch (error) {
                 console.error('Fetch error:', error);
             }
+        },
+        //當使用者選擇新圖片時，設定 selectedFile
+        onFileChange(event) {
+        const file = event.target.files[0];
+            if (file) {
+                this.selectedFile = file;
+            }
+        },
+        //呼叫全部會員上傳圖片的功能
+        UpLoadImage(){
+            this.uploadImage();
+            this.AddMemImg();
+            this.toggleComponent();
+        },
+        //上傳圖片
+        async uploadImage() {
+            if (!this.selectedFile) {
+                alert("請先選擇圖片！");
+                return;
+            }
+            // 使用 FormData 將圖片檔案包裝為表單數據
+            const formData = new FormData();
+            const UpURL = `https://localhost:7048/api/MemberMaterials/upload`
+            formData.append('image', this.selectedFile);
+            try {
+                const response = await axios.post(UpURL, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                // 假設 API 回傳一個包含圖片 URL 的 JSON 物件
+                this.imageUrl = response.data.filePath;
+                console.log("圖片上傳成功:", this.imageUrl);
+            } catch (error) {
+                console.error("上傳失敗:", error);
+            }
+        },
+        //存新圖片回sql
+        AddMemImg() {
+            let Memterms = {
+                "memberMaterialId": 0,
+                "memberId": 1,//先預設給1
+                "memberImgName": this.selectedFile.name,
+                "estimatedLength": 200,
+                "estimatedWidth": 200
+            };
+            console.log(Memterms)
+            const post = async () => {
+                const API_URL = `${BASE_URL}/MemberMaterials`;
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(Memterms),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                    const responseData = await response.json();
+                    console.log("上傳成功:", responseData);
+                } catch (error) {
+                    console.error("上傳失敗:", error);
+                }
+            };
+            post();
+        },
+        toggleComponent() {
+        // 隱藏/顯示組件，這將強制重新渲染組件
+            this.isComponentRestart = false; 
+            // 使用 setTimeout 在下一個事件循環中再將 isComponentVisible 設置為 true
+            setTimeout(() => {
+                this.isComponentRestart = true;
+                this.componentKey += 1;
+            }, 50); // 可嘗試調整延遲時間，比如 50ms
         },
         //更新舊素材回資料庫
         putsql() {
@@ -696,79 +791,108 @@ body {
     margin-right: 10px;
 }
 
-.btn,
-.btn:focus {
+.btn {
     position: relative;
-    min-width: 100px;
-    background-color: black;
-    border-radius: 4em;
-    color: white;
-    font-size: 1rem;
+    width: 100px;
+    height: 50px;
+    background: #d6cdcd;
+    color: #7a7676;
+    overflow: hidden;
+    margin-right: 10px;
+}
+
+.btn div,
+.btn:before {
+    font-size: 1em;
     font-weight: bold;
-    text-align: center;
-    text-decoration: none;
     text-transform: uppercase;
-    transition-duration: 0.4s;
-    padding: 10px 20px;
+    transition: all .2s ease-in-out;
+}
+
+.btn:before {
+    content: attr(data-hover);
+    position: absolute;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transform: translate(-100%, 0);
 }
 
 .btn:hover {
-    background-color: #CCCCCC;
-    color: #3A3A3A;
-    transition-duration: 0.1s;
+    background: #98cded;
+    color: #40779a;
 }
 
-.btn:after {
-    content: "";
-    display: block;
+.btn-red:hover {
+    background: #d48989;
+    color: #7d4040;
+
+}
+
+.btn-green:hover {
+    background: #89d494;
+    color: #407d4e;
+
+}
+
+.btn:hover div {
+    opacity: 0;
+    transform: translate(100%, 0)
+}
+
+.btn:hover:before {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+.btn-up {
+    position: relative;
+    width: 150px;
+    height: 50px;
+    background: #625e5e;
+    color: #dad0d0;
+    overflow: hidden;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+
+.btn-up div,
+.btn-up:before {
+    font-size: 1em;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all .2s ease-in-out;
+}
+
+.btn-up:before {
+    content: attr(data-hover);
     position: absolute;
     left: 0;
-    top: 0;
     width: 100%;
-    height: 100%;
     opacity: 0;
-    transition: all 0.5s;
-    box-shadow: 0 0 10px 40px rgb(0, 0, 0);
-    border-radius: 4em;
+    transform: translate(-100%, 0);
 }
 
-.btn:active:after {
-    opacity: 1;
-    transition: 0s;
-    box-shadow: 0 0 0 0 rgb(123, 123, 123);
+.btn-up:hover {
+    background: #98cded;
+    color: #40779a;
 }
 
-.btn:active {
-    top: 1px;
-}
-
-.btn.red:after {
-    content: "";
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
+.btn-up:hover div {
     opacity: 0;
-    transition: all 0.5s;
-    box-shadow: 0 0 10px 40px rgb(253, 2, 2);
-    border-radius: 4em;
+    transform: translate(100%, 0)
 }
 
-.btn.red:active:after {
+.btn-up:hover:before {
     opacity: 1;
-    transition: 0s;
-    box-shadow: 0 0 0 0 rgb(139, 65, 65);
-}
-
-.btn.red:active {
-    top: 1px;
+    transform: translate(0, 0);
 }
 
 input[type="file"] {
+    width: 250px;
+    color: #625e5e;
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid #6e6e6e;
     border-radius: 5px;
 }
 
