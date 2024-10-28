@@ -3,6 +3,8 @@ import BudgetChartComponent from '@/components/BudgetChartComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
 import { ref ,computed, watchEffect,onMounted, onBeforeUnmount} from 'vue';
 import { VAlert} from 'vuetify/components';
+import * as XLSX from 'xlsx';
+
     const BaseUrl = import.meta.env.VITE_API_BASEURL;
     //取得當前memberID
     function getMemberID() {
@@ -141,6 +143,9 @@ import { VAlert} from 'vuetify/components';
     const onCategoryClick = (sort) => {
         selectedSort.value = sort;
         loadBudgetItems(sort);
+        if (window.innerWidth < 600) {
+    isOpen.value = false; // 點擊後關閉下拉菜單
+  }
 };
     
 
@@ -333,7 +338,7 @@ import { VAlert} from 'vuetify/components';
    //table 的RWD設置
    const isVisible = ref(window.innerWidth > 768);
    const handleResize = () => {
-  isDesktop.value = window.innerWidth > 768;
+  isVisible.value = window.innerWidth > 768;
 };
    onMounted(() => {
   window.addEventListener('resize', handleResize);
@@ -343,7 +348,51 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize);
 });
 
+//分類RWD下拉選單
+const isOpen = ref(window.innerWidth >= 768);
 
+const toggleDropdown = () => {
+  isOpen.value = !isOpen.value;
+};
+
+//生成excel
+const allBudgets=ref([]);
+const loadAllBudgetsData=async()=>{
+    const responseBudgetsData=await fetch (`${API_URL}/${memberId}`)
+    allBudgets.value=await responseBudgetsData.json();
+    console.log(allBudgets.value);
+}
+
+const exportExcel = async () => {
+  await loadAllBudgetsData(); 
+
+  const modifiedData = allBudgets.value.map(item => ({
+    '類別':item.budgetItemSort,
+    '項目名稱': item.budgetItemDetail, 
+    '單價':item.budgetItemPrice,
+    '數量': item.budgetItemAmount,        
+    '小計': item.budgetItemSubtotal,
+    '實際金額':item.actualPay,
+    '已支付金額':item.alreadyPay          
+  })).sort((a, b) => a['類別'].localeCompare(b['類別']));
+
+  // 計算金額總和
+  const totalAmount = modifiedData.reduce((sum, item) => sum + item['小計'], 0);
+
+  // 添加總計行
+  modifiedData.push({
+    '類別': '總計金額',
+    '小計': totalAmount,
+  });
+
+  // 將修改後的數據轉換為工作表
+  const ws = XLSX.utils.json_to_sheet(modifiedData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '預算表');
+
+  // 導出 Excel 文件
+  XLSX.writeFile(wb, '預算表.xlsx');
+};
 </script>
 
 <template>
@@ -444,6 +493,8 @@ onBeforeUnmount(() => {
      </div>
     </div>
      <!-- DeleteModal end-->
+
+            <button @click="exportExcel">導出預算表</button>
              <BudgetChartComponent :selectSort="selectedSort" :thisMemberId="memberId" @changeTableData="onCategoryClick"></BudgetChartComponent>
              <div class="container">
                 
@@ -526,7 +577,7 @@ onBeforeUnmount(() => {
                             <button @click="toggleDropdown" class="fs-5 fw-bold text-secondary dropbtn" >預算項目分類</button>
                             <div class="list-group">
                                 <div style="height:3px; margin-bottom: 3px; background-color: #B4BEA7;"></div>
-                                <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort" @click="buttonClickHandler(budgetItemSort.budgetItemSort)" :class="selectedSort === budgetItemSort.budgetItemSort ? 'ActiveButton':'InActiveButton'">{{budgetItemSort.budgetItemSort}}</button>
+                                <button type="button" class="SortButton list-group-item list-group-item-action" v-for="budgetItemSort in ItemSorts" :key="budgetItemSort.budgetItemSort" @click="buttonClickHandler(budgetItemSort.budgetItemSort)" :class="selectedSort === budgetItemSort.budgetItemSort ? 'ActiveButton':'InActiveButton'" v-if="isOpen">{{budgetItemSort.budgetItemSort}}</button>
                             </div>
                         </div>
                          </div>
