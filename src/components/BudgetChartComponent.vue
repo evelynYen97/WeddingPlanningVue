@@ -191,6 +191,7 @@ onMounted(() => {
     };
 });
 
+//圖片下載功能
 const downloadPieChart = () => {
       const myChart = echarts.getInstanceByDom(pieChart.value);
       const imgData = myChart.getDataURL({

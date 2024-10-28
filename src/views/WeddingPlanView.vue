@@ -51,13 +51,13 @@
                 <h6 style="color: white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{weddingplanData.weddingIntroduction}}</h6>
              </div>
         </div>
-        <button class="upBtn rounded">↑</button>
-        <button class="downBtn rounded">↓</button>
+        <button class="upBtn rounded button-55">▲</button>
+        <button class="downBtn rounded button-55">▼</button>
     </div>
     <div class="block" >
         <button class="closeBtn mb-3">x</button>
-        <button class="upBtn rounded">↑</button>
-        <button class="downBtn rounded">↓</button>
+        <button class="upBtn rounded button-55">▲</button>
+        <button class="downBtn rounded button-55">▼</button>
         <div id="weddingPlace" class="pdfContent">
             <h3 id="weddingSpot">婚禮殿堂：{{weddingplanData.venueName
             }}</h3>
@@ -74,8 +74,8 @@
      </div>  
      <div class="block" >
         <button class="closeBtn mb-3">x</button>
-        <button class="upBtn rounded">↑</button>
-        <button class="downBtn rounded">↓</button>
+        <button class="upBtn rounded button-55">▲</button>
+        <button class="downBtn rounded button-55">▼</button>
         <div id="handBackground" class="pdfContent">
             <div style="position:absolute;height: 550px;width: 1100px;background-color:#CECDCD; border-radius: 25px; left: 55px; z-index: 0;" ></div>
             <img :src="imageSrc" alt="simulate" id="simulateImg" >
@@ -91,8 +91,8 @@
         </div>
         <div class="block" >
         <button class="closeBtn mb-3">x</button>
-        <button class="upBtn rounded">↑</button>
-        <button class="downBtn rounded">↓</button>
+        <button class="upBtn rounded button-55">▲</button>
+        <button class="downBtn rounded button-55">▼</button>
         <div id="handBackground2" class="pdfContent">
             <div class="quill-editor" id="simulateEdit">
                 <h2 style="color: #ffffff; font-weight: bold;">婚禮活動時程</h2>
@@ -136,8 +136,8 @@
             <h5 style="color: grey; font-weight: bold;">·</h5>
         </div>
     </div>
-        <button class="upBtn rounded text-start">↑</button>
-        <button class="downBtn rounded text-start">↓</button>
+    <button class="upBtn rounded button-55">▲</button>
+    <button class="downBtn rounded button-55">▼</button>
     </div>
     <div class="block" style="height: 0px;">
         <div class="pdfContent">.</div>
@@ -625,6 +625,7 @@ const generateButton = ref(null);
 
         .quill-editor {
             height: 100px;
+            border: none !important; 
             /* border: none !important;  最後再調*/
         }
         .quill-editor:hover{
@@ -644,16 +645,16 @@ const generateButton = ref(null);
         .upBtn{
             position: absolute;
             top:50px;
-            right: 10px;
-            width: 4px;
+            right: 40px;
+            width: 10px;
             background-color: aquamarine;
             text-align:center;
         }
         .downBtn{
             position: absolute;
-            top:80px;
-            right:10px;
-            width: 4px;
+            top:90px;
+            right:40px;
+            width: 10px;
             background-color: aquamarine
         }
         
@@ -683,7 +684,7 @@ const generateButton = ref(null);
             position:absolute;
             height:70px;
             bottom:0px; 
-            right: 5%;
+            right: 15%;
         }
 
         .budgetItemsList{
@@ -692,5 +693,48 @@ const generateButton = ref(null);
              font-weight: bold;
              position: absolute;
         }
+
+        /* button */
+
+/* CSS */
+.button-55 {
+  align-self: center;
+  background-color: #fff;
+  background-image: none;
+  background-position: 0 90%;
+  background-repeat: repeat no-repeat;
+  background-size: 4px 3px;
+  border-radius: 15px 225px 255px 15px 15px 255px 225px 15px;
+  border-style: solid;
+  border-width: 2px;
+  box-shadow: rgba(0, 0, 0, .2) 15px 28px 25px -18px;
+  box-sizing: border-box;
+  color: #41403e;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Neucha, sans-serif;
+  font-size: 1rem;
+  line-height: 23px;
+  outline: none;
+  padding: .75rem;
+  text-decoration: none;
+  transition: all 235ms ease-in-out;
+  border-bottom-left-radius: 15px 255px;
+  border-bottom-right-radius: 225px 15px;
+  border-top-left-radius: 255px 15px;
+  border-top-right-radius: 15px 225px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-55:hover {
+  box-shadow: rgba(0, 0, 0, .3) 2px 8px 8px -5px;
+  transform: translate3d(0, 2px, 0);
+}
+
+.button-55:focus {
+  box-shadow: rgba(0, 0, 0, .3) 2px 8px 4px -6px;
+}
   </style>
   

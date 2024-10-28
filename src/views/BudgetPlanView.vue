@@ -437,7 +437,7 @@ import { VAlert} from 'vuetify/components';
                          <div class="col-12 col-sm-9">
                             <!-- 總預算輸入計算 -->
                              <div class="row">
-                    <div class="col-12 col-md-4 me-0 InputBudgetContain" style="height: 142px;">
+                    <div class="col-12 col-md-4 me-0 mb-3 InputBudgetContain" style="height: 142px;">
                         <div id="InputContent">
                             <div class="me-0 w-100 d-flex justify-content-between">
                                 <label class="fs-5 fw-bold ms-0">會員預算總金額： </label>
@@ -456,7 +456,7 @@ import { VAlert} from 'vuetify/components';
                          
                 </div>
                      </div>
-                     <div class="col-12 col-md-5 mx-2 InputBudgetContain">
+                     <div class="col-12 col-md-5 mx-2 mb-3  InputBudgetContain">
                         <div id="InputContent">
                         <div class="d-flex justify-content-between">
                             <label class="fs-5 fw-bold">當前預算總支出：</label>
@@ -617,7 +617,7 @@ import { VAlert} from 'vuetify/components';
         border-bottom: 3px dashed darkolivegreen;
     }
     .listContainRow{
-        margin:20px 150px 100px 150px;
+        margin:20px ;
     }
     .alert-center {
         position: fixed;
