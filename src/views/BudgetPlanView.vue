@@ -1,6 +1,7 @@
 <script setup>
 import BudgetChartComponent from '@/components/BudgetChartComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
+import ClickButtonAComponent from '@/share_components/ClickButtonAComponent.vue';
 import { ref ,computed, watchEffect,onMounted, onBeforeUnmount} from 'vue';
 import { VAlert} from 'vuetify/components';
 import * as XLSX from 'xlsx';
@@ -364,7 +365,8 @@ const loadAllBudgetsData=async()=>{
 }
 
 const exportExcel = async () => {
-  await loadAllBudgetsData(); 
+    if(memberId>1){
+        await loadAllBudgetsData(); 
 
   const modifiedData = allBudgets.value.map(item => ({
     '類別':item.budgetItemSort,
@@ -392,6 +394,13 @@ const exportExcel = async () => {
 
   // 導出 Excel 文件
   XLSX.writeFile(wb, '預算表.xlsx');
+    }
+    else{
+        alertShow.value=true;
+        alertType.value='warning';
+        alertMessage.value='請登入以獲得完整服務。';
+    }
+  
 };
 </script>
 
@@ -493,8 +502,6 @@ const exportExcel = async () => {
      </div>
     </div>
      <!-- DeleteModal end-->
-
-            <button @click="exportExcel">導出預算表</button>
              <BudgetChartComponent :selectSort="selectedSort" :thisMemberId="memberId" @changeTableData="onCategoryClick"></BudgetChartComponent>
              <div class="container">
                 
@@ -505,6 +512,9 @@ const exportExcel = async () => {
                          <div class="col-12 col-sm-9">
                             <!-- 總預算輸入計算 -->
                              <div class="row">
+                                <div class="col-md-1" id="clickAContain">
+            <ClickButtonAComponent @ButtonAClick="exportExcel"><h5 class="fw-bold">下載預算表excel</h5></ClickButtonAComponent>
+        </div>
                     <div class="col-12 col-md-4 me-0 mb-3 InputBudgetContain" style="height: 142px;">
                         <div id="InputContent">
                             <div class="me-0 w-100 d-flex justify-content-between">
@@ -524,7 +534,7 @@ const exportExcel = async () => {
                          
                 </div>
                      </div>
-                     <div class="col-12 col-md-5 mx-2 mb-3  InputBudgetContain">
+                     <div class="col-12 col-md-4 mx-2 mb-3  InputBudgetContain">
                         <div id="InputContent">
                         <div class="d-flex justify-content-between">
                             <label class="fs-5 fw-bold">當前預算總支出：</label>
@@ -691,5 +701,10 @@ const exportExcel = async () => {
          z-index: 1000; /* 确保在最上层 */
         }
 
-    
+        #clickAContain{
+            height: 50px;
+            width: 100px;
+            margin-left: 130px;
+            margin-bottom: 10px;
+        }
 </style>

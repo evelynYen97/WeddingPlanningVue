@@ -1,6 +1,13 @@
 <template>
     <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
+    
   <div class="container">
+    <div class="row" id="videoRow">
+        <video id="myVideo" controls loop autoplay>
+            <source src="../assets/video/weddingplan.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
     <div class="row">
       <div class="col-12 col-md-12 mb-3 mt-5">
         <h2>婚禮企劃書</h2>
@@ -95,7 +102,7 @@
         <button class="downBtn rounded button-55">▼</button>
         <div id="handBackground2" class="pdfContent">
             <div class="quill-editor" id="simulateEdit">
-                <h2 style="color: #ffffff; font-weight: bold;">婚禮活動時程</h2>
+                <h2 style="color: #ffffff; font-weight: bold;">婚禮流程</h2>
              </div>
             <img :src="eventTimeLinePath" alt="events" id="eventImg">
              <div class="quill-editor" id="simulateSlogan">
@@ -117,7 +124,6 @@
             <h5 style="color: grey; font-weight: bold;">可以貼上預算規劃工具產生的圖片替換</h5>
             <h5 style="color: grey; font-weight: bold;">1.場地花了...</h5>
             <h5 style="color: grey; font-weight: bold;">2.</h5>
-            <h5 style="color: grey; font-weight: bold;">3.</h5>
         </div>
         <div class="quill-editor" id="edit6">
             <h5 style="color: grey; font-weight: bold;">自由貼入想要放的預算相關圖片，或加入一些文字説明。</h5>
@@ -165,7 +171,7 @@
             <h1 id="edit1" style="color:white">婚禮排程工作人員</h1>
             <div style="position:absolute;height: 1400px;width: 1000px;margin: 100px;background-color:#F1F1F1; border-radius: 25px">
                 <ul style="left: 30px; top:30px ;" class="budgetItemsList">
-                    <li v-for="staff in ScheduleStaffData" :key="ScheduleStaffData.staffID" style="font-size: 20px;" class="lh-lg">{{formatScheduleTime(staff.staffScheduleTime)}}&nbsp;&nbsp;&nbsp;{{staff.staffScheduleName}}-人員: {{staff.staffName
+                    <li v-for="staff in ScheduleStaffData" :key="ScheduleStaffData.staffID" style="font-size: 18px;" class="lh-lg">{{formatScheduleTime(staff.staffScheduleTime)}}&nbsp;&nbsp;&nbsp;{{staff.staffScheduleName}}-人員: {{staff.staffName
                     }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;協助内容：{{ staff.assistanceContent }}</li>
                 </ul>
                 </div>
@@ -383,6 +389,15 @@ const generateButton = ref(null);
   
   <style scoped>
   @import 'quill/dist/quill.snow.css';
+        #myVideo{
+            height:500px;
+            margin-top: 50px;
+        }
+
+        /* #videoRow{
+            background: url('@/assets/images/weddingPlanImg/videobg1.jpg');
+            width: 100%;
+        } */
 
         #makePDFButton{
             height: 50px;
