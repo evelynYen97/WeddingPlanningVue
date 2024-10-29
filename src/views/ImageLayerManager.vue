@@ -10,10 +10,14 @@
                 <div @click="changeContainerSize(750, 600)">5:4</div>
                 <div @click="changeContainerSize(900, 600)">3:2</div>
                 <div @click="changeContainerSize(1010, 625.5)">16:9</div>
+                <div @click="fillup">填滿</div>
             </div>
-            <div class="container" ref="container">
-                <div class="size-info" v-if="selectedImage">{{ sizeInfo }}</div>
+            <div style="width: 1012px; height: 626px; background-color:#F5F5DC ;" >
+                <div class="container" ref="container">
+                    <div class="size-info" v-if="selectedImage">{{ sizeInfo }}</div>
+                </div>
             </div>
+            
             <div class="components-wrapper">
                 <WImgMComponent @data-sent="handleDataSent" class="Mh3" />
                 <MImgMComponent @Memdata-sent="MemhandleDataSent" class="Mh5" v-if="isComponentRestart" :key="componentKey"/>
@@ -194,8 +198,8 @@ export default {
             };
             post();
         },
-        toggleComponent() {
         // 隱藏/顯示組件，這將強制重新渲染組件
+        toggleComponent() {
             this.isComponentRestart = false; 
             // 使用 setTimeout 在下一個事件循環中再將 isComponentVisible 設置為 true
             setTimeout(() => {
@@ -425,6 +429,24 @@ export default {
             this.$refs.container.style.width = `${newWidth}px`;
             this.$refs.container.style.height = `${newHeight}px`;
             this.adjustImagesToNewContainer();
+        },
+        //填滿背景功能
+        fillup(){
+            const container = this.$refs.container;
+            const containerRect = container.getBoundingClientRect();
+
+            this.selectedImage.style.width = `${containerRect.width}px`;
+            this.selectedImage.style.height = `${containerRect.height}px`;
+
+            this.selectedImage.style.transform = 'translate(0px, 0px)';
+            this.selectedImage.setAttribute('data-x', 0);
+            this.selectedImage.setAttribute('data-y', 0);
+
+            this.saveDragState(this.selectedImage, 0, 0);
+            const lockIcon = this.saveDragState.parentNode.querySelector('.lock-icon');
+            if (lockIcon) {
+                lockIcon.style.transform = `translate(${x}px, ${y}px)`; // 锁图标跟随图片移动
+            }
         },
         // 调用 html2canvas 来截取 container 的截图
         captureScreenshot() {
@@ -792,6 +814,7 @@ body {
 
 .container {
     position: relative;
+    max-width: 1020px;
     width: 1012px;
     height: 626px;
     background-color: #D8CAB8;
@@ -943,12 +966,12 @@ input[type="file"] {
     border-bottom-left-radius: 10px;
     border-top-left-radius: 10px;
     margin-left: 127px;
-    padding-top: 10px;
+    padding: 10px;
     position: relative;
     width: 100px;
     height: 626px;
     background-color: #F5F5DC;
-    color: #6f8170;
+    color: #625e5e;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -959,12 +982,12 @@ input[type="file"] {
     padding: 20px;
     cursor: pointer;
     text-align: center;
-    background-color: #C3E0C5;
+    background-color: #dad0d0;
     margin-bottom: 10px;
 }
 
 .menu div:hover {
-    background-color: rgb(203, 255, 213);
+    background-color: #a39c9c;
     color: black;
 }
 </style>
