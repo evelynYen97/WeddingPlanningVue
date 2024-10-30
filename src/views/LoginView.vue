@@ -2,6 +2,7 @@
 import SampleComponent from '@/components/SampleComponent.vue';
 import { ref } from 'vue'; // 使用 ref 來進行雙向綁定
 
+
 // 從環境變數獲取 BASE_URL
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BASE_URL}/Members`;
@@ -9,6 +10,7 @@ const API_URL = `${BASE_URL}/Members`;
 // 定義 email 和 password 的 ref
 const email = ref('');
 const password = ref('');
+// const lastLoginTime = ref('');
 
 // 處理表單提交
 async function handleLogin(event) {
@@ -22,6 +24,10 @@ async function handleLogin(event) {
   }
 
   try {
+    // const lastLoginTime = new Date().toISOString(); 
+    //因為資料庫是使用datetime2 所以只能用toISOString 顯示的時間是UTC時間
+    //因為後端已經寫了別的方法來轉換時間 所以這段已經不需要了
+
     const response = await fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: {
@@ -44,7 +50,7 @@ async function handleLogin(event) {
       // 設定使用者ID到 Cookie，並設定為遊覽器關閉後刪除COOKIE，如果要過期時間為 7 天 就加上 max-age=${7 * 24 * 60 * 60}; 
       document.cookie = `memberID=${data.memberID}; path=/;secure; SameSite=Strict`;
       document.cookie = `memberName=${data.memberName}; path=/;secure; SameSite=Strict`;
-      window.location.href = '/index'; // 使用 window.location.href 來跳轉到首頁
+      window.location.href = '/profile'; // 使用 window.location.href 來跳轉到會員中心
 
       // 在這裡可以儲存 session 或跳轉頁面
     } else {
@@ -71,27 +77,16 @@ async function handleLogin(event) {
       <div class="col col-xl-10">
         <div class="card" style="border-radius: 1rem;">
           <div class="row g-0">
-            <div class="col-md-6 col-lg-5 d-none d-md-block">
-              <img
-                src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img1.webp"
-                alt="login form"
-                class="img-fluid"
-                style="border-radius: 1rem 0 0 1rem;"
-              />
-            </div>
             <div class="col-md-6 col-lg-7 d-flex align-items-center">
               <div class="card-body p-4 p-lg-5 text-black">
                 <form @submit="handleLogin">
                   <div class="d-flex align-items-center mb-3 pb-1">
-                    <i
-                      class="fas fa-cubes fa-2x me-3"
-                      style="color: #ff6219;"
-                    ></i>
-                    <span class="h1 fw-bold mb-0">Logo</span>
+                    <i class="bi bi-person-fill" style="font-size: 2rem;"></i>
+                    <span class="h1 fw-bold mb-0">登入</span>
                   </div>
 
                   <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">
-                    Sign into your account
+                    登入您的帳戶
                   </h5>
 
                   <div class="form-outline mb-4">
@@ -101,7 +96,7 @@ async function handleLogin(event) {
                       v-model="email"
                       class="form-control form-control-lg"
                     />
-                    <label class="form-label" for="email">Email address</label>
+                    <label class="form-label" for="email">Email</label>
                   </div>
 
                   <div class="form-outline mb-4">
@@ -117,21 +112,27 @@ async function handleLogin(event) {
                   <div class="pt-1 mb-4">
                     <button
                       type="submit"
-                      class="btn btn-dark btn-lg btn-block"
+                      class="btn btn-dark text-white btn-lg btn-block"
                     >
                       Login
                     </button>
                   </div>
 
-                  <a class="small text-muted" href="#!">Forgot password?</a>
+                  <a class="small text-muted" href="#!">忘記密碼?</a>
                   <p class="mb-5 pb-lg-2" style="color: #393f81;">
-                    Don't have an account?
-                    <a href='register' style="color: #393f81;">Register here</a>
+                    您還沒有加入會員嗎?
+                    <a href='register' style="color: #393f81;">建立會員</a>
                   </p>
-                  <a href="#!" class="small text-muted">Terms of use.</a>
-                  <a href="#!" class="small text-muted">Privacy policy</a>
                 </form>
               </div>
+            </div>
+            <div class="col-md-6 col-lg-5 d-none d-md-block">
+              <img
+                src="/src/assets/images/church-login.jpg"
+                alt="login form"
+                class="img-fluid"
+                style="border-radius: 1rem 0 0 1rem;"
+              />
             </div>
           </div>
         </div>
