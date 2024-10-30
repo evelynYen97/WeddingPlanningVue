@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, reactive } from 'vue';
 import ShopView from './ShopView.vue';
 
 const API_URL = 'https://localhost:7048/api/Dishes';
@@ -10,7 +10,7 @@ const selectedCategory = ref('all'); // 儲存選中的分類
 const searchKeyword = ref(''); // 儲存搜尋欄的關鍵字
 const currentPage = ref(1) // 當前頁面
 const pageSize = ref(10) // 每頁顯示的商品數量
-
+const dishesQuantity = reactive({}); // 每個桌菜(每桌)的數量，拆掉彼此影響的參數依據
 
 // 讀取 API 資料
 const loadDishes = async () => {
@@ -18,6 +18,11 @@ const loadDishes = async () => {
   const datas = await response.json();
   console.log(datas);
   dishes.value = datas;
+
+//預設每張桌菜的數量為 1
+datas.forEach((dish) => {
+  dishesQuantity[dish.dishesId] = 1;
+  });
 };
 
 
@@ -77,6 +82,23 @@ watch(searchKeyword, () => {
   currentPage.value = 1
 })
 
+// 監聽初步篩選的變化，重設回去為第一頁(重置的概念)
+watch(selectedCategory, () =>{
+  currentPage.value = 1
+})
+
+// 增減數量函式
+function increaseQuantity(dishesId) {
+  dishesQuantity[dishesId]++;
+}
+
+function decreaseQuantity(dishesId) {
+  if (dishesQuantity[dishesId] > 1) {
+    dishesQuantity[dishesId]--;
+  }else{
+    alert('每件不能低於1。')
+  }
+}
 
 loadDishes();
 </script>
@@ -158,14 +180,16 @@ loadDishes();
                         <div class="d-flex align-items-center justify-content-between">
                           <div class="input-group product-qty">
                             <span class="input-group-btn">
-                              <button type="button" class="quantity-left-minus btn btn-danger btn-number">
-                                <svg width="16" height="16"><use xlink:href="#minus"></use></svg>
+                              <button type="button" class="quantity-left-minus btn btn-danger btn-number" 
+                              @click="decreaseQuantity(dish.dishesId)">
+                                -
                               </button>
                             </span>
-                            <input type="text" id="quantity" name="quantity" class="form-control input-number" value="1" />
+                            <input type="text" id="quantity" name="quantity" class="form-control input-number" :value="dishesQuantity[dish.dishesId]" />
                             <span class="input-group-btn">
-                              <button type="button" class="quantity-right-plus btn btn-success btn-number">
-                                <svg width="16" height="16"><use xlink:href="#plus"></use></svg>
+                              <button type="button" class="quantity-right-plus btn btn-success btn-number"
+                              @click="increaseQuantity(dish.dishesId)">
+                                +
                               </button>
                             </span>
                           </div>

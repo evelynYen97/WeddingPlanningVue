@@ -15,6 +15,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import CakeItemView from '@/views/CakeItemView.vue'
 import CarItemView from '@/views/CarItemView.vue'
 import DishItemView from '@/views/DishItemView.vue'
+import ShopDetailView from '@/views/ShopDetailView.vue'
 // import ToDoView from '@/views/ToDoView.vue'
 
 
@@ -115,7 +116,11 @@ const router = createRouter({
       name: 'dishItem',
       component: DishItemView
     },
-
+    { //商家個別頁面
+      path: '/allshop/:id',
+      name: 'shopdetail',
+      component: ShopDetailView
+    },
   ]
 })
 

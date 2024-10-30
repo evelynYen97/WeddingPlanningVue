@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, reactive } from 'vue'
 import ShopView from './ShopView.vue';
 
 const API_URL = 'https://localhost:7048/api/Cakes'
@@ -9,13 +9,21 @@ const selectedCategory = ref('all') // 儲存選擇的商品分類
 const searchKeyword = ref('') // 儲存搜尋欄的關鍵字
 const currentPage = ref(1) // 當前頁面
 const pageSize = ref(10) // 每頁顯示的商品數量
+const cakesQuantity = reactive({}); // 每個喜餅的數量，拆掉彼此影響的參數依據
 
 // 讀取 API 資料
 const loadcakes = async () => {
   const response = await fetch(API_URL)
   const datas = await response.json()
   cakes.value = datas
+
+// 預設每個喜餅的數量為 1
+datas.forEach((cake) => {
+  cakesQuantity[cake.cakeID] = 1;
+  });
 }
+
+
 
 // 根據選擇的分類或名稱進行篩選
 const filteredCakes = computed(() => {
@@ -57,7 +65,28 @@ watch(searchKeyword, () => {
   currentPage.value = 1
 })
 
+// 監聽初步篩選的變化，重設回去為第一頁(重置的概念)
+watch(selectedCategory, () =>{
+  currentPage.value = 1
+})
+
+// 增減數量函式
+function increaseQuantity(cakeID) {
+  cakesQuantity[cakeID]++;
+}
+
+function decreaseQuantity(cakeID) {
+  if (cakesQuantity[cakeID] > 1) {
+    cakesQuantity[cakeID]--;
+  }else{
+    alert('每件不能低於1。')
+  }
+}
+
+
 loadcakes()
+
+
 </script>
 
 
@@ -105,7 +134,7 @@ loadcakes()
                   type="text" 
                   v-model="searchKeyword" 
                   class="form-control search-input" 
-                  placeholder="輸入商品名稱進行搜尋..." 
+                  placeholder="輸入喜餅名稱進行搜尋..." 
                 />
               </div>
               <div class="col-6">
@@ -159,18 +188,14 @@ loadcakes()
                       <div class="d-flex align-items-center justify-content-between">
                         <div class="input-group product-qty">
                           <span class="input-group-btn">
-                            <button type="button" class="quantity-left-minus btn btn-danger btn-number" data-type="minus">
-                              <svg width="16" height="16">
-                                <use xlink:href="#minus"></use>
-                              </svg>
+                            <button type="button" class="quantity-left-minus btn btn-danger btn-number"   @click="decreaseQuantity(cake.cakeID)">
+                              -
                             </button>
                           </span>
-                          <input type="text" id="quantity" name="quantity" class="form-control input-number" value="1" />
+                          <input type="text" id="quantity" name="quantity" class="form-control input-number" :value="cakesQuantity[cake.cakeID]" />
                           <span class="input-group-btn">
-                            <button type="button" class="quantity-right-plus btn btn-success btn-number" data-type="plus">
-                              <svg width="16" height="16">
-                                <use xlink:href="#plus"></use>
-                              </svg>
+                            <button type="button" class="quantity-right-plus btn btn-success btn-number" @click="increaseQuantity(cake.cakeID)">
+                              +                     
                             </button>
                           </span>
                         </div>

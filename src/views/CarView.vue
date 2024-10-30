@@ -1,5 +1,5 @@
 <script setup>
-import {ref, computed, watch} from 'vue'
+import {ref, computed, watch, reactive} from 'vue'
 import ShopView from './ShopView.vue';
 
 const API_URL =   'https://localhost:7048/api/Cars'
@@ -10,7 +10,7 @@ const selectedCategory = ref('all'); // 存放目前選中的分類
 const searchKeyword = ref('') // 儲存搜尋欄的關鍵字
 const currentPage = ref(1) // 當前頁面
 const pageSize = ref(10) // 每頁顯示的商品數量
-
+const carsQuantity = reactive({}); // 每台禮車的數量，拆掉彼此影響的參數依據
 
 //讀取API資料
 const  loadCars = async() => {
@@ -18,6 +18,11 @@ const  loadCars = async() => {
   const datas = await response.json()
   console.log(datas)
   cars.value = datas
+
+// 預設每台禮車的數量為 1
+datas.forEach((car) => {
+  carsQuantity[car.carId] = 1;
+  });
 }
 
 //關鍵字搜尋：根據選擇的分類或是名稱挑選資料
@@ -61,6 +66,25 @@ const goToPage = (page) => {
 watch(searchKeyword, () => {
   currentPage.value = 1
 })
+
+// 監聽初步篩選的變化，重設回去為第一頁(重置的概念)
+watch(selectedCategory, () =>{
+  currentPage.value = 1
+})
+
+
+// 增減數量函式
+function increaseQuantity(carId) {
+  carsQuantity[carId]++;
+}
+
+function decreaseQuantity(carId) {
+  if (carsQuantity[carId] > 1) {
+    carsQuantity[carId]--;
+  }else{
+    alert('每件數量不能低於1。')
+  }
+}
 
 loadCars()
 
@@ -161,25 +185,21 @@ loadCars()
                           <span class="input-group-btn">
                             <button type="button" 
                                     class="quantity-left-minus btn btn-danger btn-number" 
-                                    data-type="minus"
+                                    @click="decreaseQuantity(car.carId)"
                                     >
-                              <svg width="16" height="16">
-                                <use xlink:href="#minus"></use>
-                              </svg>
+                            -
                             </button>
                           </span>
                           <input type="text" 
                                  id="quantity" 
                                  name="quantity" 
                                  class="form-control input-number" 
-                                 value="1" />
+                                 :value="carsQuantity[car.carId]"  />
                           <span class="input-group-btn">
                             <button type="button" 
                                     class="quantity-right-plus btn btn-success btn-number" 
-                                    data-type="plus">
-                              <svg width="16" height="16">
-                                <use xlink:href="#plus"></use>
-                              </svg>
+                                    @click="increaseQuantity(car.carId)">
+                            +
                             </button>
                           </span>
                         </div>
