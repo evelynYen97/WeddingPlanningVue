@@ -8,7 +8,9 @@ import { onMounted } from 'vue';
 </script>
 
 <template>
-    <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
+    
+  <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
+  
   <div class="main-container">
 
     

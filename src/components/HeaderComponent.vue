@@ -158,7 +158,7 @@ const scrollToContactUs = () => {
                   會員中心
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  <li><RouterLink class="dropdown-item" :to="{name:'shop'}">待辦事項</RouterLink></li>
+                  <li><RouterLink class="dropdown-item" :to="{name:'todo'}">待辦事項</RouterLink></li>
                   <li><RouterLink class="dropdown-item" :to="{name:'profile'}">會員資料</RouterLink></li>
                 </ul>
               </li>

@@ -12,7 +12,7 @@ import ShopView from '@/views/ShopView.vue'
 import WeddingPlanView from '@/views/WeddingPlanView.vue'
 import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-// import ToDoView from '@/views/ToDoView.vue'
+import ToDoView from '@/views/ToDoView.vue'
 
 
 const router = createRouter({
@@ -36,11 +36,11 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
-    // { //待辦事項
-    //   path: '/todo',
-    //   name: 'todo',
-    //   component: ToDoView
-    // },
+    { //待辦事項
+      path: '/todo',
+      name: 'todo',
+      component: ToDoView
+    },
     { //預算
       path: '/budgetplan',
       name: 'budgetplan',
