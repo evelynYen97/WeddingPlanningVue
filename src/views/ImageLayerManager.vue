@@ -60,7 +60,6 @@
 import MImgMComponent from '@/components/MImgMComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
 import WImgMComponent from '@/components/WImgMComponent.vue';
-import SampleComponent from '@/components/SampleComponent.vue';
 import html2canvas from 'html2canvas';
 import interact from 'interactjs';
 import axios from 'axios';

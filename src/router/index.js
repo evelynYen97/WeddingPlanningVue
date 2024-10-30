@@ -96,7 +96,11 @@ const router = createRouter({
       name: 'allShop',
       component: AllShopView
     },
-
+    { //所有商家頁面
+      path: '/event',
+      name: 'event',
+      component: EventsView
+    },
     { //圖層頁面
       path: '/LayerSimulation',
       name: 'layers',
