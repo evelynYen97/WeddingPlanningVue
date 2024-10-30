@@ -105,7 +105,27 @@ const router = createRouter({
       path: '/LayerSimulation',
       name: 'layers',
       component: ImageLayerManager
-    }
+    },
+    { //喜餅商品頁面
+      path: '/cake/:id',
+      name: 'Cakeitem',
+      component: CakeItemView,
+    },
+    { //車輛個別頁面
+      path: '/car/:id',
+      name: 'carItem',
+      component: CarItemView
+    },
+    { //桌菜個別頁面
+      path: '/dish/:id',
+      name: 'dishItem',
+      component: DishItemView
+    },
+    { //商家個別頁面
+      path: '/allshop/:id',
+      name: 'shopdetail',
+      component: ShopDetailView
+    },
   ]
 })
 
