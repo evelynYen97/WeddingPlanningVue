@@ -3,7 +3,7 @@
         <h5>MemberMaterials</h5>
         <div class="col" v-for="term in terms" :key="term.memberMaterialId">
             <div class="card" @click="sendMemData(term)">
-            <img :src="`/src/assets/images/Layer_MemImg/${term.memberImgName}`" class="card-img-top" :alt="term.memberMaterialId" :title="term.memberMaterialId">
+            <img :src="`https://localhost:7048/uploads/${term.memberImgName}`" class="card-img-top" :alt="term.memberMaterialId" :title="term.memberMaterialId">
                 <div class="card-body">
                     <!-- 使用split來根據.分割字只取第一部分 為了去掉.png-->
                     <p class="card-text">{{ term.memberImgName.split('.').slice(0, -1).join('.') }}</p>
@@ -44,7 +44,7 @@ loadImg()
 
 const emit = defineEmits(['Memdata-sent']); // 定義 emit
 const sendMemData = (term) => {
-    const imagePath = `/src/assets/images/Layer_MemImg/${term.memberImgName}`;
+    const imagePath = `https://localhost:7048/uploads/${term.memberImgName}`;
     const name = term.memberImgName;
     const memberid = term.memberid;
     const materialId = term.memberMaterialId;
