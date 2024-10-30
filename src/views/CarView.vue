@@ -1,12 +1,16 @@
 <script setup>
-import {ref, computed} from 'vue'
+import {ref, computed, watch, reactive} from 'vue'
 import ShopView from './ShopView.vue';
 
 const API_URL =   'https://localhost:7048/api/Cars'
+const loadImgURL =  'https://localhost:7162/Car1/'
 
 const cars = ref([]) //宣告放在名為cars的陣列中
 const selectedCategory = ref('all'); // 存放目前選中的分類
-
+const searchKeyword = ref('') // 儲存搜尋欄的關鍵字
+const currentPage = ref(1) // 當前頁面
+const pageSize = ref(10) // 每頁顯示的商品數量
+const carsQuantity = reactive({}); // 每台禮車的數量，拆掉彼此影響的參數依據
 
 //讀取API資料
 const  loadCars = async() => {
@@ -14,19 +18,73 @@ const  loadCars = async() => {
   const datas = await response.json()
   console.log(datas)
   cars.value = datas
+
+// 預設每台禮車的數量為 1
+datas.forEach((car) => {
+  carsQuantity[car.carId] = 1;
+  });
 }
 
-// 根據選擇的分類過濾商家(幾人座)
-const filtered = computed(() => {
-  if (selectedCategory.value === 'all') {
-    return cars.value; // 顯示全部商家
+//關鍵字搜尋：根據選擇的分類或是名稱挑選資料
+const filteredCarryMount = computed(() => {
+  // 根據幾人座式分類
+  let filtered = selectedCategory.value === 'all'
+    ? cars.value
+    : cars.value.filter(car => car.passengerCapacity === parseInt(selectedCategory.value))
+
+  // 根據名稱分類
+  if (searchKeyword.value.trim() !== '') {
+    filtered = filtered.filter(car =>
+      car.carName.toLowerCase().includes(searchKeyword.value.toLowerCase())
+    )
   }
 
-  // 根據 `passengerCapacity` 過濾商家
-  return cars.value.filter(car => car.
-  passengerCapacity === selectedCategory.value);
-});
+  return filtered
+})
 
+// 設計分頁的功能
+// 計算分頁後顯示的商品
+const paginatedCar = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredCarryMount.value.slice(start, end)
+})
+
+// 計算總頁數
+const totalPages = computed(() => 
+  Math.ceil(filteredCarryMount.value.length / pageSize.value)
+)
+
+// 切換頁面
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+  }
+}
+
+// 監聽搜尋欄的變化，重設回去為第一頁(重置的概念)
+watch(searchKeyword, () => {
+  currentPage.value = 1
+})
+
+// 監聽初步篩選的變化，重設回去為第一頁(重置的概念)
+watch(selectedCategory, () =>{
+  currentPage.value = 1
+})
+
+
+// 增減數量函式
+function increaseQuantity(carId) {
+  carsQuantity[carId]++;
+}
+
+function decreaseQuantity(carId) {
+  if (carsQuantity[carId] > 1) {
+    carsQuantity[carId]--;
+  }else{
+    alert('每件數量不能低於1。')
+  }
+}
 
 loadCars()
 
@@ -84,6 +142,19 @@ loadCars()
               </nav>
             </div>
 
+            <!-- 搜尋欄位 -->
+            <div class="row">
+              <div class="col-md-3 search-sidebar">
+                <input 
+                  type="text" 
+                  v-model="searchKeyword" 
+                  class="form-control search-input" 
+                  placeholder="輸入車輛名稱進行搜尋..." 
+                />
+              </div>
+            </div>
+           
+
             <!-- Tabs Content -->
             <div class="tab-content" id="nav-tabContent">
               <div class="tab-pane fade show active" 
@@ -92,19 +163,20 @@ loadCars()
                    aria-labelledby="nav-all-tab">
 
                 <div class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 
-                            row-cols-lg-4 row-cols-xl-5"
-                            
-                            >
+                            row-cols-lg-4 row-cols-xl-5">
                   
                   <!-- Product Item -->
-                  <div class="col" v-for="car in filtered" >
+                  <div class="col" v-for="car in paginatedCar" >
                     <div class="product-item">
                       <figure>
-                        <a href="index.html" title="Product Title">
-                          <img src="../assets/images/thumb-bananas.png" class="tab-image" />
-                        </a>
+                        <RouterLink :to="{ name: 'carItem', params: { id: car.carId } }">
+                          <img :src="`${loadImgURL}${car.carImg}`" class="tab-image"/>
+                        </RouterLink>
                       </figure>
-                      <h3>{{ car.carName }}</h3>
+                      <h3>
+                        <RouterLink :to="{ name: 'carItem', params: { id: car.carId } }">
+                          {{ car.carName }}
+                        </RouterLink></h3>
                       <span class="flavor">{{ car.carDetail }}</span><br>
                       <span class="qty">{{ car.passengerCapacity }}人座</span>
                       <span class="price">{{ car.rentalPerDay }}</span>
@@ -113,25 +185,21 @@ loadCars()
                           <span class="input-group-btn">
                             <button type="button" 
                                     class="quantity-left-minus btn btn-danger btn-number" 
-                                    data-type="minus"
+                                    @click="decreaseQuantity(car.carId)"
                                     >
-                              <svg width="16" height="16">
-                                <use xlink:href="#minus"></use>
-                              </svg>
+                            -
                             </button>
                           </span>
                           <input type="text" 
                                  id="quantity" 
                                  name="quantity" 
                                  class="form-control input-number" 
-                                 value="1" />
+                                 :value="carsQuantity[car.carId]"  />
                           <span class="input-group-btn">
                             <button type="button" 
                                     class="quantity-right-plus btn btn-success btn-number" 
-                                    data-type="plus">
-                              <svg width="16" height="16">
-                                <use xlink:href="#plus"></use>
-                              </svg>
+                                    @click="increaseQuantity(car.carId)">
+                            +
                             </button>
                           </span>
                         </div>
@@ -145,6 +213,28 @@ loadCars()
 
 
                 </div> <!-- /product-grid -->
+
+                <!-- 分頁控制 -->
+                <nav aria-label="Page navigation" class="mt-4">
+                  <ul class="pagination justify-content-center">
+                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                      <a class="page-link" href="#" @click.prevent="goToPage(currentPage - 1)">上一頁</a>
+                    </li>
+                    <li 
+                      class="page-item" 
+                      v-for="page in totalPages" 
+                      :key="page" 
+                      :class="{ active: page === currentPage }"
+                    >
+                      <a class="page-link" href="#" @click.prevent="goToPage(page)">{{ page }}</a>
+                    </li>
+                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                      <a class="page-link" href="#" @click.prevent="goToPage(currentPage + 1)">下一頁</a>
+                    </li>
+                  </ul>
+                </nav>
+                <!-- 分頁控制結束 -->
+
               </div> <!-- /tab-pane -->
             </div> <!-- /tab-content -->
           </div> <!-- /product-tabs -->

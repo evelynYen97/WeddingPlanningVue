@@ -12,6 +12,10 @@ import ShopView from '@/views/ShopView.vue'
 import WeddingPlanView from '@/views/WeddingPlanView.vue'
 import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import CakeItemView from '@/views/CakeItemView.vue'
+import CarItemView from '@/views/CarItemView.vue'
+import DishItemView from '@/views/DishItemView.vue'
+import ShopDetailView from '@/views/ShopDetailView.vue'
 import EventsView from '@/views/EventsView.vue'
 import ToDoView from '@/views/ToDoView.vue'
 
@@ -60,7 +64,7 @@ const router = createRouter({
     { //喜餅頁面
       path: '/cake',
       name: 'cake',
-      component: CakeView
+      component: CakeView,
     },
     { //登入頁面
       path: '/login',
@@ -93,16 +97,11 @@ const router = createRouter({
       component: AllShopView
     },
 
-    {//圖層頁面
+    { //圖層頁面
       path: '/LayerSimulation',
       name: 'layers',
       component: ImageLayerManager
-    },
-    {//圖層頁面
-      path: '/Event',
-      name: 'event',
-      component: EventsView
-    },
+    }
   ]
 })
 
