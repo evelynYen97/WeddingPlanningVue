@@ -22,16 +22,6 @@ function getMemberID() {
 }
 const memberId = getMemberID();
 
-//評論數據
-const reviews=ref([
-    { id: 1, merchantName: '會員 1', text: '這家商家的服務非常好，工作人員熱情友好。', rating: 5 },
-    { id: 2, merchantName: '會員 2', text: '產品質量優良，值得推薦。', rating: 4 },
-    { id: 3, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
-    { id: 4, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
-    { id: 5, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
-    { id: 6, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 4 },
-  ])
-
 //取得商家資訊
 const route=useRoute();
 const shopId=route.params.id;
@@ -48,16 +38,7 @@ loadShopInfo();
 const changeRateInfo=(rate)=>{
   return rate===0?'暫無評價': `⭐${rate}`
 };
-//評論是否有幫助
-// const helpful=ref(false);
-// const helpfulChange=()=>{
-//     if(helpful.value===false){
-//         helpful.value=true;
-//     }
-//     else{
-//         helpful.value=false;
-//     }
-// }
+
 
 </script>
 
@@ -70,7 +51,6 @@ const changeRateInfo=(rate)=>{
          <CircleButtonComponent id="backButton">回到商家 &nbsp;&nbsp;&nbsp; back to shop</CircleButtonComponent>
   </RouterLink>
         <div class="container mt-5">
-            <!-- .row>.col-12.col-md-12.bg-success>.col-md-2+.col-md-10>h3+label+label -->
             <div class="row">
                 <div class="col-12 col-md-12 d-flex align-items-center p-3 mb-3" id="shopNameCard">
                     <div class="col-2 col-md-2"><img :src="`https://localhost:7162/ShopLogo/${shopInfo.logoName}`" alt="" id="shopLogoImg"></div>
@@ -87,16 +67,7 @@ const changeRateInfo=(rate)=>{
             </div>
             <div class="row">
                 <div class="col-12 col-md-12 tabs-header d-flex justify-content-between border-bottom my-5" >
-                    <h3>婚友評價</h3>
-                    <div class="search  col-12 col-md-3 mb-3">
-                    <input type="text" class="search__input" placeholder="搜尋評論">
-                    <button class="search__button">
-                     <svg class="search__icon" aria-hidden="true" viewBox="0 0 24 24">
-                    <g>
-                     <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
-                    </g>
-                 </svg>
-                 </button>
+                    <h3>寫下你對{{shopInfo.shopName}}的評價</h3>
                 </div>
               </div>
               <div class="row mb-3">
@@ -108,7 +79,7 @@ const changeRateInfo=(rate)=>{
                         <v-btn class="m-2">2⭐</v-btn>
                         <v-btn class="m-2">1⭐</v-btn>
                         <v-btn class="m-2">附照片</v-btn>
-                        <RouterLink :to="{ name: 'writeReview', params: { id: shopId }} " style="text-decoration: none;"><v-btn class="m-2" id="giveReviewBtn"><i class="bi bi-chat-right-text"></i>&nbsp;給評價</v-btn></RouterLink>
+                        <v-btn class="m-2" id="giveReviewBtn"><i class="bi bi-chat-right-text"></i>&nbsp;給評價</v-btn>
                     </div>
                 </div>
              <div class="row">
@@ -118,13 +89,9 @@ const changeRateInfo=(rate)=>{
                     <h5 class="card-title">{{ review.merchantName }}</h5>
                     <p class="card-text">{{ review.text }}</p>
                     <div id="imgsContain"><img src="@/assets/images/weddingPlanImg/wed1.jpg" alt="" id="reviewImg"></div>
-                    <p class="card-text"><small class="text-muted">評價：{{ '⭐'.repeat(review.rating) + '✰'.repeat(5 - review.rating) }}</small></p>
-                    <!-- <button id="btnEditReview" v-if="review.id===memberID"><i class="bi bi-pencil-square fs-5"></i></button> 待修改啓用會員可編輯自己的資料-->   
+                    <p class="card-text"><small class="text-muted">評價：{{ '⭐'.repeat(review.rating) + '✰'.repeat(5 - review.rating) }}</small></p> 
                     <button id="btnEditReview"><i class="bi bi-pencil-square fs-5"></i></button>
                     <div id="orderLike">
-                        <!-- <small>該評論有幫助：
-                            <button v-if="!helpful" class="fs-5" @click="helpfulChange"><i class="bi bi-hand-thumbs-up"></i></button>
-                            <button v-else="helpful" class="fs-5"><i class="bi bi-hand-thumbs-up-fill" @click="helpfulChange"></i></button></small> -->
                         <div><small>是否已訂購該店家商品：否</small></div>
                     </div> 
                   </div>
@@ -137,7 +104,6 @@ const changeRateInfo=(rate)=>{
                
             </div>
         </div>
-    </div>
 </template>
 
 <style lang="css" scoped>
