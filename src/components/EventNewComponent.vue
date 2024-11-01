@@ -10,12 +10,12 @@
                 <!-- 圖片之後的位置 -->
             </v-card-text>
             <v-card-actions>
-                <button @click="dialog = false" class="btn" style="margin-right: 10px;">
-                    <span>close</span>
-                    <em></em>
-                </button>
                 <button @click="createEvent" class="btn">
                     <span>new</span>
+                    <em></em>
+                </button>
+                <button @click="dialog = false" class="btn" style="margin-right: 10px;">
+                    <span>close</span>
                     <em></em>
                 </button>
             </v-card-actions>
@@ -85,38 +85,54 @@ export default {
 
 <style scoped>
     .my-dialog .v-card {
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 20px; /* 自定義圓角 */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 陰影 */
     }
+    
+    /* 標題樣式 */
     .my-dialog .v-card-title {
         font-weight: bold;
         font-size: 1.5em;
-        color: #0f4881;
+        color: #372209; /* Vuetify 藍色 */
         text-align: center;
     }
     
-    .my-dialog .v-btn {
-        text-transform: none;
+    /* 自定義 v-text-field 樣式 */
+    .my-dialog .v-field__field {
+        border: 2px solid #475460;
+        border-radius: 10px;
+        background-color: #f0f4f8;
+        transition: border-color 0.3s, background-color 0.3s; /* 過渡效果 */
     }
-    .dialog-transition-enter-active,
+
+    /* 懸停時的效果 */
+    .my-dialog .v-field__field:hover {
+        border-color: #b0c0cf; /* 懸停時邊框顏色 */
+        background-color: #f3f9fe; /* 懸停時背景顏色 */
+    }
+
+
+    /* 動態過渡效果 */
+    .dialog-transition-enter-active, 
     .dialog-transition-leave-active {
-        transition: opacity 0.5s ease, transform 0.5s ease;
+        transition: opacity 0.5s ease, transform 0.5s ease; /* 設置透明度和變換的過渡效果 */
     }
-    .dialog-transition-enter,
-    .dialog-transition-leave-to {
+    .dialog-transition-enter, 
+    .dialog-transition-leave-to /* .leave-active 在 Vue 2.x 中 */ {
         opacity: 0;
-        transform: translateY(-30px);
+        transform: translateY(-30px); /* 進場時向上滑動，退場時向下滑動 */
     }
 
     .btn {
         position: relative;
         z-index: 1;
         min-width: 90px;
-        background-color: #676767;
+        background-color: #A6C8F0;
         overflow: hidden;
         box-shadow: 0px 0px 17px 1px rgba(0, 0, 0, 0.34);
         padding: 12px 20px;
         text-decoration: none;
+        margin-right: 10px;
     }
     .btn span {
         color: #ffffff;

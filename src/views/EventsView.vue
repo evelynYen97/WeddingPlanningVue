@@ -7,19 +7,22 @@
   <div class="container" style="margin-top: 50px;">
     <div class="row">
       <div class="col-4 carousel-wrapper" v-for="(term, index) in paginatedTerms" :key="term.eventId">
-        <div style="display: flex; flex-direction: column;">
-          <i class="fa-solid fa-pencil pencil-icon" style="font-size:22px;" @click="handlePencilClick(term)">
+        <div class="icon-container">
+          <i class="fa-solid fa-pencil pencil-icon" style="font-size:22px;margin-right: 20px;color:#B0B0B0 " @click="handlePencilClick(term)">
             <p style="font-size: 13px !important; margin-top: 5px;">Edit</p>
           </i>
-          <i class="fa-solid fa-circle-plus new-icon" style="font-size: 22px;" :id="term.eventId" @click="handlePlusClick()">
+          <i class="fa-solid fa-circle-plus new-icon" style="font-size: 22px;margin-right: 20px;color: #A6C8F0" @click="handlePlusClick()">
             <p style="font-size: 13px !important; margin-top: 5px;">New</p>
+          </i>
+          <i class="fa-solid fa-ban delete-icon" style="font-size: 24px;color: #D4A1BB;" @click="handleDeleteClick(term.eventId)">
+            <p style="font-size: 13px !important; margin-top: 5px;">Delete</p>
           </i>
         </div>
         <v-timeline direction="horizontal" v-if="index % 2 === 0">
           <v-timeline-item>
             <template v-slot:opposite>
               <div style="width: auto; height: 200px;">
-                <label style="display: flex; justify-content: center; padding-top: 15px">{{ term.eventTime }}</label>
+                <label style="display: flex; justify-content: center;">{{ term.eventTime }}</label>
                 <img src="/src/assets/images/navImage2.jpg" alt="User Icon" class="user-icon"
                   style="width: 220px; height: 150px;" />
               </div>
@@ -45,7 +48,7 @@
               </div>
             </template>
             <div style="width: auto; height: 200px;">
-              <label style="display: flex; justify-content: center; padding-top: 15px">{{ term.eventTime }}</label>
+              <label style="display: flex; justify-content: center;">{{ term.eventTime }}</label>
               <img src="/src/assets/images/navImage2.jpg" alt="User Icon" class="user-icon"
                 style="width: 220px; height: 150px;" />
             </div>
@@ -53,7 +56,7 @@
         </v-timeline>
       </div>
       <EventEditComponent ref="editEventDialog" @update="refreshTerms"/>
-      <EventNewComponent ref="editEventPlus" @update="refreshTerms"></EventNewComponent>
+      <EventNewComponent ref="editEventPlus" @refresh="refreshTerms"></EventNewComponent>
     </div>
     <div class="pagination-controls">
       <button @click="prevPage" :disabled="currentPage === 0">上一頁</button>
@@ -63,27 +66,28 @@
     </div>
   </div>
   <div class="container">
-    <div v-for="term in termschedul" :key="term.scheduleId">
-      <v-timeline>
+    <div v-for="terms in termschedul" :key="terms.scheduleId">
+      <v-timeline style="justify-content: flex-start !important;">
         <v-timeline-item dot-color="teal-lighten-3" size="small" >
-          <v-row no-gutters>
+          <v-row>
           <!-- 第一張 Card -->
             <v-col>
               <v-card style="width: 300px; height: auto;">
                 <v-card-title class="text-h6 bg-info" style="margin-bottom: 10px;">
-                  {{ term.scheduleStageName }}
+                  {{ terms.scheduleStageName }}
                 </v-card-title>
-                <v-card-text class="bg-white text--primary">
-                  <strong class="me-4">{{ term.scheduleTime.split("T")[1] }}</strong>
+                <v-card-text class="bg-white">
+                  <strong class="me-4">{{ terms.scheduleTime.split("T")[1] }}</strong>
                   <div class="text-caption">
-                    {{ term.scheduleStageNotes }}
+                    {{ terms.scheduleStageNotes }}
                   </div>
-                  <v-btn style="color: #2894FF;" variant="outlined">修改</v-btn>
+                  <v-btn style="color:red;" variant="outlined" @click="SchedulEditClick(terms)">修改</v-btn>
+                  <v-btn style="color:blue" variant="outlined">新增</v-btn>
                 </v-card-text>
               </v-card>
             </v-col>
             <!-- 第二張 Card -->
-            <v-col v-if="termschedulstaff && termschedulstaff.length > 0 && filteredStaff(term.scheduleId).length > 0">
+            <v-col v-if="termschedulstaff && termschedulstaff.length > 0 && filteredStaff(terms.scheduleId).length > 0">
               <v-card style="width: 250px; height: auto;">
                 <v-card-title class="text-h6" style="margin-bottom: 10px; background-color: blueviolet !important;">
                   參與成員
@@ -103,6 +107,7 @@
         </v-timeline-item>
       </v-timeline>
     </div>
+    <SchedulEditComponent ref="editschedulDialog" @schedulupdate="refreshschedul(this.noweventID)"></SchedulEditComponent>
   </div>  
 </template>
 
@@ -110,17 +115,17 @@
 import EventEditComponent from '@/components/EventEditComponent.vue';
 import EventNewComponent from '@/components/EventNewComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
-import { VTimeline, VTimelineItem, VCard, VCardTitle, VCardText, VBtn ,VIcon} from 'vuetify/components';
+import SchedulEditComponent from '@/components/SchedulEditComponent.vue';
+import { VTimeline, VTimelineItem, VCard, VCardTitle, VCardText, VBtn } from 'vuetify/components';
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 
 export default {
   components: {
     SampleComponent,
-    VTimeline,
-    VTimelineItem,
     EventEditComponent,
-    EventNewComponent
+    EventNewComponent,
+    SchedulEditComponent
   },
   props: {
     term: {
@@ -135,14 +140,15 @@ export default {
       termschedulstaff:[],
       currentPage: 0,
       itemsPerPage: 3,
+      noweventID:0,//重載排程要用的引數
     };
   },
   mounted() {
     this.loadevent();
   },
   watch: {
+    // 當 paginatedTerms 更新並渲染後執行選取
     paginatedTerms(newPaginatedTerms) { // 監視 paginatedTerms
-      // 當 paginatedTerms 更新並渲染後執行選取
       this.$nextTick(() => {
         const dots = document.querySelectorAll('.v-timeline-divider__inner-dot');
         newPaginatedTerms.forEach((term, index) => {
@@ -153,6 +159,7 @@ export default {
         });
       });
     },
+    // 當 termschedul 更新並渲染後執行選取
     termschedul(newtermschedul) { 
       this.$nextTick(() => {
         const dots = document.querySelectorAll('.v-timeline-divider__dot--size-small');
@@ -165,6 +172,7 @@ export default {
       });
     },
   },
+  //計算翻頁頁面
   computed: {
     paginatedTerms() {
       const start = this.currentPage * this.itemsPerPage;
@@ -173,31 +181,55 @@ export default {
     },
   },
   methods: {
+    //載入活動資料
     async loadevent() {
-      const API_URL = `${BASE_URL}/Events/caseID/1`; // 之後使用正確的localhost
+      const API_URL = `${BASE_URL}/Events/caseID/1`;//先預設 1
       try {
         const response = await fetch(API_URL);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const results = await response.json();
-        this.termsevent = results; // 將 API 回傳的結果存入 terms 陣列
+        this.termsevent = results;
       } catch (error) {
         console.error('Fetch error:', error);
       }
     },
-    // 打開彈窗並傳遞事件數據
+    //打開活動編輯彈窗並傳遞事件數據
     handlePencilClick(term) {
       this.$refs.editEventDialog.open(term); 
     },
+    // 打開活動新增彈窗並傳遞事件數據
     handlePlusClick() {
       this.$refs.editEventPlus.open(); 
     },
+    //刪除活動事件
+    handleDeleteClick(eventId){
+      const deleteImg = async () => {
+        try {
+            const FindID_URL = `${BASE_URL}/Events/${eventId}`; // 正確的URL
+            const response = await fetch(FindID_URL, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+              console.log('刪除成功');
+              this.loadevent();
+            } else {
+                console.error('刪除失敗', response.status);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+      };
+      deleteImg();
+    },
     //彈窗編輯回來,更新頁面資料
     refreshTerms() {
-        this.loadevent(); // 呼叫資料載入方法重新渲染
+        this.loadevent();
     },
+    //載入排程資訊
     async loadschedul(eventID) {
+      this.noweventID = eventID;
       const API_URL = `${BASE_URL}/Schedules/EventID/${eventID}`;
       try {
         const response = await fetch(API_URL);
@@ -205,11 +237,19 @@ export default {
           throw new Error('Network response was not ok');
         }
         const results = await response.json();
-        this.termschedul = results; // 將 API 回傳的結果存入 terms 陣列
+        this.termschedul = results;
         console.log(results);
       } catch (error) {
         console.error('Fetch error:', error);
       }
+    },
+    //打開編輯排程對話框並傳入事件數據
+    SchedulEditClick(term) {
+      this.$refs.editschedulDialog.open(term); 
+    },
+    //彈窗編輯回來,更新排程資料
+    refreshschedul(eventID) {
+        this.loadschedul(eventID); 
     },
     async loadschedulstaff(schedulID) {
       const API_URL = `${BASE_URL}/ScheduledStaffs/Schedul/${schedulID}`;
@@ -259,6 +299,11 @@ export default {
     margin-top: 50px;
   }
 
+  .icon-container {
+    display: flex;
+    flex-direction: row; /* 垂直排列 */
+  }
+
   .pagination-controls {
     display: flex;
     justify-content: center;
@@ -289,5 +334,21 @@ export default {
   .carousel-wrapper:hover .new-icon {
     opacity: 1;
   }
+
+  .carousel-wrapper .delete-icon {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .carousel-wrapper:hover .delete-icon {
+    opacity: 1;
+  }
   
+  .v-btn {
+    display: none !important;
+  }
+
+  .v-col:hover .v-btn {
+    display: inline-flex !important;
+  }
 </style>

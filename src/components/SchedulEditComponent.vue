@@ -1,73 +1,67 @@
 <template>
-    <v-dialog v-model="dialog" max-width="500px" class="my-dialog" transition="dialog-transition">
+    <v-dialog v-model="dialog" max-width="500px">
         <v-card>
-            <v-card-title class="headline">修改事件</v-card-title>
+            <v-card-title class="headline">修改資料</v-card-title>
             <v-card-text>
-                <v-text-field v-model="editedEvent.eventName" label="Event Name" outlined></v-text-field>
-                <v-text-field v-model="editedEvent.eventLocation" label="Event Location" outlined></v-text-field>
-                <v-text-field v-model="editedEvent.eventTime" label="Event Time" type="datetime-local" outlined></v-text-field>
-                <v-textarea v-model="editedEvent.eventNotes" label="Event Notes" outlined></v-textarea>
-                <p>{{ editedEvent.eventLocationImg }}</p>
+                <v-text-field v-model="editedData.scheduleStageName" label="排程名稱" outlined></v-text-field>
+                <v-text-field v-model="editedData.scheduleStageNotes" label="排程內容" outlined></v-text-field>
+                <v-text-field v-model="editedData.scheduleTime" label="安排時間" type="datetime-local" outlined></v-text-field>
             </v-card-text>
             <v-card-actions>
-                <button @click="saveEvent" class="btn">
-                    <span>edit</span>
+                <button @click="saveChanges" class="btn">
+                    <span>修改</span>
                     <em></em>
                 </button>
                 <button @click="dialog = false" class="btn" style="margin-right: 10px;">
-                    <span>close</span>
+                    <span>關閉</span>
                     <em></em>
                 </button>
             </v-card-actions>
         </v-card>
     </v-dialog>
 </template>
-
+  
 <script>
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 
-    export default {
-        data() {
-            return {
-                dialog: false,
-                editedEvent: {}, // 存放編輯的事件數據
+export default {
+    data() {
+        return {
+            editedData: {},
+            dialog: false,
+        };
+    },
+    methods: {
+        open(event) {
+            this.editedData = { ...event }; // 將傳入的事件數據複製到本地變量
+            this.dialog = true; // 打開對話框
+        },
+        async saveChanges() {
+            const terms = {
+                "scheduleId":this.editedData.scheduleId,
+                "eventId":this.editedData.eventId,
+                "scheduleTime":this.editedData.scheduleTime,
+                "scheduleStageName":this.editedData.scheduleStageName,
+                "scheduleStageNotes":this.editedData.scheduleStageNotes
             };
+            console.log(terms);
+            const API_URL = `${BASE_URL}/Schedules/${this.editedData.scheduleId}`;
+            try {
+            const response = await fetch(API_URL, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json',},
+                body: JSON.stringify(this.editedData),
+            });
+            if (!response.ok) throw new Error('API 更新失敗');
+                this.$emit('updateData', this.editedData); // 傳遞更新後的數據
+            } catch (error) {
+                console.error(error);
+            }
+            this.dialog = false; // 關閉對話框
+            this.$emit('schedulupdate'); // 觸發更新事件
         },
-        methods: {
-            open(event) {
-                this.editedEvent = { ...event }; // 將傳入的事件數據複製到本地變量
-                this.dialog = true; // 打開對話框
-            },
-            async saveEvent() {
-                let terms = {
-                    "eventId": this.editedEvent.eventId,
-                    "caseId": 1, //之後吃cookie裡的
-                    "eventName": this.editedEvent.eventName,
-                    "eventTime": this.editedEvent.eventTime,
-                    "eventLocation": this.editedEvent.eventLocation,
-                    "eventNotes": this.editedEvent.eventNotes,
-                    "eventLocationImg": this.editedEvent.eventLocationImg
-                }
-                const API_URL = `${BASE_URL}/Events/${this.editedEvent.eventId}`; // 之後使用正確的localhost
-                try {
-                    const response = await fetch(API_URL,{
-                        method: 'PUT',
-                        body: JSON.stringify(terms),
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    // const results = await response.json();
-                    // this.termsevent = results;
-                } catch (error) {
-                    console.error('Fetch error:', error);
-                }
-                this.dialog = false; // 關閉對話框
-                this.$emit('update');
-            },
-        },
-    };
+    },
+};
 </script>
 <style scoped>
     .my-dialog .v-card {
@@ -87,7 +81,7 @@ const BASE_URL = import.meta.env.VITE_API_BASEURL;
     .my-dialog .v-field__field {
         border: 1px solid #475460;
         border-radius: 5px;
-        background-color: #B0B0B0;
+        background-color: #f0f4f8;
         transition: border-color 0.3s, background-color 0.3s; /* 過渡效果 */
     }
 
@@ -112,7 +106,7 @@ const BASE_URL = import.meta.env.VITE_API_BASEURL;
         position: relative;
         z-index: 1;
         min-width: 90px;
-        background-color: #B0B0B0;
+        background-color: #676767;
         overflow: hidden;
         box-shadow: 0px 0px 17px 1px rgba(0, 0, 0, 0.34);
         padding: 12px 20px;
