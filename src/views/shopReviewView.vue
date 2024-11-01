@@ -31,6 +31,16 @@ const reviews=ref([
     { id: 5, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
     { id: 6, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 4 },
   ])
+//顯示内容改變
+const showInfo=ref(true);
+const changeShowInfo=(review)=>{
+    if(review<=0){
+      showInfo.value=false;
+    }
+    else{
+      showInfo.value=true;
+    }
+}
 
 //取得商家資訊
 const route=useRoute();
@@ -40,7 +50,7 @@ const loadShopInfo=async()=>{
   const response=await fetch(`${APIUrl}/ShopReviewsShopInfo/${shopId}`);
   if(response.ok){
     shopInfo.value=await response.json();
-    console.log(shopInfo.value.shopName)
+    changeShowInfo(shopInfo.value.reviewCount);
   }
 }
 loadShopInfo();
@@ -59,6 +69,7 @@ const changeRateInfo=(rate)=>{
 //     }
 // }
 
+
 </script>
 
 <template>
@@ -73,7 +84,7 @@ const changeRateInfo=(rate)=>{
             <!-- .row>.col-12.col-md-12.bg-success>.col-md-2+.col-md-10>h3+label+label -->
             <div class="row">
                 <div class="col-12 col-md-12 d-flex align-items-center p-3 mb-3" id="shopNameCard">
-                    <div class="col-2 col-md-2"><img :src="`https://localhost:7162/ShopLogo/${shopInfo.logoName}`" alt="" id="shopLogoImg"></div>
+                    <div class="col-2 col-md-2"><img :src="`https://localhost:7162/ShopLogo/${shopInfo.logoName}`" alt="shopLogo" id="shopLogoImg" class="rounded"></div>
                     <div class="col-7 col-md-7 ">
                         <h3>{{shopInfo.shopName}}</h3>
                         <label class="d-block "><i class="bi bi-geo-fill"></i>服務地點:{{shopInfo.serviceSpot}}</label>
@@ -86,10 +97,10 @@ const changeRateInfo=(rate)=>{
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-md-12 tabs-header d-flex justify-content-between border-bottom my-5" >
+                <div class="col-12 col-md-12 tabs-header d-flex justify-content-between border-bottom my-5">
                     <h3>婚友評價</h3>
-                    <div class="search  col-12 col-md-3 mb-3">
-                    <input type="text" class="search__input" placeholder="搜尋評論">
+                    <div class="search  col-12 col-md-3 mb-3" v-show="showInfo===true">
+                    <input type="text" class="search__input" placeholder="搜尋評論" >
                     <button class="search__button">
                      <svg class="search__icon" aria-hidden="true" viewBox="0 0 24 24">
                     <g>
@@ -100,7 +111,7 @@ const changeRateInfo=(rate)=>{
                 </div>
               </div>
               <div class="row mb-3">
-                    <div class="col-12 col-md-12">
+                    <div class="col-12 col-md-12" v-if="showInfo===true">
                         <v-btn class="m-2">全部評價</v-btn>
                         <v-btn class="m-2">5⭐</v-btn>
                         <v-btn class="m-2">4⭐</v-btn>
@@ -110,9 +121,12 @@ const changeRateInfo=(rate)=>{
                         <v-btn class="m-2">附照片</v-btn>
                         <RouterLink :to="{ name: 'writeReview', params: { id: shopId }} " style="text-decoration: none;"><v-btn class="m-2" id="giveReviewBtn"><i class="bi bi-chat-right-text"></i>&nbsp;給評價</v-btn></RouterLink>
                     </div>
+                    <div class="col-12 col-md-12" v-else>
+                        <RouterLink :to="{ name: 'writeReview', params: { id: shopId }} " style="text-decoration: none;"><v-btn class="m-2" id="giveReviewBtn"><i class="bi bi-chat-right-text"></i>&nbsp;給評價</v-btn></RouterLink>
+                    </div>
                 </div>
              <div class="row">
-              <div class="col-12 col-md-12 mb-3" v-for="review in reviews" :key="review.id">
+              <div class="col-12 col-md-12 mb-3" v-for="review in reviews" :key="review.id" v-if="showInfo===true">
                 <div class="card">
                   <div class="card-body p-3">
                     <h5 class="card-title">{{ review.merchantName }}</h5>
@@ -130,11 +144,12 @@ const changeRateInfo=(rate)=>{
                   </div>
                 </div>
              </div>
-             <div class="text-center my-4">
+             <div class="text-center my-4" v-show="showInfo===true">
                     <v-pagination :length="10"></v-pagination>
                </div>
+               <div class="col-12 col-md-12 mb-3" v-if="showInfo===false">暫無評價，歡迎寫下你對{{shopInfo.shopName}}的評價~</div>
          </div>
-               
+            <!-- row end↑ -->
             </div>
         </div>
     </div>

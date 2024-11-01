@@ -1,8 +1,8 @@
 <script setup>
     import SampleComponent from '@/components/SampleComponent.vue';
 import CircleButtonComponent from '@/share_components/CircleButtonComponent.vue';
-import { ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 //URL
 const BaseUrl=import.meta.env.VITE_API_BASEURL;
 const APIUrl=`${BaseUrl}/ShopReviews`;
@@ -30,7 +30,6 @@ const loadShopInfo=async()=>{
   const response=await fetch(`${APIUrl}/ShopReviewsShopInfo/${shopId}`);
   if(response.ok){
     shopInfo.value=await response.json();
-    console.log(shopInfo.value.shopName)
   }
 }
 loadShopInfo();
@@ -39,6 +38,55 @@ const changeRateInfo=(rate)=>{
   return rate===0?'暫無評價': `⭐${rate}`
 };
 
+//宣告回傳評論資料
+const backReview=ref({
+  "shopReviewId": 0,
+    "memberId": memberId,
+    "shopId":parseInt(shopId, 10),
+    "rating":1,
+    "comment":"",
+    "orderYet":false
+})
+ watch(backReview, (newValue) => {
+       console.log('backReview changed:', newValue);
+     }, { deep: true }); 
+
+//檔案上傳
+const fileUpload = ref(null);
+const files = ref([]);
+const handleFileUpload = (event) => {
+  files.value = Array.from(event.target.files);
+};
+const router = useRouter();
+const onSubmit=async()=>{
+  const formData = new FormData();
+  files.value.forEach((file) => {
+    formData.append('files', file);
+  });
+  formData.append('shopReviewId', backReview.value.shopReviewId);
+  formData.append('shopId', backReview.value.shopId);
+  formData.append('memberId', backReview.value.memberId);
+  formData.append('rating', backReview.value.rating);
+  formData.append('comment', backReview.value.comment);
+  formData.append('orderYet', backReview.value.orderYet);
+ 
+  const response=await fetch(`${APIUrl}/ShopReviewsAndImgs`,{
+        method: 'POST',
+        body: formData,
+    });
+    if(!response.ok){
+      alert("新增評價失敗");
+    }
+    else{
+      alert("新增評價成功");
+      setTimeout(() => {
+      router.push(`/shopReview/${shopId}`);
+    }, 1000);
+    }
+}
+    
+    
+    
 
 </script>
 
@@ -53,7 +101,7 @@ const changeRateInfo=(rate)=>{
         <div class="container mt-5">
             <div class="row">
                 <div class="col-12 col-md-12 d-flex align-items-center p-3 mb-3" id="shopNameCard">
-                    <div class="col-2 col-md-2"><img :src="`https://localhost:7162/ShopLogo/${shopInfo.logoName}`" alt="" id="shopLogoImg"></div>
+                    <div class="col-2 col-md-2"><img :src="`https://localhost:7162/ShopLogo/${shopInfo.logoName}`" alt="shopLogo" id="shopLogoImg" class="rounded"></div>
                     <div class="col-7 col-md-7 ">
                         <h3>{{shopInfo.shopName}}</h3>
                         <label class="d-block "><i class="bi bi-geo-fill"></i>服務地點:{{shopInfo.serviceSpot}}</label>
@@ -65,43 +113,59 @@ const changeRateInfo=(rate)=>{
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" id="reviewSection">
                 <div class="col-12 col-md-12 tabs-header d-flex justify-content-between border-bottom my-5" >
-                    <h3>寫下你對{{shopInfo.shopName}}的評價</h3>
+                    <h3>寫下你的評價</h3>
                 </div>
               </div>
               <div class="row mb-3">
                     <div class="col-12 col-md-12">
-                        <v-btn class="m-2">全部評價</v-btn>
-                        <v-btn class="m-2">5⭐</v-btn>
-                        <v-btn class="m-2">4⭐</v-btn>
-                        <v-btn class="m-2">3⭐</v-btn>
-                        <v-btn class="m-2">2⭐</v-btn>
-                        <v-btn class="m-2">1⭐</v-btn>
-                        <v-btn class="m-2">附照片</v-btn>
-                        <v-btn class="m-2" id="giveReviewBtn"><i class="bi bi-chat-right-text"></i>&nbsp;給評價</v-btn>
+                       <form @submit.prevent="onSubmit" name="newReviewForm">
+                        <v-textarea
+                          v-model="backReview.comment"
+                          label="評價(500字内)"
+                           counter="500"
+                           maxlength="500"
+                          outlined variant="solo"
+                          rows="8" placeholder="歡迎留下您寶貴的評價，幫助同樣前往幸福路上的新人們~"
+                          name="Comment"></v-textarea>
+                          <br>
+                          <br>
+                          <h6>給商家打個分吧~</h6>
+                          <v-rating
+                            hover
+                            :length="5"
+                            :size="37"
+                            v-model="backReview.rating"
+                            color="teal"
+                            active-color="teal"
+                             name="Rating"
+                          />
+                          <br>
+                          <br>
+                          <h6>是否曾經在婚禮訂購過商家商品？</h6>
+                          <v-radio-group name="OrderYet" v-model="backReview.orderYet">
+                             <v-radio label="訂購過" value="true"></v-radio>
+                              <v-radio label="曾體驗過，未在婚禮訂購" value="false"></v-radio>
+                            </v-radio-group>
+                          <br>
+                          <h6>上傳一些照片(可選)</h6>
+                          <br>
+                          <input type="file" multiple @change="handleFileUpload" accept="image/*" class="form-control" id="inputGroupFile04">
+                          <div id="submitBtn">
+                            <v-btn
+                               :loading="loading"
+                                class="mt-2"
+                               text="送出評價"
+                                type="submit"
+                               block
+                               base-color="#F6E2E7"
+                               height="50px"
+                             ></v-btn>
+                          </div>
+                       </form>
                     </div>
                 </div>
-             <div class="row">
-              <div class="col-12 col-md-12 mb-3" v-for="review in reviews" :key="review.id">
-                <div class="card">
-                  <div class="card-body p-3">
-                    <h5 class="card-title">{{ review.merchantName }}</h5>
-                    <p class="card-text">{{ review.text }}</p>
-                    <div id="imgsContain"><img src="@/assets/images/weddingPlanImg/wed1.jpg" alt="" id="reviewImg"></div>
-                    <p class="card-text"><small class="text-muted">評價：{{ '⭐'.repeat(review.rating) + '✰'.repeat(5 - review.rating) }}</small></p> 
-                    <button id="btnEditReview"><i class="bi bi-pencil-square fs-5"></i></button>
-                    <div id="orderLike">
-                        <div><small>是否已訂購該店家商品：否</small></div>
-                    </div> 
-                  </div>
-                </div>
-             </div>
-             <div class="text-center my-4">
-                    <v-pagination :length="10"></v-pagination>
-               </div>
-         </div>
-               
             </div>
         </div>
 </template>
@@ -202,5 +266,22 @@ const changeRateInfo=(rate)=>{
 #giveReviewBtn{
   position: absolute; 
   right: 15px;
+}
+
+#submitBtn{
+  width: 200px;
+  position: relative;
+  left: 30vw;
+  margin-top: 50px;
+}
+
+@media (max-width: 430px) {
+  #submitBtn {
+    left: 25vw;
+  }
+}
+
+#reviewSection{
+  margin-top: 50px;
 }
 </style>

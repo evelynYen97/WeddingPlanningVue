@@ -1,6 +1,6 @@
 <script setup>
 import Carousel from 'primevue/carousel';
-import { ref } from 'vue';
+import { ref,computed } from 'vue';
 import ClickButtonCComponent from '@/share_components/ClickButtonCComponent.vue';
     const props=defineProps({
       shopId:Number
@@ -54,14 +54,28 @@ import ClickButtonCComponent from '@/share_components/ClickButtonCComponent.vue'
       if(response.ok){
         const data=await response.json();
         reviews.value=data;
+       if(reviews.value.length<=0){
+          showInfo.value=false;
+       }else{
+        showInfo.value=true;
+       }
+       console.log(showInfo.value)
       }
     }
     loadReviews();
+
+    //顯示内容改變
+    const showInfo=ref(true);
 
     //調整時間顯示格式的方法
     const formatScheduleTime = (GetTime) => {
         return GetTime.replace('T', ' ').split('.')[0];
     };
+    //調整顯示文字長度
+    const desc100 = (review) => {
+    return review.length <= 90 ? review : review.substring(0, 90) + '...';
+};
+
 </script>
 
 <template>
@@ -74,7 +88,7 @@ import ClickButtonCComponent from '@/share_components/ClickButtonCComponent.vue'
               <v-btn class="mb-3"><i class="bi bi-chat-right-text"></i>&nbsp; 給評價</v-btn>
             </RouterLink>
             </div>
-            <div class="row">
+            <div class="row" v-if="showInfo==true">
               <Carousel :value="reviews" :numVisible="3" :numScroll="1" :responsiveOptions="responsiveOptions" circular :autoplayInterval="3000">
        <template #item="{data}">
         <div class="border border-surface-200 dark:border-surface-700 rounded m-2  p-4" style="height:350px;">
@@ -84,7 +98,7 @@ import ClickButtonCComponent from '@/share_components/ClickButtonCComponent.vue'
                 </div>
             </div>
             <div class="flex justify-between items-center">
-                <div class="mt-0 font-semibold text-xl lh-lg">{{ data.review }}</div>
+                <div class="mt-0 font-semibold text-xl lh-lg">{{ desc100(data.review) }}</div>
                 <br>
                 <div id="rateAndDateContain">
                   <div><small class="text-muted">曾在婚禮訂購過：{{ data.orderOrNot==true?'是':'否' }}</small></div>
@@ -95,6 +109,9 @@ import ClickButtonCComponent from '@/share_components/ClickButtonCComponent.vue'
         </div>
     </template>
 </Carousel>
+            </div>
+            <div class="row" v-else>
+              <h5>暫無評價，歡迎寫下你的評價~</h5>
             </div>
                <div class="col-12 col-md-12" style="position:relative; left: -100px;">
                 <RouterLink :to="{ name: 'shopReview', params: { id: shopId }} " style="text-decoration: none;">
