@@ -5,10 +5,10 @@
             <v-card-text>
                 <v-text-field v-model="newSchedul.scheduleStageName" label="排程名稱" outlined></v-text-field>
                 <v-text-field v-model="newSchedul.scheduleStageNotes" label="排程內容" outlined></v-text-field>
-                <v-text-field v-model="newSchedul.scheduleTime" label="安排時間" type="datetime-local" outlined></v-text-field>
+                <v-text-field v-model="newSchedul.scheduleTime" label="安排時間" type="datetime-local" outlined @change="updateScheduleTime"></v-text-field>
             </v-card-text>
             <v-card-actions>
-                <button @click="saveChanges" class="btn">
+                <button @click="createChanges" class="btn">
                     <span>儲存</span>
                     <em></em>
                 </button>
@@ -27,7 +27,9 @@ const BASE_URL = import.meta.env.VITE_API_BASEURL;
 export default {
     data() {
         return {
+            newData:{},
             dialog: false,
+            fixedDate: '',
             newSchedul: {
                 "scheduleId": 0,
                 "eventId": 0,
@@ -38,35 +40,38 @@ export default {
         };
     },
     methods: {
-        open() {
+        open(event) {
+            this.newData = { ...event };
+            this.fixedDate = this.newData.scheduleTime.split("T")[0]; // 從事件數據中獲取固定日期
             this.resetForm();
             this.dialog = true;
         },
+        updateScheduleTime(event) {
+            const time = event.target.value; // 獲取用戶選擇的時間
+            this.newSchedul.scheduleTime = `${this.fixedDate}T${time.split('T')[1]}`; // 只更新時間
+        },
         async createChanges() {
-            const newEventDetails = {
-                ...this.newEvent,
-                caseId: 1 // 之後可從 cookie 或其他來源取得
-            };
             const API_URL = `${BASE_URL}/Schedules`;
             try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json',},
-                body: JSON.stringify(this.editedData),
-            });
-            if (!response.ok) throw new Error('API 更新失敗');
-                this.$emit('updateData', this.editedData); // 傳遞更新後的數據
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(this.newSchedul),
+                    headers: {'Content-Type': 'application/json',},
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to create event');
+                }
             } catch (error) {
-                console.error(error);
+                console.error('Fetch error:', error);
             }
             this.dialog = false; // 關閉對話框
-            this.$emit('schedulupdate'); // 觸發更新事件
+            this.$emit('schedulnew'); // 觸發更新事件
         },
         resetForm() {
             this.newSchedul = {
                 "scheduleId": 0,
-                "eventId": 0,
-                "scheduleTime": "",
+                "eventId": this.newData.eventId,
+                "scheduleTime": this.newData.scheduleTime,
                 "scheduleStageName": "",
                 "scheduleStageNotes": ""
             }

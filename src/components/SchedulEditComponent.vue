@@ -5,7 +5,7 @@
             <v-card-text>
                 <v-text-field v-model="editedData.scheduleStageName" label="排程名稱" outlined></v-text-field>
                 <v-text-field v-model="editedData.scheduleStageNotes" label="排程內容" outlined></v-text-field>
-                <v-text-field v-model="editedData.scheduleTime" label="安排時間" type="datetime-local" outlined></v-text-field>
+                <v-text-field v-model="editedData.scheduleTime" label="安排時間" type="datetime-local" outlined @change="updateScheduleTime"></v-text-field>
             </v-card-text>
             <v-card-actions>
                 <button @click="saveChanges" class="btn">
@@ -27,14 +27,22 @@ const BASE_URL = import.meta.env.VITE_API_BASEURL;
 export default {
     data() {
         return {
-            editedData: {},
             dialog: false,
+            fixedDate: '',
+            editedData: {
+                scheduleTime: '' // 初始化時間
+            }
         };
     },
     methods: {
         open(event) {
             this.editedData = { ...event }; // 將傳入的事件數據複製到本地變量
+            this.fixedDate = this.editedData.scheduleTime.split("T")[0]; // 從事件數據中獲取固定日期
             this.dialog = true; // 打開對話框
+        },
+        updateScheduleTime(event) {
+            const time = event.target.value; // 獲取用戶選擇的時間
+            this.editedData.scheduleTime = `${this.fixedDate}T${time.split('T')[1]}`; // 只更新時間
         },
         async saveChanges() {
             const terms = {
@@ -44,7 +52,6 @@ export default {
                 "scheduleStageName":this.editedData.scheduleStageName,
                 "scheduleStageNotes":this.editedData.scheduleStageNotes
             };
-            console.log(terms);
             const API_URL = `${BASE_URL}/Schedules/${this.editedData.scheduleId}`;
             try {
             const response = await fetch(API_URL, {
