@@ -2,7 +2,9 @@
     import SampleComponent from '@/components/SampleComponent.vue';
 import CircleButtonComponent from '@/share_components/CircleButtonComponent.vue';
 import { ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter  } from 'vue-router';
+import { VAlert} from 'vuetify/components';
+import VueEasyLightbox from 'vue-easy-lightbox'
 //URL
 const BaseUrl=import.meta.env.VITE_API_BASEURL;
 const APIUrl=`${BaseUrl}/ShopReviews`;
@@ -21,16 +23,15 @@ function getMemberID() {
     return memberID;
 }
 const memberId = getMemberID();
-
 //評論數據
-const reviews=ref([
-    { id: 1, merchantName: '會員 1', text: '這家商家的服務非常好，工作人員熱情友好。', rating: 5 },
-    { id: 2, merchantName: '會員 2', text: '產品質量優良，值得推薦。', rating: 4 },
-    { id: 3, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
-    { id: 4, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
-    { id: 5, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
-    { id: 6, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 4 },
-  ])
+// const reviews=ref([
+//     { id: 1, merchantName: '會員 1', text: '這家商家的服務非常好，工作人員熱情友好。', rating: 5 },
+//     { id: 2, merchantName: '會員 2', text: '產品質量優良，值得推薦。', rating: 4 },
+//     { id: 3, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
+//     { id: 4, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
+//     { id: 5, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
+//     { id: 6, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 4 },
+//   ])
 //顯示内容改變
 const showInfo=ref(true);
 const changeShowInfo=(review)=>{
@@ -70,6 +71,123 @@ const changeRateInfo=(rate)=>{
 // }
 
 
+//搜尋條件
+const searchTerms = ref({
+    shopID:shopId,
+    "keyword": "",
+    "sortBy": "all",
+    "page": 1,
+})
+
+//取得評論
+const reviewsAndImgs=ref([]);
+const reviews=ref([]);
+const totalPage=ref(0);
+const loadReviewData=async()=>{
+  const response=await fetch(`${APIUrl}/reviewAndImgs`,{
+    method:'POST',
+    body:JSON.stringify(searchTerms.value),
+    headers:{'Content-type':'application/json'}
+  })
+  const data=await response.json();
+  reviewsAndImgs.value=data.reviews;
+  console.log(reviewsAndImgs.value)
+  totalPage.value=data.totalPages>10?10:data.totalPages;
+  reviews.value=reviewsAndImgs.value.map(item=>item.reviewDTO);
+  console.log(reviews.value)
+}
+loadReviewData();
+
+//轉換是否曾經購買過的方法
+const OrderOrNot=(orderOrNot)=>{
+  return orderOrNot===true?"是":"否";
+}
+
+//刪除評論
+//要刪除的Id
+const deleteItem=ref({
+        "reviewId": 0,
+        "reviewDetail": "",
+    });
+
+//顯示刪除資料内容提示
+const whichItemToDelete=async(itemID, detail)=>{
+        deleteItem.value.reviewId=itemID,
+        deleteItem.value.reviewDetail=detail
+    }
+
+const deleteReview=async(review)=>{
+    const response=await fetch(`${APIUrl}/DeleteShopReviewAndImg/${review}`,{
+      method:'DELETE',
+    });
+    if(response.ok){
+            alertShow.value=true;
+            alertType.value='success';
+            alertMessage.value='刪除成功';
+            setTimeout(() => {
+          location.reload();
+        }, 2000);
+    }else{
+            alertShow.value=true;
+            alertType.value='danger';
+            alertMessage.value='刪除失敗，請再次嘗試';
+    }
+}
+
+//給評論前判斷是否為會員
+const router = useRouter();
+const ToReview = () => {
+  if(memberId>1){
+    router.push({ name: 'writeReview', params: { id: shopId.value } });
+  }
+  else{
+    alertShow.value=true;
+    alertType.value='warning';
+    alertMessage.value='請登入以進行評價';
+  }
+};
+
+ //alert
+ const alertShow = ref(false);
+    const alertType = ref('success'); // 或 'error', 'warning', 'info'
+    const alertMessage=ref('請登入以獲得完整服務。')
+
+
+//返回圖片限制5張
+const visibleImages = (images) => {
+  if(images.length>5){
+    return images.slice(0, 5); // 否则只返回前5张
+  }else{
+    return images;
+  }
+};
+
+//燈箱效果
+const visibleRef = ref(false)
+const indexRef = ref(0)
+const imgsRef = ref([])
+
+const onShow = () => {
+  visibleRef.value = true
+}
+
+const showMultiple = (reviewImages) => {
+  imgsRef.value =  reviewImages.map(image => `https://localhost:7048/images/${image.imageName}`);
+  indexRef.value = 0 // 圖片顯示順序
+  onShow()
+}
+
+const  openLightbox=(index, reviewImages)=>{
+  imgsRef.value = reviewImages.map(image => `https://localhost:7048/images/${image.imageName}`);
+      indexRef.value = index;
+      onShow()
+    }
+
+
+const onHide = () => {
+  visibleRef.value = false
+}
+
 </script>
 
 <template>
@@ -80,6 +198,50 @@ const changeRateInfo=(rate)=>{
     <RouterLink :to="{ name: 'shopdetail', params: { id: shopId }} " style="text-decoration: none;">
          <CircleButtonComponent id="backButton">回到商家 &nbsp;&nbsp;&nbsp; back to shop</CircleButtonComponent>
   </RouterLink>
+  <v-alert
+      v-model="alertShow"
+      :type="alertType"
+      border="start"
+      close-label="Close Alert"
+      :title="alertMessage"
+      variant="tonal"
+      closable
+      class="alert-center"
+      dismissable
+    >
+      點擊提示框右上角可關閉此提示
+    </v-alert>
+
+    <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">評價刪除確認</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        是否確認刪除您的這則評價？
+      </div>
+      <div class="m-3"><p>{{ deleteItem.reviewDetail }}</p></div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary text-light" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-danger text-light" @click="deleteReview(deleteItem.reviewId)" data-bs-dismiss="modal">確認刪除</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal end -->
+ <!-- lightbox  -->
+ <vue-easy-lightbox
+      :visible="visibleRef"
+      :imgs="imgsRef"
+      :index="indexRef"
+      @hide="onHide"
+    ></vue-easy-lightbox>
+  <!-- lightbox end  -->
+
         <div class="container mt-5">
             <!-- .row>.col-12.col-md-12.bg-success>.col-md-2+.col-md-10>h3+label+label -->
             <div class="row">
@@ -119,27 +281,32 @@ const changeRateInfo=(rate)=>{
                         <v-btn class="m-2">2⭐</v-btn>
                         <v-btn class="m-2">1⭐</v-btn>
                         <v-btn class="m-2">附照片</v-btn>
-                        <RouterLink :to="{ name: 'writeReview', params: { id: shopId }} " style="text-decoration: none;"><v-btn class="m-2" id="giveReviewBtn"><i class="bi bi-chat-right-text"></i>&nbsp;給評價</v-btn></RouterLink>
+                        <v-btn class="m-2" id="giveReviewBtn" @click="ToReview"><i class="bi bi-chat-right-text"></i>&nbsp;給評價</v-btn>
                     </div>
                     <div class="col-12 col-md-12" v-else>
-                        <RouterLink :to="{ name: 'writeReview', params: { id: shopId }} " style="text-decoration: none;"><v-btn class="m-2" id="giveReviewBtn"><i class="bi bi-chat-right-text"></i>&nbsp;給評價</v-btn></RouterLink>
+                        <v-btn class="m-2" id="giveReviewBtn" @click="ToReview"><i class="bi bi-chat-right-text"></i>&nbsp;給評價</v-btn>
                     </div>
                 </div>
              <div class="row">
-              <div class="col-12 col-md-12 mb-3" v-for="review in reviews" :key="review.id" v-if="showInfo===true">
+              <div class="col-12 col-md-12 mb-3" v-for="review in reviewsAndImgs" :key="review.shopReviewId" v-if="showInfo===true">
                 <div class="card">
                   <div class="card-body p-3">
-                    <h5 class="card-title">{{ review.merchantName }}</h5>
-                    <p class="card-text">{{ review.text }}</p>
-                    <div id="imgsContain"><img src="@/assets/images/weddingPlanImg/wed1.jpg" alt="" id="reviewImg"></div>
-                    <p class="card-text"><small class="text-muted">評價：{{ '⭐'.repeat(review.rating) + '✰'.repeat(5 - review.rating) }}</small></p>
-                    <!-- <button id="btnEditReview" v-if="review.id===memberID"><i class="bi bi-pencil-square fs-5"></i></button> 待修改啓用會員可編輯自己的資料-->   
-                    <button id="btnEditReview"><i class="bi bi-pencil-square fs-5"></i></button>
+                    <h5 class="card-title">會員：{{ review.reviewDTO.memberName}}</h5>
+                    <p class="card-text">{{ review.reviewDTO.review }}</p>
+                    <div id="imgsContain">
+                      <img v-for="(image, imageIndex) in visibleImages(review.images)" 
+                      :key="image.reviewImageId" :src="`https://localhost:7048/images/${image.imageName}`" alt="評價照片" id="reviewImg" @click="openLightbox(imageIndex, review.images)">
+                      <span > <button v-if="review.images.length > 5" id="moreImages" class="fw-bold fs-5" @click="showMultiple(review.images)">+{{ review.images.length - 5 }} </button></span>
+                    </div>
+
+                      
+                    <p class="card-text"><small class="text-muted">評價：{{ '⭐'.repeat(review.reviewDTO.rate) + '✰'.repeat(5 - review.reviewDTO.rate) }}</small></p>
+                    <button id="btnDeleteReview"  v-show="review.reviewDTO.memberId==memberId" data-bs-toggle="modal" data-bs-target="#exampleModal" @click="whichItemToDelete(review.reviewDTO.shopReviewId,review.reviewDTO.review)"><i class="bi bi-trash"></i></button>
                     <div id="orderLike">
                         <!-- <small>該評論有幫助：
                             <button v-if="!helpful" class="fs-5" @click="helpfulChange"><i class="bi bi-hand-thumbs-up"></i></button>
                             <button v-else="helpful" class="fs-5"><i class="bi bi-hand-thumbs-up-fill" @click="helpfulChange"></i></button></small> -->
-                        <div><small>是否已訂購該店家商品：否</small></div>
+                        <div><small>是否已訂購該店家商品：{{ OrderOrNot(review.reviewDTO.orderOrNot) }}</small></div>
                     </div> 
                   </div>
                 </div>
@@ -157,16 +324,20 @@ const changeRateInfo=(rate)=>{
 
 <style lang="css" scoped>
     #reviewImg{
-        height:auto;
+        height:100px;
         width: 100px;
         padding: 5px;
+        object-fit: contain;
+        background-color: #EAEDED;
+        border-radius: 10px;
+        margin-right: 10px;
     }
     #imgsContain{
         display: flex;
         height: 100px;
         align-items: center;
     }
-    #btnEditReview{
+    #btnDeleteReview{
         position: absolute;
         top: 20px;
         right: 20px ;
@@ -251,5 +422,24 @@ const changeRateInfo=(rate)=>{
 #giveReviewBtn{
   position: absolute; 
   right: 15px;
+}
+
+.alert-center {
+        position: fixed;
+         top: 90%;
+         left: 90%;
+         transform: translate(-50%, -50%);
+         z-index: 1000; /* 确保在最上层 */
+         height: 100px;
+         width: 300px;
+         font-size:12px
+        }
+
+#moreImages{
+  margin: 15px;
+  width: 100px;
+  height: 100px;
+  border-radius: 15px;
+  background-color:#EAEDED;
 }
 </style>
