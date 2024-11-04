@@ -75,16 +75,24 @@ const onSubmit=async()=>{
         body: formData,
     });
     if(!response.ok){
-      alert("新增評價失敗");
+      alertShow.value=true;
+      alertType.value='danger';
+      alertMessage.value='新增評價失敗，請再次嘗試';
     }
     else{
-      alert("新增評價成功");
+      alertShow.value=true;
+      alertType.value='success';
+      alertMessage.value='新增評價成功';
       setTimeout(() => {
       router.push(`/shopReview/${shopId}`);
-    }, 1000);
+    }, 1500);
     }
 }
     
+//alert
+    const alertShow = ref(false);
+    const alertType = ref('success'); // 或 'error', 'warning', 'info'
+    const alertMessage=ref('請登入以獲得完整服務。')
     
     
 
@@ -98,6 +106,21 @@ const onSubmit=async()=>{
     <RouterLink :to="{ name: 'shopdetail', params: { id: shopId }} " style="text-decoration: none;">
          <CircleButtonComponent id="backButton">回到商家 &nbsp;&nbsp;&nbsp; back to shop</CircleButtonComponent>
   </RouterLink>
+        <div id="alertContain">
+          <v-alert
+      v-model="alertShow"
+      :type="alertType"
+      border="start"
+      close-label="Close Alert"
+      :title="alertMessage"
+      variant="tonal"
+      closable
+      class="alert-center"
+      dismissable
+    >
+      點擊提示框右上角可關閉此提示
+    </v-alert>
+        </div>
         <div class="container mt-5">
             <div class="row">
                 <div class="col-12 col-md-12 d-flex align-items-center p-3 mb-3" id="shopNameCard">
@@ -283,5 +306,16 @@ const onSubmit=async()=>{
 
 #reviewSection{
   margin-top: 50px;
+}
+
+#alertContain{
+  position: fixed;
+         top: 90%;
+         left: 90%;
+         transform: translate(-50%, -50%);
+         z-index: 1000; /* 确保在最上层 */
+         height: 100px;
+         width: 300px;
+         font-size:12px
 }
 </style>
