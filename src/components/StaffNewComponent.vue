@@ -1,88 +1,73 @@
 <template>
-    <v-dialog v-model="dialog" max-width="500px" class="my-dialog" transition="dialog-transition">
+    <v-dialog v-model="dialog" max-width="400px">
         <v-card>
-            <v-card-title class="headline" >新增事件</v-card-title>
+            <v-card-title class="headline">新增排程人員</v-card-title>
             <v-card-text>
-                <v-text-field v-model="newEvent.eventName" label="Event Name" outlined></v-text-field>
-                <v-text-field v-model="newEvent.eventLocation" label="Event Location" outlined></v-text-field>
-                <v-text-field v-model="newEvent.eventTime" label="Event Time" type="datetime-local" outlined></v-text-field>
-                <v-textarea v-model="newEvent.eventNotes" label="Event Notes" outlined></v-textarea>
-                <!-- 圖片之後的位置 -->
+                <v-text-field v-model="newStaff.personnelName" label="姓名" outlined></v-text-field>
+                <v-text-field v-model="newStaff.assistanceContent" label="工作內容" outlined></v-text-field>
             </v-card-text>
             <v-card-actions>
-                <button @click="createEvent" class="btn">
-                    <span>new</span>
+                <button @click="createChanges" class="btn">
+                    <span>新增</span>
                     <em></em>
                 </button>
                 <button @click="dialog = false" class="btn" style="margin-right: 10px;">
-                    <span>close</span>
+                    <span>關閉</span>
                     <em></em>
                 </button>
             </v-card-actions>
         </v-card>
     </v-dialog>
 </template>
-
+  
 <script>
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 
 export default {
     data() {
         return {
+            newData:0,
             dialog: false,
-            newEvent: {
-                eventId:0,
-                caseId:1, //之後吃cookie
-                eventName: '',
-                eventTime: '',
-                eventLocation: '',
-                eventNotes: '',
-                eventLocationImg: '' // 如果需要新增圖片欄位，可以填入
+            newStaff: {
+                "personnelId": 0,
+                "scheduleId": 0,
+                "personnelName": "",
+                "assistanceContent": ""
             }
         };
     },
     methods: {
-        open() {
+        open(scheduleId) {
+            this.newData = scheduleId; // 將傳入的scheduleId複製到本地變量
             this.resetForm();
             this.dialog = true;
         },
-        async createEvent() {
-            const newEventDetails = {
-                ...this.newEvent,
-                caseId: 1 // 之後可從 cookie 或其他來源取得
-            };
-            const API_URL = `${BASE_URL}/Events`; // 請確認 API URL 是否正確
-
+        async createChanges() {
+            const API_URL = `${BASE_URL}/ScheduledStaffs`;
+            console.log(JSON.stringify(this.newStaff));
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    body: JSON.stringify(newEventDetails),
-                    headers: { 'Content-Type': 'application/json' }
+                    body: JSON.stringify(this.newStaff),
+                    headers: {'Content-Type': 'application/json',},
                 });
-                if (!response.ok) {
-                    throw new Error('Failed to create event');
-                }
             } catch (error) {
-                console.error('Fetch error:', error);
+                console.error(error);
             }
-            this.dialog = false;
-            this.$emit('refresh');
+            this.dialog = false; // 關閉對話框
+            this.$emit('staffnew');//觸發更新事件
         },
         resetForm() {
-            this.newEvent = {
-                eventId:0,
-                caseId:1, //之後吃cookie
-                eventName: '',
-                eventTime: '',
-                eventLocation: '',
-                eventNotes: '',
-                eventLocationImg: ''
-            };
+            this.newStaff = {
+                "personnelId": 0,
+                "scheduleId": this.newData,
+                "personnelName": "",
+                "assistanceContent": ""
+            }
         }
-    }
+    },
 };
 </script>
-
 <style scoped>
     .my-dialog .v-card {
         border-radius: 20px; /* 自定義圓角 */
@@ -99,18 +84,17 @@ export default {
     
     /* 自定義 v-text-field 樣式 */
     .my-dialog .v-field__field {
-        border: 2px solid #475460;
-        border-radius: 10px;
+        border: 1px solid #475460;
+        border-radius: 5px;
         background-color: #f0f4f8;
         transition: border-color 0.3s, background-color 0.3s; /* 過渡效果 */
     }
 
     /* 懸停時的效果 */
     .my-dialog .v-field__field:hover {
-        border-color: #b0c0cf; /* 懸停時邊框顏色 */
-        background-color: #f3f9fe; /* 懸停時背景顏色 */
+        border-color: #c3cad0; /* 懸停時邊框顏色 */
+        background-color: #aebdca; /* 懸停時背景顏色 */
     }
-
 
     /* 動態過渡效果 */
     .dialog-transition-enter-active, 
@@ -130,13 +114,13 @@ export default {
         background-color: #A6C8F0;
         overflow: hidden;
         box-shadow: 0px 0px 17px 1px rgba(0, 0, 0, 0.34);
-        padding: 8px 12px;
+        padding: 7px 11px;
         text-decoration: none;
         margin-right: 10px;
     }
     .btn span {
-        color: #ffffff;
-        font-size: 1.5rem;
+        color: #556679;
+        font-size: 1.3rem;
         font-weight: bold;
         text-align: left;
         text-decoration: none;

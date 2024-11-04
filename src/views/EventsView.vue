@@ -65,45 +65,65 @@
       </button>
     </div>
   </div>
-  <div class="container">
+  <div class="container" style="margin-bottom: 50px;">
     <div v-for="terms in termschedul" :key="terms.scheduleId">
       <v-timeline style="justify-content: flex-start !important;">
         <v-timeline-item dot-color="teal-lighten-3" size="small" >
-          <v-row>
+          <v-row align="center" justify="start">
           <!-- 第一張 Card -->
-            <v-col>
+            <v-col cols="auto">
               <v-card style="width: 300px; height: auto;">
-                <v-card-title class="text-h6 bg-info" style="margin-bottom: 10px;">
+                <v-card-title class="bg-info" style="font-weight: bold;background-color: #5579a2 !important;">
                   {{ terms.scheduleStageName }}
+                  <i class="fa-solid fa-user-plus" @click="staffNewClick(terms.scheduleId)" style="margin-left: 15px;"></i>
                 </v-card-title>
-                <v-card-text class="bg-white">
+                <v-card-text style="background-color:#eeecec;padding-top: 16px;padding-bottom: 10px">
                   <strong class="me-4">{{ terms.scheduleTime.split("T")[0].split("-").slice(1).join("-") }}</strong>
                   <strong class="me-4">{{ terms.scheduleTime.split("T")[1] }}</strong>
                   <div class="text-caption">
                     {{ terms.scheduleStageNotes }}
                   </div>
-                  <v-btn style="color:blue;" variant="outlined" @click="SchedulEditClick(terms)">修改</v-btn>
-                  <v-btn style="color:green" variant="outlined" @click="SchedulNewClick(terms)">新增</v-btn>
-                  <v-btn style="color:red" variant="outlined" @click="scheduleDeleteClick(terms.scheduleId,terms.eventId)">刪除</v-btn>
+                  <button class="btn" @click="SchedulEditClick(terms)">
+                    修改
+                    <span></span><span></span><span></span><span></span>
+                  </button>
+                  <button class="btn" @click="SchedulNewClick(terms)" style="border: 3px solid #A6C8F0;background-color:#A6C8F0;color: #556679;">
+                    新增
+                    <span></span><span></span><span></span><span></span>
+                  </button>
+                  <button class="btn" @click="scheduleDeleteClick(terms.scheduleId,terms.eventId)" style="border: 3px solid #D4A1BB;background-color:#D4A1BB;color: #644c58">
+                    刪除
+                    <span></span><span></span><span></span><span></span>
+                  </button>
                 </v-card-text>
               </v-card>
             </v-col>
             <!-- 第二張 Card -->
-            <v-col v-if="termschedulstaff && termschedulstaff.length > 0 && filteredStaff(terms.scheduleId).length > 0">
-              <v-card style="width: 250px; height: auto;">
-                <v-card-title class="text-h6" style="margin-bottom: 10px; background-color: blueviolet !important;">
-                  參與成員
-                </v-card-title>
-                <div v-for="staff in termschedulstaff" :key="staff.personnelId">
-                  <v-card-text class="bg-white">
-                    <strong class="me-4">{{ staff.personnelName }}</strong>
-                    <div class="text-caption">
-                      {{ staff.assistanceContent }}
-                    </div>
-                  </v-card-text>
-                </div>
-                <v-btn style="color:purple;" variant="outlined">修改</v-btn>
-              </v-card>
+            <v-col v-if="filteredStaff(terms.scheduleId).length > 0">
+              <v-row align="center">
+                <v-col v-for="staff in filteredStaff(terms.scheduleId)" :key="staff.personnelId">
+                  <v-card style="width: 250px; height: auto;">
+                    <v-card-title class="bg-info" style="background-color:#bd89ee !important;font-weight: bold;">
+                      參與成員
+                    </v-card-title>
+                      <v-card-text style="background-color:#eeecec;padding-top: 16px;padding-bottom: 10px">
+                        <strong class="me-4">{{ staff.personnelName }}</strong>
+                        <div class="text-caption">
+                          {{ staff.assistanceContent }}
+                        </div>
+                        <button class="btn" @click="staffEditClick(staff)">
+                          修改
+                          <span></span><span></span><span></span><span></span>
+                        </button>
+                        <button class="btn" @click="staffDeleteClick(staff.personnelId,terms.eventId)" style="border: 3px solid #D4A1BB;background-color:#D4A1BB;color: #644c58">
+                          刪除
+                          <span></span><span></span><span></span><span></span>
+                      </button>
+                      </v-card-text>
+                  </v-card>
+                </v-col>
+                
+              </v-row>
             </v-col>
           </v-row>
         </v-timeline-item>
@@ -111,6 +131,8 @@
     </div>
     <SchedulEditComponent ref="editschedulDialog" @schedulupdate="refreshschedul(this.noweventID)"></SchedulEditComponent>
     <SchedulNewComponent ref="newschedulDialog" @schedulnew="refreshschedul(this.noweventID)"></SchedulNewComponent>
+    <StaffEditComponent ref="editstaffDialog" @staffupdate="refreshschedul(this.noweventID)"></StaffEditComponent>
+    <StaffNewComponent ref="newstaffDialog" @staffnew="refreshschedul(this.noweventID)"></StaffNewComponent>
   </div>  
 </template>
 
@@ -120,6 +142,8 @@ import EventNewComponent from '@/components/EventNewComponent.vue';
 import SampleComponent from '@/components/SampleComponent.vue';
 import SchedulEditComponent from '@/components/SchedulEditComponent.vue';
 import SchedulNewComponent from '@/components/SchedulNewComponent.vue';
+import StaffEditComponent from '@/components/StaffEditComponent.vue';
+import StaffNewComponent from '@/components/StaffNewComponent.vue';
 import { VTimeline, VTimelineItem, VCard, VCardTitle, VCardText, VBtn } from 'vuetify/components';
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
@@ -130,7 +154,9 @@ export default {
     EventEditComponent,
     EventNewComponent,
     SchedulEditComponent,
-    SchedulNewComponent
+    SchedulNewComponent,
+    StaffEditComponent,
+    StaffNewComponent
   },
   props: {
     term: {
@@ -167,7 +193,7 @@ export default {
             let colorToggle = false;
             // 定時切換 scale 和顯示文字
             setInterval(() => {
-              scale = scale === 1 ? 1.15 : 1; // 切換 scale
+              scale = scale === 1 ? 1.2 : 1; // 切換 scale
               colorToggle = !colorToggle;
               dots[index].style.transform = `scale(${scale})`;
               dots[index].style.backgroundColor = colorToggle ? '#B8B8DC' : '#D8D8EB';
@@ -176,7 +202,7 @@ export default {
               let hoverText = dots[index].querySelector('.hover-text');
               if (!hoverText) {
                 hoverText = document.createElement('span');
-                hoverText.innerText = 'Check Schedule';
+                hoverText.innerText = 'Check Schedule !!';
                 hoverText.classList.add('hover-text');
                 hoverText.style.position = 'absolute';
                 hoverText.style.top = '-25px';
@@ -201,15 +227,11 @@ export default {
         });
       });
     },
-    // 當 termschedul 更新並渲染後執行選取
     termschedul(newtermschedul) { 
       this.$nextTick(() => {
-        const dots = document.querySelectorAll('.v-timeline-divider__dot--size-small');
-        newtermschedul.forEach((term, index) => {
-          if (dots[index]) {
-            dots[index].setAttribute('data-schedul-id', term.schedulId); // 用來確認選取
-            dots[index].addEventListener('click', () => this.loadschedulstaff(term.scheduleId));
-          }
+        newtermschedul.forEach((term) => {
+          // 自動依序調用 this.loadschedulstaff
+          this.loadschedulstaff(term.scheduleId);
         });
       });
     },
@@ -283,7 +305,7 @@ export default {
         }
         const results = await response.json();
         this.termschedul = results;
-        console.log(results);
+
       } catch (error) {
         console.error('Fetch error:', error);
       }
@@ -297,7 +319,7 @@ export default {
     },
     //彈窗編輯回來,更新排程資料
     refreshschedul(eventID) {
-        this.loadschedul(eventID); 
+      this.loadschedul(eventID); 
     },
     //刪除排程事件
     scheduleDeleteClick(scheduleId,eventID){
@@ -322,22 +344,60 @@ export default {
       deleteschedule();
       this.refreshschedul(eventID);
     },
+    //載入排程人員
     async loadschedulstaff(schedulID) {
       const API_URL = `${BASE_URL}/ScheduledStaffs/Schedul/${schedulID}`;
+      this.termschedulstaff = [];
       try {
         const response = await fetch(API_URL);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const results = await response.json();
-        this.termschedulstaff = results; // 將 API 回傳的結果存入 terms 陣列
-
-        if(results.length == 0){
-          alert("尚未安排人手");
-        }
+        // 使用 push 合併新資料而不是覆蓋
+        this.termschedulstaff.push(...results);
+        
       } catch (error) {
         console.error('Fetch error:', error);
       }
+    },
+    //彈窗掛載資料
+    staffEditClick(staffdata) {
+      if (this.$refs.editstaffDialog) {
+        this.$refs.editstaffDialog.open(staffdata); 
+      } else {
+        console.error('editstaffDialog 尚未掛載');
+      }
+    },
+    staffNewClick(scheduleId) {
+      if (this.$refs.newstaffDialog) {
+        this.$refs.newstaffDialog.open(scheduleId); 
+      } else {
+        console.error('newstaffDialog 尚未掛載');
+      }
+    },
+    //刪除事件人員
+    staffDeleteClick(staffId,eventID){
+      const isConfirmed = window.confirm("您確定要刪除此活動嗎？"); // 確認視窗
+      if (!isConfirmed) return; // 如果使用者點擊取消，則直接返回
+      const deletestaff = async () => {
+        try {
+            const FindID_URL = `${BASE_URL}/ScheduledStaffs/${staffId}`; // 正確的URL
+            const response = await fetch(FindID_URL, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+              console.log('刪除成功');
+              this.loadevent();
+            } else {
+                console.error('刪除失敗', response.status);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+      };
+      deletestaff();
+      this.refreshschedul(eventID);
     },
     // 根據 scheduleId 過濾出對應的 staff 成員
     filteredStaff(scheduleId) {
@@ -414,13 +474,68 @@ export default {
   .carousel-wrapper:hover .delete-icon {
     opacity: 1;
   }
-  
-  .v-btn {
-    display: none !important;
-  }
 
-  .v-col:hover .v-btn {
+  .v-col:hover .btn {
     display: inline-flex !important;
   }
 
+  .v-col .fa-user-plus{
+    display: none !important;
+  }
+
+  .v-col:hover .fa-user-plus {
+    display: inline-flex !important;
+  }
+
+  .btn {
+    display: none !important;
+    position: relative;
+    z-index: 1;
+    min-width: 40px;
+    background: #B0B0B0;
+    border: 3px solid #B0B0B0;
+    border-radius: 8px !important;
+    color: #464646;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    overflow: hidden;
+    transition: 0.5s;
+    padding: 7px 13px;
+    margin-right: 15px;
+    }
+
+    .btn span {
+        position: absolute;
+        width: 25%;
+        height: 100%;
+        background-color: #FFFFFF;
+        transform: translateY(150%);
+        border-radius: 50%;
+        left: calc((var(--n) - 1) * 25%);
+        transition: 0.5s;
+        transition-delay: calc((var(--n) - 1) * 0.1s);
+        z-index: -1;
+    }
+
+    .btn:hover,
+    .btn:focus {
+        color: #464646;
+    }
+    .btn:hover span {
+        transform: translateY(0) scale(2);
+    }
+    .btn span:nth-child(1) {
+        --n: 1;
+    }
+    .btn span:nth-child(2) {
+        --n: 2;
+    }
+    .btn span:nth-child(3) {
+        --n: 3;
+    }
+    .btn span:nth-child(4) {
+        --n: 4;
+    }
 </style>

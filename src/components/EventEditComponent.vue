@@ -115,13 +115,13 @@ const BASE_URL = import.meta.env.VITE_API_BASEURL;
         background-color: #B0B0B0;
         overflow: hidden;
         box-shadow: 0px 0px 17px 1px rgba(0, 0, 0, 0.34);
-        padding: 12px 20px;
+        padding: 8px 12px;
         text-decoration: none;
         margin-right: 10px;
     }
     .btn span {
         color: #ffffff;
-        font-size: 1rem;
+        font-size: 1.5rem;
         font-weight: bold;
         text-align: left;
         text-decoration: none;

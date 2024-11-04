@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" max-width="500px">
+    <v-dialog v-model="dialog" max-width="400px">
         <v-card>
             <v-card-title class="headline">修改資料</v-card-title>
             <v-card-text>
@@ -45,13 +45,6 @@ export default {
             this.editedData.scheduleTime = `${this.fixedDate}T${time.split('T')[1]}`; // 只更新時間
         },
         async saveChanges() {
-            const terms = {
-                "scheduleId":this.editedData.scheduleId,
-                "eventId":this.editedData.eventId,
-                "scheduleTime":this.editedData.scheduleTime,
-                "scheduleStageName":this.editedData.scheduleStageName,
-                "scheduleStageNotes":this.editedData.scheduleStageNotes
-            };
             const API_URL = `${BASE_URL}/Schedules/${this.editedData.scheduleId}`;
             try {
             const response = await fetch(API_URL, {
@@ -116,13 +109,13 @@ export default {
         background-color: #676767;
         overflow: hidden;
         box-shadow: 0px 0px 17px 1px rgba(0, 0, 0, 0.34);
-        padding: 12px 20px;
+        padding: 7px 11px;
         text-decoration: none;
         margin-right: 10px;
     }
     .btn span {
         color: #ffffff;
-        font-size: 1rem;
+        font-size: 1.3rem;
         font-weight: bold;
         text-align: left;
         text-decoration: none;
