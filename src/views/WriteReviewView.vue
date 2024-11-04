@@ -70,14 +70,16 @@ const onSubmit=async()=>{
   formData.append('comment', backReview.value.comment);
   formData.append('orderYet', backReview.value.orderYet);
  
-  const response=await fetch(`${APIUrl}/ShopReviewsAndImgs`,{
+  // const response=await fetch(`${APIUrl}/ShopReviewsAndImgs`,{
+  const response=await fetch(`https://localhost:7162/api/ShopReviewsAPI/ShopReviewsAndImgs`,{
+
         method: 'POST',
         body: formData,
     });
     if(!response.ok){
       alertShow.value=true;
       alertType.value='danger';
-      alertMessage.value='新增評價失敗，請再次嘗試';
+      alertMessage.value = '新增評價失敗，請再次嘗試';
     }
     else{
       alertShow.value=true;

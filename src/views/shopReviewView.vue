@@ -119,7 +119,7 @@ const whichItemToDelete=async(itemID, detail)=>{
     }
 
 const deleteReview=async(review)=>{
-    const response=await fetch(`${APIUrl}/DeleteShopReviewAndImg/${review}`,{
+    const response=await fetch(`https://localhost:7162/api/ShopReviewsAPI/DeleteShopReviewAndImg/${review}`,{
       method:'DELETE',
     });
     if(response.ok){
@@ -318,7 +318,7 @@ const updateKeyword=()=>{
                     <p class="card-text">{{ review.reviewDTO.review }}</p>
                     <div id="imgsContain">
                       <img v-for="(image, imageIndex) in visibleImages(review.images)" 
-                      :key="image.reviewImageId" :src="`https://localhost:7048/images/${image.imageName}`" alt="評價照片" id="reviewImg" @click="openLightbox(imageIndex, review.images)">
+                      :key="image.reviewImageId" :src="`https://localhost:7162/reviewImg/${image.imageName}`" alt="評價照片" id="reviewImg" @click="openLightbox(imageIndex, review.images)">
                       <span > <button v-if="review.images.length > 5" id="moreImages" class="fw-bold fs-5" @click="showMultiple(review.images)">+{{ review.images.length - 5 }} </button></span>
                     </div>
 
