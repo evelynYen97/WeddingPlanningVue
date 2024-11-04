@@ -1,7 +1,7 @@
 <script setup>
     import SampleComponent from '@/components/SampleComponent.vue';
 import CircleButtonComponent from '@/share_components/CircleButtonComponent.vue';
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { useRoute, useRouter  } from 'vue-router';
 import { VAlert} from 'vuetify/components';
 import VueEasyLightbox from 'vue-easy-lightbox'
@@ -72,14 +72,16 @@ const changeRateInfo=(rate)=>{
 
 
 //搜尋條件
+const currentPage=ref(1);
 const searchTerms = ref({
     shopID:shopId,
     "keyword": "",
     "sortBy": "all",
-    "page": 1,
+    page: currentPage.value,
 })
 
 //取得評論
+
 const reviewsAndImgs=ref([]);
 const reviews=ref([]);
 const totalPage=ref(0);
@@ -173,7 +175,7 @@ const onShow = () => {
 
 const showMultiple = (reviewImages) => {
   imgsRef.value =  reviewImages.map(image => `https://localhost:7048/images/${image.imageName}`);
-  indexRef.value = 0 // 圖片顯示順序
+  indexRef.value =6 // 圖片顯示順序
   onShow()
 }
 
@@ -188,6 +190,27 @@ const onHide = () => {
   visibleRef.value = false
 }
 
+//分類搜尋
+const changeSort=(sortType)=>{
+  searchTerms.value.page=1;
+    searchTerms.value.sortBy=sortType;
+    loadReviewData();
+}
+
+//分頁
+const updatePage = (page) => {
+      currentPage.value = page;
+      searchTerms.value.page = page; 
+       loadReviewData();
+    };
+
+//關鍵字搜尋
+const searchKeyword=ref('');
+const updateKeyword=()=>{
+  searchTerms.value.page=1;
+  searchTerms.value.keyword=searchKeyword.value;
+  loadReviewData();
+};
 </script>
 
 <template>
@@ -262,8 +285,8 @@ const onHide = () => {
                 <div class="col-12 col-md-12 tabs-header d-flex justify-content-between border-bottom my-5">
                     <h3>婚友評價</h3>
                     <div class="search  col-12 col-md-3 mb-3" v-show="showInfo===true">
-                    <input type="text" class="search__input" placeholder="搜尋評論" >
-                    <button class="search__button">
+                    <input type="text" class="search__input" placeholder="搜尋評論" v-model="searchKeyword">
+                    <button class="search__button" @click="updateKeyword">
                      <svg class="search__icon" aria-hidden="true" viewBox="0 0 24 24">
                     <g>
                      <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
@@ -274,13 +297,13 @@ const onHide = () => {
               </div>
               <div class="row mb-3">
                     <div class="col-12 col-md-12" v-if="showInfo===true">
-                        <v-btn class="m-2">全部評價</v-btn>
-                        <v-btn class="m-2">5⭐</v-btn>
-                        <v-btn class="m-2">4⭐</v-btn>
-                        <v-btn class="m-2">3⭐</v-btn>
-                        <v-btn class="m-2">2⭐</v-btn>
-                        <v-btn class="m-2">1⭐</v-btn>
-                        <v-btn class="m-2">附照片</v-btn>
+                        <v-btn class="m-2" @click="changeSort('all')">全部評價</v-btn>
+                        <v-btn class="m-2" @click="changeSort('five')">5⭐</v-btn>
+                        <v-btn class="m-2" @click="changeSort('four')">4⭐</v-btn>
+                        <v-btn class="m-2" @click="changeSort('three')">3⭐</v-btn>
+                        <v-btn class="m-2" @click="changeSort('two')">2⭐</v-btn>
+                        <v-btn class="m-2" @click="changeSort('one')">1⭐</v-btn>
+                        <v-btn class="m-2" @click="changeSort('photo')">附照片</v-btn>
                         <v-btn class="m-2" id="giveReviewBtn" @click="ToReview"><i class="bi bi-chat-right-text"></i>&nbsp;給評價</v-btn>
                     </div>
                     <div class="col-12 col-md-12" v-else>
@@ -312,7 +335,8 @@ const onHide = () => {
                 </div>
              </div>
              <div class="text-center my-4" v-show="showInfo===true">
-                    <v-pagination :length="10"></v-pagination>
+                    <v-pagination :length="totalPage" v-model="currentPage"
+                    @update:modelValue="updatePage"></v-pagination>
                </div>
                <div class="col-12 col-md-12 mb-3" v-if="showInfo===false">暫無評價，歡迎寫下你對{{shopInfo.shopName}}的評價~</div>
          </div>
