@@ -73,12 +73,7 @@
                 <h4 style=" font-weight: bold;color:#353637;">賓客人數:&nbsp;</h4>
             </div>
             <img :src="venueImgPath1" alt="venue1" id="venue1Img">
-            <div v-if="venueImgPath2">
-    <img :src="venueImgPath2" alt="Venue Image">
-  </div>
-  <div v-else>
-    <p>圖片加載中...</p>
-  </div>
+            <img :src="venueImgPath2" alt="venue2" id="venue2Img">
              <div class="quill-editor" id="firstPageHeader">
                 <h1 style="color: white; font-weight: bold;">Forever starts today.</h1>
              </div>
@@ -146,7 +141,7 @@
         <button class="downBtn rounded button-55">▼</button>
         <div id="eventBackground2" class="pdfContent">
             <div class="quill-editor" id="simulateEdit">
-                <h2 style="color: #ffffff; font-weight: bold;">可以貼上婚禮流程圖</h2>
+                <h2 style="color: #ffffff; font-weight: bold;">可以貼上婚禮流程</h2>
              </div>
              <div class="quill-editor" id="eventImgedit">
 
@@ -298,8 +293,9 @@ const memberID = getMemberID();
         weddingplanData.value=await responseData.json();
         formattedTime.value = weddingplanData.value.weddingTime.replace('T', ' ');
             imageSrc = `http://localhost:5173/src/assets/images/weddingPlanImg/${weddingplanData.value.editingImgName}`;
-            venueImgPath1= `https://localhost:7162/Ven1/${weddingplanData.value.venueImgName1}`;
-            venueImgPath2=`https://localhost:7162/Ven1/${weddingplanData.value.venueImgName2}`;
+            venueImgPath1= `http://localhost:5173/src/assets/images/Ven1/${weddingplanData.value.venueImgName1}`;
+            console.log(weddingplanData.value.venueImgName1)
+            venueImgPath2=`http://localhost:5173/src/assets/images/Ven1/${weddingplanData.value.venueImgName2}`;
             // eventTimeLinePath=`https://localhost:7162/eventImg/${weddingplanData.value.eventImgName}`;
 
     }
@@ -356,7 +352,12 @@ if (elements.length === 0) {
     alert('沒有可生成的內容！');
     return;
 }
-  const promises = elements.map(element => html2canvas(element));
+const promises = elements.map(element => {
+        // 使用 html2canvas 並加上 useCORS: true
+        return html2canvas(element, {
+            useCORS: true, // 允許跨域請求圖片
+        });
+    });
 
   Promise.all(promises).then(canvases => {
     const pdf = new jsPDF();
@@ -388,7 +389,6 @@ if (elements.length === 0) {
 
 const generateButton = ref(null);
   onMounted(()=>{
-    
     const editors = document.querySelectorAll('.quill-editor');
         editors.forEach(editor => {
             const quill = new Quill(editor, {
