@@ -3,7 +3,7 @@
 
 const formData = ref({
   valid: false,
-  memberId:'',
+  memberId: 1,
   name: '',
   email: '',
   subject: '',
@@ -29,39 +29,38 @@ const errors = ref({
   message: ''
 });
 
- // 解析 Cookie 等待盛恩的登入再做測試，現階段訪客模式OK
- const getCookieValue = (name) => {
+// 登入狀態
+const user = ref({
+  isLoggedIn: false,
+  memberId: 1
+});
+
+
+// 獲取 Cookie 中的值
+const getCookieValue = (name) => {
   const cookieValue = document.cookie
     .split('; ')
-    .find((row) => row.startsWith(name + '='))
-    ?.split('=')[1];
+    .find(row => row.startsWith(name + '='))?.split('=')[1];
   return cookieValue ? decodeURIComponent(cookieValue) : null;
 };
 
 
-// // 模擬已登入的會員資料
-// const user = ref({
-//   isLoggedIn: true, // 假設你有某種方式檢查是否已登入
-//   memberId: 1   // 假設有一個已登入的會員ID
-// });
-
-// 登入狀態
-const user = ref({
-  isLoggedIn: false,
-  memberId: null
-});
-
-
-// 嘗試從 Cookie 中獲取 memberId
+// 確認登入狀態
 const checkLoginStatus = () => {
-  const memberId = getCookieValue('memberId');
-  if (memberId) {
+  const memberID = getCookieValue('memberID'); // 只要取id剩下給fetchMemberData去取資料
+  // const memberName = getCookieValue('memberName');
+
+  if (memberID) {
     user.value.isLoggedIn = true;
-    user.value.memberId = parseInt(memberId, 10); // 轉換為整數
+    user.value.memberId = parseInt(memberID, 10);
+
+    // 自動填入用戶名稱和電子郵件
+    formData.value.memberId = user.value.memberId;  // 新增此行以同步更新 formData 中的 memberId
+    // formData.value.name = memberName || '';
+
   } else {
-    // 如果沒有 memberId，則使用訪客模式
     user.value.isLoggedIn = false;
-    user.value.memberId = 1;
+    user.value.memberId = 1; // 訪客的 memberId
   }
 };
 
@@ -71,8 +70,10 @@ const fetchMemberData = async () => {
     const response = await fetch(`https://localhost:7048/api/Members/${user.value.memberId}`);
     if (response.ok) {
       const data = await response.json();
-      formData.value.memberId = data.memberId; 
-      formData.value.name = data.memberName;
+      // if (data.memberId !== null && data.memberId !== undefined) {
+      //   formData.value.memberId = data.memberId;
+      // } // memberId在checkLoginStatus已經設定，不需要取
+      formData.value.name = data.memberName; 
       formData.value.email = data.email;
     } else {
       console.error('無法獲取會員資料');
@@ -82,24 +83,9 @@ const fetchMemberData = async () => {
   }
 };
 
-// onMounted(() => {
-//   if (user.value.isLoggedIn && user.value.memberId > 1) {
-//     fetchMemberData(); // 登入會員才調用 API 獲取數據
-//   } else {
-//     // 訪客模式，統一使用 memberId = 1，允許訪客自己填寫名稱和郵件
-//     formData.value.memberId = 1;
-//   }
-// });
 
-onMounted(() => {
-  checkLoginStatus(); // 在頁面加載時檢查是否已登入
-  if (user.value.isLoggedIn && user.value.memberId > 1) {
-    fetchMemberData(); // 如果已登入，調用 API 獲取會員資料
-  } else {
-    // 訪客模式
-    formData.value.memberId = 1;
-  }
-});
+
+
 
 // 自定義驗證邏輯
 const validateForm = () => {
@@ -111,6 +97,7 @@ const validateForm = () => {
 
   return !errors.value.name && !errors.value.email && !errors.value.subject && !errors.value.message;
 };
+
 
 // 清理所有錯誤訊息
 const clearErrors = () => {
@@ -167,7 +154,6 @@ const submitForm = async () => {
             message: ''
           };
         }
-
            
         } else {
             errorMessage.value = '發送失敗，請稍後再試。';
@@ -184,19 +170,32 @@ const submitForm = async () => {
   }
 };
 
+
 // 自定義檢查函數，當使用者在欄位中輸入時調用
 const clearError = (field) => {
+
 
 if (formData.value[field]) {
   errors.value[field] = ''; // 當欄位有值時清除錯誤訊息
 }
 };
 
+
 // 監聽 subject 的變化
 watch(() => formData.value.subject, (newValue) => {
 if (newValue) {
   errors.value.subject = ''; // 當 subject 有值時清除錯誤訊息
 }
+});
+
+onMounted(() => {
+  checkLoginStatus(); // 在頁面加載時檢查是否已登入  // 這裡取得的memberId供下面fetchMemberData();調取email和userName
+  if (user.value.isLoggedIn && user.value.memberId > 1) {
+    fetchMemberData(); // 如果已登入，調用 API 獲取會員資料
+  } else {
+    // 訪客模式
+    formData.value.memberId = 1;
+  }
 });
 
 </script>
@@ -268,7 +267,8 @@ if (newValue) {
       <v-btn color="grey" type="submit" @click="clearSuccessMessage">提交</v-btn>
     </v-form>
   </v-container>
-    
+   
+   
 </template>
 
 <style lang="css" scoped>
