@@ -52,7 +52,6 @@ const backReview=ref({
      }, { deep: true }); 
 
 //檔案上傳
-const fileUpload = ref(null);
 const files = ref([]);
 const handleFileUpload = (event) => {
   files.value = Array.from(event.target.files);

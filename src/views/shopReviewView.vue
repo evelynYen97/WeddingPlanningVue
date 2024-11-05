@@ -23,15 +23,7 @@ function getMemberID() {
     return memberID;
 }
 const memberId = getMemberID();
-//評論數據
-// const reviews=ref([
-//     { id: 1, merchantName: '會員 1', text: '這家商家的服務非常好，工作人員熱情友好。', rating: 5 },
-//     { id: 2, merchantName: '會員 2', text: '產品質量優良，值得推薦。', rating: 4 },
-//     { id: 3, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
-//     { id: 4, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
-//     { id: 5, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 5 },
-//     { id: 6, merchantName: '會員 3', text: '價格實惠，服務態度一流。', rating: 4 },
-//   ])
+
 //顯示内容改變
 const showInfo=ref(true);
 const changeShowInfo=(review)=>{
@@ -59,17 +51,6 @@ loadShopInfo();
 const changeRateInfo=(rate)=>{
   return rate===0?'暫無評價': `⭐${rate}`
 };
-//評論是否有幫助
-// const helpful=ref(false);
-// const helpfulChange=()=>{
-//     if(helpful.value===false){
-//         helpful.value=true;
-//     }
-//     else{
-//         helpful.value=false;
-//     }
-// }
-
 
 //搜尋條件
 const currentPage=ref(1);
@@ -81,7 +62,9 @@ const searchTerms = ref({
 })
 
 //取得評論
-
+const formatScheduleTime = (GetTime) => {
+        return GetTime.replace('T', ' ').split('.')[0];
+    };
 const reviewsAndImgs=ref([]);
 const reviews=ref([]);
 const totalPage=ref(0);
@@ -93,10 +76,8 @@ const loadReviewData=async()=>{
   })
   const data=await response.json();
   reviewsAndImgs.value=data.reviews;
-  console.log(reviewsAndImgs.value)
   totalPage.value=data.totalPages>10?10:data.totalPages;
   reviews.value=reviewsAndImgs.value.map(item=>item.reviewDTO);
-  console.log(reviews.value)
 }
 loadReviewData();
 
@@ -174,13 +155,13 @@ const onShow = () => {
 }
 
 const showMultiple = (reviewImages) => {
-  imgsRef.value =  reviewImages.map(image => `https://localhost:7048/images/${image.imageName}`);
+  imgsRef.value =  reviewImages.map(image => `https://localhost:7162/reviewImg/${image.imageName}`);
   indexRef.value =6 // 圖片顯示順序
   onShow()
 }
 
 const  openLightbox=(index, reviewImages)=>{
-  imgsRef.value = reviewImages.map(image => `https://localhost:7048/images/${image.imageName}`);
+  imgsRef.value = reviewImages.map(image => `https://localhost:7162/reviewImg/${image.imageName}`);
       indexRef.value = index;
       onShow()
     }
@@ -324,11 +305,9 @@ const updateKeyword=()=>{
 
                       
                     <p class="card-text"><small class="text-muted">評價：{{ '⭐'.repeat(review.reviewDTO.rate) + '✰'.repeat(5 - review.reviewDTO.rate) }}</small></p>
+                    <p class="card-text"><small>評價時間：{{formatScheduleTime(review.reviewDTO.createdTime)}}</small></p>
                     <button id="btnDeleteReview"  v-show="review.reviewDTO.memberId==memberId" data-bs-toggle="modal" data-bs-target="#exampleModal" @click="whichItemToDelete(review.reviewDTO.shopReviewId,review.reviewDTO.review)"><i class="bi bi-trash"></i></button>
                     <div id="orderLike">
-                        <!-- <small>該評論有幫助：
-                            <button v-if="!helpful" class="fs-5" @click="helpfulChange"><i class="bi bi-hand-thumbs-up"></i></button>
-                            <button v-else="helpful" class="fs-5"><i class="bi bi-hand-thumbs-up-fill" @click="helpfulChange"></i></button></small> -->
                         <div><small>是否已訂購該店家商品：{{ OrderOrNot(review.reviewDTO.orderOrNot) }}</small></div>
                     </div> 
                   </div>

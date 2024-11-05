@@ -502,6 +502,7 @@ const exportExcel = async () => {
      </div>
     </div>
      <!-- DeleteModal end-->
+       <h2 id="budgetPlanTitle">婚禮預算規劃</h2>
              <BudgetChartComponent :selectSort="selectedSort" :thisMemberId="memberId" @changeTableData="onCategoryClick"></BudgetChartComponent>
              <div class="container">
                 
@@ -607,6 +608,21 @@ const exportExcel = async () => {
 
 <style lang="css" scoped>
     @import url(@/assets/css/budgetPlanViewModal.css);
+    @font-face {
+    font-family: 'ChenYuluoyan-Thin'; /* 自定義字體名稱 */
+    src: url('@/assets/fonts/ChenYuluoyan-Thin.ttf') format('truetype'); /* 字體檔案路徑 */
+    font-weight: normal;
+    font-style: normal;
+    };
+
+     #budgetPlanTitle{
+        position: relative;
+        top: 30px;
+        left: 100px ;
+        font-family: 'ChenYuluoyan-Thin', sans-serif;
+        font-size:50px;
+    }
+
     .InputBudgetContain,#tableContain,#sortListContain{
          border: 1px solid rgb(245, 240, 240);
          border-radius: 25px;
