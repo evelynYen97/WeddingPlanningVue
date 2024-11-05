@@ -178,6 +178,7 @@ initializeFunction();
         </div>
       </div>
     </section>
+    <ShopReviewComponent :shopId="shopId"></ShopReviewComponent>
   </div>
 </template>
 

@@ -1,10 +1,10 @@
 <script setup>
-    import SampleComponent from '@/components/SampleComponent.vue';
+import SampleComponent from '@/components/SampleComponent.vue';
 import CircleButtonComponent from '@/share_components/CircleButtonComponent.vue';
 import { ref, watchEffect } from 'vue';
 import { useRoute, useRouter  } from 'vue-router';
 import { VAlert} from 'vuetify/components';
-import VueEasyLightbox from 'vue-easy-lightbox'
+import VueEasyLightbox from 'vue-easy-lightbox';
 //URL
 const BaseUrl=import.meta.env.VITE_API_BASEURL;
 const APIUrl=`${BaseUrl}/ShopReviews`;
