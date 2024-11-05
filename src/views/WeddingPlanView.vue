@@ -10,10 +10,10 @@
     </div>
     <div class="row">
       <div class="col-12 col-md-12 mb-3 mt-5">
-        <h2>婚禮企劃書</h2>
+        <h2 id="weddingPlanTitle">婚禮企劃書</h2>
         <!-- <button ref="generateButton">生成 PDF</button> -->
         <div id="makePDFButton" class="my-4">
-        <ClickButtonAComponent @ButtonAClick="generatePDF"><h3>生成PDF</h3></ClickButtonAComponent>
+        <ClickButtonAComponent @ButtonAClick="generatePDF"><h3 >生成PDF</h3></ClickButtonAComponent>
     </div>
       </div>
     </div>
@@ -27,7 +27,7 @@
         
             <div id="firstpageBackground"></div>
              <div class="quill-editor" id="firstPageHeader">
-                <h1 style="color: white; font-weight: bold;">愛的旅程，從此啟程。</h1>
+                <h1 style="color: white; font-weight: bold;" >愛的旅程，從此啟程。</h1>
              </div>
                 <h2 id="weddingDate" class="mb-0 whiteBoldFont"> {{weddingplanData.weddingLocation}} &nbsp;&nbsp;{{ formattedTime}}</h2>
             </div>
@@ -388,12 +388,24 @@ const generateButton = ref(null);
   </script>
   
   <style scoped>
+
   @import 'quill/dist/quill.snow.css';
+
+  @font-face {
+    font-family: 'ChenYuluoyan-Thin'; /* 自定義字體名稱 */
+    src: url('@/assets/fonts/ChenYuluoyan-Thin.ttf') format('truetype'); /* 字體檔案路徑 */
+    font-weight: normal;
+    font-style: normal;
+    };
         #myVideo{
             height:500px;
             margin-top: 50px;
         }
-
+        #weddingPlanTitle{
+            font-family: 'ChenYuluoyan-Thin', sans-serif;
+            font-size:50px;
+            margin-top: 50px;
+        }
         /* #videoRow{
             background: url('@/assets/images/weddingPlanImg/videobg1.jpg');
             width: 100%;
@@ -403,7 +415,6 @@ const generateButton = ref(null);
             height: 50px;
             width: 100px;
         }
-
         #firstpageBackground{
             position: absolute;
             width: 1140px;

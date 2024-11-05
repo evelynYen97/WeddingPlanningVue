@@ -18,6 +18,8 @@ import DishItemView from '@/views/DishItemView.vue'
 import ShopDetailView from '@/views/ShopDetailView.vue'
 import EventsView from '@/views/EventsView.vue'
 import ToDoView from '@/views/ToDoView.vue'
+import ShopReviewView from '@/views/shopReviewView.vue'
+import WriteReviewView from '@/views/WriteReviewView.vue'
 
 
 const router = createRouter({
@@ -126,6 +128,18 @@ const router = createRouter({
       name: 'shopdetail',
       component: ShopDetailView
     },
+    { //商家所有評論頁面
+      path: '/shopReview/:id',
+      name: 'shopReview',
+      component: ShopReviewView
+    },
+    { //寫評論頁面
+      path: '/writeReview/:id',
+      name: 'writeReview',
+      component: WriteReviewView
+    },
+
+
   ]
 })
 
