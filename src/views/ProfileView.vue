@@ -49,7 +49,16 @@ const closeEditModal = () => {
     // 其他關閉模態框的邏輯
 };
 
+const resetMemberNameCookie = () => {
+    // 先清除 "memberName" cookie
+    document.cookie = "memberName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    
+    // 然後設置新的 "memberName" cookie，值為 "xxx"，有效期為 7 天
+    document.cookie = `memberName=${member.value.memberName}; path=/;secure; SameSite=Strict`;
 
+    //重新整理頁面
+    window.location.reload()
+}
 
 
 const fetchMemberData = async () => {
@@ -121,6 +130,7 @@ const editMemberData = async () => {
     if (response.ok) {
       member.value = await response.json();
       alert('會員資料更新成功！');
+      resetMemberNameCookie();
       errorMessage.value = ''; // 清空錯誤消息
     } else {
       console.error("更新會員資料失敗:", await response.text());

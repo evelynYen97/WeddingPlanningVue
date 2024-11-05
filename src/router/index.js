@@ -18,6 +18,7 @@ import DishItemView from '@/views/DishItemView.vue'
 import ShopDetailView from '@/views/ShopDetailView.vue'
 import EventsView from '@/views/EventsView.vue'
 import ToDoView from '@/views/ToDoView.vue'
+import ResetPasswordView from '@/views/ResetPasswordView.vue'
 import ShopReviewView from '@/views/shopReviewView.vue'
 import WriteReviewView from '@/views/WriteReviewView.vue'
 
@@ -77,6 +78,11 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: RegisterView
+    },
+    { //重設密碼頁面
+      path: '/resetPassword',
+      name: 'resetPassword',
+      component: ResetPasswordView
     },
     { //我的檔案
       path: '/profile',
