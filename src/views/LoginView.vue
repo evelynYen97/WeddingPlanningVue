@@ -24,10 +24,6 @@ async function handleLogin(event) {
   }
 
   try {
-    // const lastLoginTime = new Date().toISOString(); 
-    //因為資料庫是使用datetime2 所以只能用toISOString 顯示的時間是UTC時間
-    //因為後端已經寫了別的方法來轉換時間 所以這段已經不需要了
-
     const response = await fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: {
@@ -118,7 +114,7 @@ async function handleLogin(event) {
                     </button>
                   </div>
 
-                  <a class="small text-muted" href="#!">忘記密碼?</a>
+                  <a class="small text-muted" href='resetPassword'>忘記密碼?</a>
                   <p class="mb-5 pb-lg-2" style="color: #393f81;">
                     您還沒有加入會員嗎?
                     <a href='register' style="color: #393f81;">建立會員</a>

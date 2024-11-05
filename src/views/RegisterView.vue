@@ -36,6 +36,7 @@ const validity = ref({
     "preferenceRequired":true,
     "weddingStatusRequired":true,
     "budgetRequired":true,
+    "budgetIntegerRequired":true,
     "isValid":false
 })
 
@@ -67,10 +68,12 @@ const validate = async() =>{
     validity.value.phoneRequired = phonenumber.length > 0
     validity.value.addressRequired = address.length > 0
     validity.value.genderRequired = gender.length > 0
-    validity.value.birthdayRequired = birthday.length > 0 // 檢查生日
-    validity.value.preferenceRequired = preference.length > 0  // 檢查婚禮風格
-    validity.value.weddingStatusRequired = weddingStatus.length > 0  // 檢查婚禮狀態
-    validity.value.budgetRequired = budget.length > 0; // 檢查預算
+    validity.value.birthdayRequired = birthday.length > 0
+    validity.value.preferenceRequired = preference.length > 0  
+    validity.value.weddingStatusRequired = weddingStatus.length > 0 
+    validity.value.budgetRequired = budget.length > 0 
+    validity.value.budgetIntegerRequired = budget !== null && budget !== "" && !isNaN(budget) && budget.trim().length > 0
+
 
     //密碼與再次輸入密碼一致
     validity.value.pwdConfirmed = password1 === password2
@@ -84,7 +87,7 @@ const validate = async() =>{
     // console.log(userData.value)
 
     validity.value.isValid = validity.value.userNameRequired && validity.value.pwdRequired && validity.value.emailRequired && validity.value.nameRequired && validity.value.phoneRequired && validity.value.addressRequired && validity.value.genderRequired && validity.value.pwdConfirmed && validity.value.emailFormat && validity.value.pwdValidate && validity.value.birthdayRequired && validity.value.preferenceRequired && 
-    validity.value.weddingStatusRequired && validity.value.budgetRequired 
+    validity.value.weddingStatusRequired && validity.value.budgetRequired && validity.value.budgetIntegerRequired
 
     // 檢查 Email 是否已存在
     if (await checkEmailExists(useremail)) {
@@ -138,10 +141,6 @@ const validate = async() =>{
 
     }
 
-
-
-
-
 }
 
     
@@ -179,7 +178,7 @@ const validate = async() =>{
                     <div class="col-12 col-xl-7">
                         <input type="password" v-model.trim="userData.password1" id="password1" class="form-control" placeholder="請輸入密碼" autocomplete="off" required>
                         <div class="mb-3">
-                            <small v-if="!validity.pwdRequired" class="text-danger">請輸入密碼</small>
+                            <small v-if="!validity.pwdRequired" class="text-danger">請輸入密碼</small><br>
                             <small v-if="!validity.pwdValidate" class="text-danger">密碼至少8個字，要有大小寫字母加數字</small>
                         </div>
                     </div>
@@ -306,7 +305,9 @@ const validate = async() =>{
                     <div class="col-12 col-xl-7">
                         <input type="text" v-model.trim="userData.budget" id="budget" class="form-control" placeholder="請填寫預算" autocomplete="off" required>
                         <div class="mb-3">
-                            <small v-if="!validity.budgetRequired" class="text-danger hide">請填寫預算</small>
+                            <small v-if="!validity.budgetRequired" class="text-danger hide">請填寫預算</small><br>
+                            <small v-if="!validity.budgetIntegerRequired" class="text-danger hide">預算必須是整數</small>
+
                         </div>
                     </div>
                 </div>
