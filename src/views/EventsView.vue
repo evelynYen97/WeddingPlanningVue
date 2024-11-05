@@ -4,9 +4,9 @@
     </div>
   </SampleComponent>
 
-  <div class="container" style="margin-top: 50px;">
-    <div class="row">
-      <div class="col-4 carousel-wrapper" v-for="(term, index) in paginatedTerms" :key="term.eventId">
+  <div class="container" style="margin-top: 50px;" >
+    <div class="row" ref="eventshot">
+      <div class="col-3 carousel-wrapper" v-for="(term, index) in paginatedTerms" :key="term.eventId" >
         <div class="icon-container">
           <i class="fa-solid fa-pencil pencil-icon" style="font-size:22px;margin-right: 20px;color:#B0B0B0;cursor: pointer;" @click="handlePencilClick(term)">
             <p style="font-size: 13px !important; margin-top: 5px;">Edit</p>
@@ -18,37 +18,37 @@
             <p style="font-size: 13px !important; margin-top: 5px;">Delete</p>
           </i>
         </div> 
-        <v-timeline direction="horizontal" v-if="index % 2 === 0">
-          <v-timeline-item>
+        <v-timeline direction="horizontal" v-if="index % 2 === 0" >
+          <v-timeline-item >
             <template v-slot:opposite>
               <div style="width: auto; height: 200px;">
-                <label style="display: flex; justify-content: center;">{{ term.eventTime }}</label>
-                <img src="/src/assets/images/navImage2.jpg" alt="User Icon" class="user-icon"
-                  style="width: 220px; height: 150px;" />
+                <label style="display: flex; justify-content: center;font-size:calc(1rem + 0.6vw);" class="fontspecial">{{ term.eventTime.replace("T", " ").slice(0, 16) }}</label>
+                
+                <img :src="`${loadImgURL}${term.eventLocationImg}`" alt="User Icon" style="width: 220px; height: 150px;" />
               </div>
             </template>
-            <div style="width: auto; height: 200px;">
-              <div class="text-h6">{{ term.eventName }}</div>
-              <p>活動地點 : </p>
-              <p>{{ term.eventLocation }}</p>
-              <p>活動備註 : </p>
-              <p>{{ term.eventNotes }}</p>
+            <div style="width: auto; height: 200px;text-align: center;" >
+              <h1 class="fontspecial" style="font-size:calc(1.5rem + 1.5vw)">{{ term.eventName }}</h1>
+              <p style="margin-bottom: 5px;font-weight:bolder;">( 活動地點 )</p>
+              <p style="margin-bottom: 10px;">{{ term.eventLocation }}</p>
+              <p style="margin-bottom: 5px;font-weight:bolder;">( 活動備註 )</p>
+              <p style="margin-bottom: 6px;">{{ term.eventNotes }}</p>
             </div>
           </v-timeline-item>
         </v-timeline>
         <v-timeline direction="horizontal" v-else>
-          <v-timeline-item>
+          <v-timeline-item >
             <template v-slot:opposite>
-              <div style="width: auto; height: 200px;">
-                <div class="text-h6">{{ term.eventName }}</div>
-                <p>活動地點 : </p>
-                <p>{{ term.eventLocation }}</p>
-                <p>活動備註 : </p>
-                <p>{{ term.eventNotes }}</p>
+              <div style="width: auto; height: 200px;text-align: center;" >
+                <h1 class="fontspecial" style="font-size:calc(1.5rem + 1.5vw)">{{ term.eventName }}</h1>
+                <p style="margin-bottom: 5px;font-weight:bolder;">( 活動地點 )</p>
+                <p style="margin-bottom: 10px;">{{ term.eventLocation }}</p>
+                <p style="margin-bottom: 5px;font-weight:bolder;">( 活動備註 )</p>
+                <p style="margin-bottom: 10px;">{{ term.eventNotes }}</p>
               </div>
             </template>
             <div style="width: auto; height: 200px;">
-              <label style="display: flex; justify-content: center;">{{ term.eventTime }}</label>
+              <label style="display: flex; justify-content: center;font-size:calc(1rem + 0.6vw);" class="fontspecial">{{ term.eventTime.replace("T", " ").slice(0, 16) }}</label>
               <img src="/src/assets/images/navImage2.jpg" alt="User Icon" class="user-icon"
                 style="width: 220px; height: 150px;" />
             </div>
@@ -58,13 +58,13 @@
       <EventEditComponent ref="editEventDialog" @update="refreshTerms"/>
       <EventNewComponent ref="editEventPlus" @refresh="refreshTerms"></EventNewComponent>
     </div>
-    <div class="pagination-controls">
+    <div class="pagination-controls fontspecial">
       <button @click="prevPage" :disabled="currentPage === 0">上一頁</button>
-      <button @click="nextPage" :disabled="(currentPage + 1) * itemsPerPage >= termsevent.length">
-        下一頁
-      </button>
+      <button @click="nextPage" :disabled="(currentPage + 1) * itemsPerPage >= termsevent.length">下一頁</button>
+      <button @click="captureScreenshot">截圖</button>
     </div>
   </div>
+
   <div class="container" style="margin-bottom: 50px;">
     <div v-for="terms in termschedul" :key="terms.scheduleId">
       <v-timeline style="justify-content: flex-start !important;">
@@ -144,9 +144,11 @@ import SchedulEditComponent from '@/components/SchedulEditComponent.vue';
 import SchedulNewComponent from '@/components/SchedulNewComponent.vue';
 import StaffEditComponent from '@/components/StaffEditComponent.vue';
 import StaffNewComponent from '@/components/StaffNewComponent.vue';
+import html2canvas from 'html2canvas';
 import { VTimeline, VTimelineItem, VCard, VCardTitle, VCardText, VBtn } from 'vuetify/components';
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
+const loadImgURL = 'https://localhost:7162/eventImg/'
 
 export default {
   components: {
@@ -170,7 +172,7 @@ export default {
       termschedul: [],
       termschedulstaff:[],
       currentPage: 0,
-      itemsPerPage: 3,
+      itemsPerPage: 4,
       noweventID:0,//重載排程要用的引數
     };
   },
@@ -205,13 +207,13 @@ export default {
                 hoverText.innerText = 'Check Schedule !!';
                 hoverText.classList.add('hover-text');
                 hoverText.style.position = 'absolute';
-                hoverText.style.top = '-25px';
+                hoverText.style.top = '-19px';
                 hoverText.style.left = '50%';
                 hoverText.style.transform = 'translateX(-50%)';
                 hoverText.style.color = '#B8B8DC';
                 hoverText.style.padding = '2px 6px';
                 hoverText.style.borderRadius = '4px';
-                hoverText.style.fontSize = '12px';
+                hoverText.style.fontSize = '11px';
                 hoverText.style.whiteSpace = 'nowrap';
                 dots[index].appendChild(hoverText); // 添加文字元素
               }
@@ -413,16 +415,46 @@ export default {
         this.currentPage -= 1;
       }
     },
+    // 调用 html2canvas 来截取 container 的截图
+    captureScreenshot() {
+      const eventshot = this.$refs.eventshot;
+      html2canvas(eventshot).then(canvas => {
+          // 獲取 Base64 圖片數據
+          const imageData = canvas.toDataURL('image/png');
+          const fileName = `screenshot_${Date.now()}.png`;
+          
+          // 建立下載鏈接並自動觸發下載
+          const link = document.createElement('a');
+          link.href = imageData;
+          link.download = fileName;
+          link.click();
+
+          // 儲存檔名和時間戳
+          this.screenshotname = fileName;
+          this.timestamp = new Date().toISOString().split('.')[0]; // "YYYY-MM-DDTHH:MM:SS" 格式
+      });
+    }
   },
 };
 
 </script>
 <style lang="css" scoped>
+  @font-face {
+    font-family: 'ChenYuluoyan-Thin'; /* 自定義字體名稱 */
+    src: url('@/assets/fonts/ChenYuluoyan-Thin.ttf') format('truetype'); /* 字體檔案路徑 */
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  .fontspecial {
+      font-family: 'ChenYuluoyan-Thin', sans-serif; /* 將自定義字體應用於標題、段落、按鈕等 */
+  }
+
   .titleColor {
     background-color: red;
   }
 
-  .col-4 {
+  .col-3 {
     padding: 0px;
   }
 
