@@ -73,7 +73,12 @@
                 <h4 style=" font-weight: bold;color:#353637;">賓客人數:&nbsp;</h4>
             </div>
             <img :src="venueImgPath1" alt="venue1" id="venue1Img">
-            <img :src="venueImgPath2" alt="venue2" id="venue2Img">
+            <div v-if="venueImgPath2">
+    <img :src="venueImgPath2" alt="Venue Image">
+  </div>
+  <div v-else>
+    <p>圖片加載中...</p>
+  </div>
              <div class="quill-editor" id="firstPageHeader">
                 <h1 style="color: white; font-weight: bold;">Forever starts today.</h1>
              </div>
@@ -104,9 +109,50 @@
             <div class="quill-editor" id="simulateEdit">
                 <h2 style="color: #ffffff; font-weight: bold;">婚禮流程</h2>
              </div>
-            <img :src="eventTimeLinePath" alt="events" id="eventImg">
+             <div  id="eventTextBackground">
+                <div class="eventText" v-for="event in eventsData" :key="event.eventId">
+                    <h5 style="margin-right: 20px;">{{formatScheduleTime( event.eventTime )}}</h5>
+                    <h4 style="margin-right: 30px;">{{ event.eventName }}</h4>
+                    <br>
+                    <h5 style="margin-right: 30px;">地點：{{ event.eventLocation }}</h5>
+                    <h5>備注：{{ event.eventNote }}</h5>
+                </div>
+                
+             </div>
              <div class="quill-editor" id="simulateSlogan">
                 <h1 style="color: white; font-weight: bold;">Celebrating love in every corner!</h1>
+             </div>
+            </div>
+        </div>
+        <div class="block" >
+        <button class="closeBtn mb-3">x</button>
+        <button class="upBtn rounded button-55">▲</button>
+        <button class="downBtn rounded button-55">▼</button>
+        <div id="eventBackground" class="pdfContent">
+            <div class="quill-editor" id="simulateEdit">
+                <h2 style="color: #ffffff; font-weight: bold;">婚禮流程</h2>
+             </div>
+             <div class="quill-editor" id="eventImgedit">
+
+                 <img src="@/assets/images/weddingPlanImg/event1.png" alt="events" id="eventImg">
+             </div>
+             <div class="quill-editor" id="simulateSlogan">
+             </div>
+            </div>
+        </div>
+        <div class="block" >
+        <button class="closeBtn mb-3">x</button>
+        <button class="upBtn rounded button-55">▲</button>
+        <button class="downBtn rounded button-55">▼</button>
+        <div id="eventBackground2" class="pdfContent">
+            <div class="quill-editor" id="simulateEdit">
+                <h2 style="color: #ffffff; font-weight: bold;">可以貼上婚禮流程圖</h2>
+             </div>
+             <div class="quill-editor" id="eventImgedit">
+
+             </div>
+             <div class="quill-editor" id="simulateSlogan">
+                <h2 style="color: white; font-weight: bold;">讓婚禮成為最美的回憶，讓愛情成為最長的旅程。</h2>
              </div>
             </div>
         </div>
@@ -234,6 +280,7 @@ const memberID = getMemberID();
 
     //載入企劃書數據
     const weddingplanData=ref([]);
+    const eventsData=ref([]);
     const eventScheduleData=ref([]);
     const ScheduleStaffData=ref([]);
     const BudgetData=ref([]);
@@ -253,13 +300,20 @@ const memberID = getMemberID();
             imageSrc = `http://localhost:5173/src/assets/images/weddingPlanImg/${weddingplanData.value.editingImgName}`;
             venueImgPath1= `https://localhost:7162/Ven1/${weddingplanData.value.venueImgName1}`;
             venueImgPath2=`https://localhost:7162/Ven1/${weddingplanData.value.venueImgName2}`;
-            eventTimeLinePath=`https://localhost:7162/eventImg/${weddingplanData.value.eventImgName}`;
+            // eventTimeLinePath=`https://localhost:7162/eventImg/${weddingplanData.value.eventImgName}`;
 
     }
     loadWeddingplanData();
     
+    const loadEventsData=async()=>{
+        const response =await fetch(`${API_URL}/Events/${memberID}`);
+        eventsData.value=await response.json();
+        console.log(eventsData.value)
+    }
+    loadEventsData();
+
     const loadEventScheduleData=async()=>{
-        const responseEventSchedule=await fetch(`${API_URL}/EventSchedules/${memberID}`)
+        const responseEventSchedule=await fetch(`${API_URL}/EventSchedules/${memberID}`);
         eventScheduleData.value=await responseEventSchedule.json();
     }
     loadEventScheduleData();
@@ -396,7 +450,7 @@ const generateButton = ref(null);
     src: url('@/assets/fonts/ChenYuluoyan-Thin.ttf') format('truetype'); /* 字體檔案路徑 */
     font-weight: normal;
     font-style: normal;
-    };
+    }
         #myVideo{
             height:500px;
             margin-top: 50px;
@@ -526,13 +580,45 @@ const generateButton = ref(null);
             bottom:20px; 
             left: 650px;
       }
+      #eventTextBackground{
+        position:absolute;
+        left: 100px;
+        top: 120px;
+        width: 1050px;
+        height: 500px;
+        font-size: 24px;
+        background-color:#E8E8E8;
+        border-radius: 15px;
+        color:gray
+      }
+
+      .eventText{
+        margin-left: 40px;
+        margin-top: 25px;
+        display: flex;
+      }
+
+      .eventImgs{
+        width: 200px;
+        height: 250px;
+        position:absolute;
+        margin-left: 40px;
+        top: 200px;
+      }
+
+        #eventImgedit{
+            position:absolute;
+        left: 100px;
+        top: 120px;
+        height: 520px;
+        width: 1050px;
+        font-size: 24px;
+        }
 
       #eventImg{
-        position:absolute;
-        left: 205px;
-        top: 120px;
+       
         height: 500px;
-        width: 700px;
+        width: 1000px;
       }
 
       #edit1{
@@ -619,6 +705,18 @@ const generateButton = ref(null);
 
       #handBackground2{
          background: url('@/assets/images/weddingPlanImg/wed4.jpg') no-repeat;
+          height:800px;
+          width: 1200px;
+      }
+
+      #eventBackground{
+        background: url('@/assets/images/weddingPlanImg/eventbackground3.jpg') no-repeat;
+          height:800px;
+          width: 1200px;
+      }
+
+      #eventBackground2{
+        background: url('@/assets/images/weddingPlanImg/eventbackground4.jpg') no-repeat;
           height:800px;
           width: 1200px;
       }
