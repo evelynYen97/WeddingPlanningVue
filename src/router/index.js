@@ -151,8 +151,11 @@ const router = createRouter({
       component: WriteReviewView
     },
 
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    // 跳轉到頁面最上方
+    return { left: 0, top: 0 };
+  }
+});
+export default router;
 
-  ]
-})
-
-export default router
