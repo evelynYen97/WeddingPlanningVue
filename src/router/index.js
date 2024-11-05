@@ -18,6 +18,7 @@ import DishItemView from '@/views/DishItemView.vue'
 import ShopDetailView from '@/views/ShopDetailView.vue'
 import EventsView from '@/views/EventsView.vue'
 import ToDoView from '@/views/ToDoView.vue'
+import VenuesView from '@/views/VenuesView.vue'
 
 
 const router = createRouter({
@@ -85,6 +86,11 @@ const router = createRouter({
       path: '/dish',
       name: 'dish',
       component: DishesView
+    },
+    { //場地預定
+      path: '/venue',
+      name: 'venue',
+      component: VenuesView
     },
     { //車輛頁面
       path: '/car',

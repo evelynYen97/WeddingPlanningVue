@@ -58,21 +58,19 @@ initializeFunction();
               </div>
               <div class="post-header">
                 <h2 class="post-title">
-                  <a href="#" class="text-decoration-none">名稱：</a>
+                  <a href="#" class="text-decoration-none">名稱：{{ dish.dishesName }}</a>
                 </h2>
                 <br>
+                <h3>種類：{{dish.dishesSort}}</h3>
                 <br>
+                <h3>內含： {{ dish.dishesDescription}}</h3>
                 <div class="post-header">
                 <h5></h5>
                 </div>
                 <br>
+                <h3>價格：{{dish.pricePerTable}}元/桌</h3>
                 <br>
-                <br>
-                <h3>內容物：</h3>
-                <h4></h4>
-                <br>
-                <h3>過敏原資訊：</h3>
-                <h4></h4>      
+                <br>  
                 <br>         
               </div>
             

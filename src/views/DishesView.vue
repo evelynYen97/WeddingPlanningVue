@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, reactive } from 'vue';
 import ShopView from './ShopView.vue';
+import Cookies from 'js-cookie';
 
 const API_URL = 'https://localhost:7048/api/Dishes';
 const loadImgURL = 'https://localhost:7162/Dish1/';
@@ -100,6 +101,45 @@ function decreaseQuantity(dishesId) {
   }
 }
 
+//將桌菜加入預算規畫表
+async function addToBudget(dish) {
+  const memberId = Cookies.get('memberID'); // 取得會員 ID
+
+  if (!memberId) {
+    alert('您尚未登入，請先登入');
+    return;
+  }
+
+  const budgetItem = {
+    memberId: memberId,
+    budgetItemDetail: dish.dishesName,                                      // 桌菜名稱
+    budgetItemPrice: dish.pricePerTable,                                    // 桌菜單價
+    budgetItemAmount: dishesQuantity[dish.dishesId],                        // 桌菜桌數
+    budgetItemSubtotal: dish.pricePerTable * dishesQuantity[dish.dishesId], // 辦桌總價
+    budgetItemSort: '桌菜'                                                  // 固定值 "桌菜"
+  };
+
+  try {
+    const response = await fetch( 'https://localhost:7048/api/MemberBudgetItems', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(budgetItem)
+    });
+
+    if (!response.ok) {
+      throw new Error('無法加入預算表');
+    }
+    alert('成功加入預算表！');
+  } catch (error) {
+    console.error('加入預算表時發生錯誤：', error);
+    alert('加入預算表失敗');
+  }
+}
+
+
+
 loadDishes();
 </script>
 
@@ -193,7 +233,7 @@ loadDishes();
                               </button>
                             </span>
                           </div>
-                          <a href="#" class="nav-link">
+                          <a href="#" class="nav-link" @click.prevent="addToBudget(dish)">
                             加入預算規劃表 <iconify-icon icon="uil:shopping-cart" />
                           </a>
                         </div>

@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed, watch, reactive } from 'vue'
 import ShopView from './ShopView.vue';
+import Cookies from 'js-cookie';
+import { stringify } from 'postcss';
 
 const API_URL = 'https://localhost:7048/api/Cakes'
 
@@ -83,6 +85,42 @@ function decreaseQuantity(cakeID) {
   }
 }
 
+//將喜餅加入預算規畫表
+async function addToBudget(cake) {
+  const memberId = Cookies.get('memberID'); // 取得會員 ID
+
+  if (!memberId) {
+    alert('您尚未登入，請先登入');
+    return;
+  }
+
+  const budgetItem = {
+    memberId: memberId,
+    budgetItemDetail: cake.cakeName,              // 喜餅名稱
+    budgetItemPrice: cake.cakePrice,              // 喜餅單價
+    budgetItemAmount: cakesQuantity[cake.cakeID], // 喜餅數量
+    budgetItemSubtotal: cake.cakePrice * cakesQuantity[cake.cakeID], // 喜餅總價
+    budgetItemSort: '喜餅'                        // 固定值 "喜餅"
+  };
+
+  try {
+    const response = await fetch( 'https://localhost:7048/api/MemberBudgetItems', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(budgetItem)
+    });
+
+    if (!response.ok) {
+      throw new Error('無法加入預算表');
+    }
+    alert('成功加入預算表！');
+  } catch (error) {
+    console.error('加入預算表時發生錯誤：', error);
+    alert('加入預算表失敗');
+  }
+}
 
 loadcakes()
 
@@ -199,9 +237,9 @@ loadcakes()
                             </button>
                           </span>
                         </div>
-                        <a href="#" class="nav-link">
-                          加入預算規劃表 <iconify-icon icon="uil:shopping-cart" />
-                        </a>
+                        <a href="#" class="nav-link" @click.prevent="addToBudget(cake)">
+                          加入預算規劃表 
+                        </a>                      
                       </div>
                     </div>
                   </div>
