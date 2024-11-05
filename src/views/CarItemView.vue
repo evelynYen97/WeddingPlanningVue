@@ -61,17 +61,16 @@ initializeFunction();
                   <a href="#" class="text-decoration-none">名稱：{{ car.carName }}</a>
                 </h2>
                 <br>
-                <br>
+                <h3>{{ car.passengerCapacity }}人座</h3>
                 <div class="post-header">
                 <h5></h5>
                 </div>
                 <br>
+                <h3>價格：{{ car.rentalPerDay }}/天</h3>
                 <br>
-                <br>
-                <h3>內容物：</h3>
+                <h3>{{ car.carDetail }}</h3>             
                 <h4></h4>
-                <br>
-                <h3>過敏原資訊：</h3>
+                
                 <h4></h4>      
                 <br>         
               </div>

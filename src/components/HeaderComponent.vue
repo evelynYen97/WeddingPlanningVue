@@ -163,7 +163,7 @@ const scrollToContactUs = () => {
                 </ul>
               </li>
 
-              <li class="nav-item user hover-1" >
+              <li class="nav-item user" >
                 <div>
                 <RouterLink
                   v-if="!memberId" 

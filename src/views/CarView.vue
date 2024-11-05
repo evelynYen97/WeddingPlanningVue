@@ -1,6 +1,7 @@
 <script setup>
 import {ref, computed, watch, reactive} from 'vue'
 import ShopView from './ShopView.vue';
+import Cookies from 'js-cookie';
 
 const API_URL =   'https://localhost:7048/api/Cars'
 const loadImgURL =  'https://localhost:7162/Car1/'
@@ -83,6 +84,43 @@ function decreaseQuantity(carId) {
     carsQuantity[carId]--;
   }else{
     alert('每件數量不能低於1。')
+  }
+}
+
+//將車輛加入預算規畫表
+async function addToBudget(car) {
+  const memberId = Cookies.get('memberID'); // 取得會員 ID
+
+  if (!memberId) {
+    alert('您尚未登入，請先登入');
+    return;
+  }
+
+  const budgetItem = {
+    memberId: memberId,
+    budgetItemDetail: car.carName,                                  // 車輛名稱
+    budgetItemPrice: car.rentalPerDay,                              // 車輛單價
+    budgetItemAmount: carsQuantity[car.carId],                      // 禮車數量
+    budgetItemSubtotal: car.rentalPerDay * carsQuantity[car.carId], // 禮車總價
+    budgetItemSort: '禮車'                                          // 固定值 "禮車"
+  };
+
+  try {
+    const response = await fetch( 'https://localhost:7048/api/MemberBudgetItems', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(budgetItem)
+    });
+
+    if (!response.ok) {
+      throw new Error('無法加入預算表');
+    }
+    alert('成功加入預算表！');
+  } catch (error) {
+    console.error('加入預算表時發生錯誤：', error);
+    alert('加入預算表失敗');
   }
 }
 
@@ -203,8 +241,8 @@ loadCars()
                             </button>
                           </span>
                         </div>
-                        <a href="#" class="nav-link">
-                          加入預算規劃表 <iconify-icon icon="uil:shopping-cart" />
+                        <a href="#" class="nav-link" @click.prevent="addToBudget(car)">
+                          加入預算規劃表 
                         </a>
                       </div>
                     </div>

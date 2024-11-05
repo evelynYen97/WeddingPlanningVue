@@ -21,6 +21,7 @@ import ToDoView from '@/views/ToDoView.vue'
 import ResetPasswordView from '@/views/ResetPasswordView.vue'
 import ShopReviewView from '@/views/shopReviewView.vue'
 import WriteReviewView from '@/views/WriteReviewView.vue'
+import VenuesView from '@/views/VenuesView.vue'
 
 
 const router = createRouter({
@@ -93,6 +94,11 @@ const router = createRouter({
       path: '/dish',
       name: 'dish',
       component: DishesView
+    },
+    { //場地預定
+      path: '/venue',
+      name: 'venue',
+      component: VenuesView
     },
     { //車輛頁面
       path: '/car',

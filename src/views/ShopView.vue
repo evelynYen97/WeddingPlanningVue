@@ -24,33 +24,33 @@ import SampleComponent from '@/components/SampleComponent.vue';
         <div>
           <div class="category-carousel d-flex flex-wrap justify-content-around">
             <div class="col-sm-6  col-lg-3 mb-4">
-              <RouterLink class="nav-link category-item text-center" :to="{name:'cake'}">
-                <img src="../assets/images/icon-vegetables-broccoli.png" 
-                     alt="Category Thumbnail" class="category-img img-fluid">
+              <RouterLink class="nav-link category-item text-center" :to="{name:'venue'}">
+                <img src="../assets/images/brand/church.jpg" 
+                     alt="Category Thumbnail" class="category-img img-fluid iconSize">
                 <h3 class="category-title">婚宴會場</h3>
               </RouterLink>
             </div>
   
             <div class="col-sm-6  col-lg-3 mb-4">
               <RouterLink class="nav-link category-item text-center" :to="{name:'dish'}">
-                <img src="../assets/images/icon-vegetables-broccoli.png" 
-                     alt="Category Thumbnail" class="category-img img-fluid">
+                <img src="../assets/images/brand/dish.jpg" 
+                     alt="Category Thumbnail" class="category-img img-fluid iconSize" >
                 <h3 class="category-title">婚宴菜餚</h3>
               </RouterLink>
             </div>
   
             <div class="col-sm-6  col-lg-3 mb-4">
               <RouterLink class="nav-link category-item text-center" :to="{name:'car'}">
-                <img src="../assets/images/icon-vegetables-broccoli.png" 
-                     alt="Category Thumbnail" class="category-img img-fluid">
+                <img src="../assets/images/brand/car.jpg" 
+                     alt="Category Thumbnail" class="category-img img-fluid iconSize">
                 <h3 class="category-title">婚宴禮車</h3>
               </RouterLink>
             </div>
   
             <div class="col-sm-6  col-lg-3 mb-4">
               <RouterLink class="nav-link category-item text-center" :to="{name:'cake'}">
-                <img src="../assets/images/icon-vegetables-broccoli.png" 
-                     alt="Category Thumbnail" class="category-img img-fluid">
+                <img src="../assets/images/brand/cake.jpg" 
+                     alt="Category Thumbnail" class="category-img img-fluid iconSize">
                 <h3 class="category-title">送禮喜餅</h3>
               </RouterLink>
             </div>
@@ -63,6 +63,9 @@ import SampleComponent from '@/components/SampleComponent.vue';
 
 <style lang="css" scoped>
 @import '../assets/css/shop.css'; /*引用css文件*/
+.iconSize{
+  width: 70px;
+}
 
 </style>
   
