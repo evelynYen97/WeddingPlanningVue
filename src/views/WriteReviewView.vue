@@ -55,6 +55,7 @@ const backReview=ref({
 const files = ref([]);
 const handleFileUpload = (event) => {
   files.value = Array.from(event.target.files);
+  generateImagePreviews(files.value); 
 };
 const router = useRouter();
 const onSubmit=async()=>{
@@ -95,8 +96,24 @@ const onSubmit=async()=>{
     const alertType = ref('success'); // 或 'error', 'warning', 'info'
     const alertMessage=ref('請登入以獲得完整服務。')
     
+  //圖片預覽
+  const imagePreviews = ref([]);
+ // 生成图片预览的函数
+const generateImagePreviews = (uploadedFiles) => {
+  imagePreviews.value = []; // 清空之前的预览
+  uploadedFiles.forEach((file) => {
+    const reader = new FileReader();
     
-
+    // 读取文件并生成 Base64 URL
+    reader.onload = (e) => {
+      imagePreviews.value.push(e.target.result); 
+      // 将读取的文件数据推入 imagePreviews 数组
+    };
+    
+    // 读取每个文件
+    reader.readAsDataURL(file);
+  });
+};
 </script>
 
 <template>
@@ -176,6 +193,13 @@ const onSubmit=async()=>{
                           <h6>上傳一些照片(可選)</h6>
                           <br>
                           <input type="file" multiple @change="handleFileUpload" accept="image/*" class="form-control" id="inputGroupFile04">
+                          <div v-if="imagePreviews.length" style="display:flex">
+                            <div v-for="(img, index) in imagePreviews" :key="index">
+                              <img :src="img" alt="Image Preview" class="preview-img" />
+                           </div>
+                         </div>
+
+
                           <div id="submitBtn">
                             <v-btn
                                :loading="loading"
@@ -318,5 +342,14 @@ const onSubmit=async()=>{
          height: 100px;
          width: 300px;
          font-size:12px
+}
+
+.preview-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin: 10px;
+  border-radius: 15px;
+  background-color: #EAEDED; ;
 }
 </style>
