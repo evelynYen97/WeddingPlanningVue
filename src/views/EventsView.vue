@@ -4,8 +4,8 @@
     </div>
   </SampleComponent>
 
-  <div class="container" style="margin-top: 50px;" >
-    <div class="row" ref="eventshot">
+  <div class="container" style="margin-top: 50px;" ref="targetArea">
+    <div class="row"  style="margin-bottom: 10px">
       <div class="col-3 carousel-wrapper" v-for="(term, index) in paginatedTerms" :key="term.eventId" >
         <div class="icon-container">
           <i class="fa-solid fa-pencil pencil-icon" style="font-size:22px;margin-right: 20px;color:#B0B0B0;cursor: pointer;" @click="handlePencilClick(term)">
@@ -23,8 +23,7 @@
             <template v-slot:opposite>
               <div style="width: auto; height: 200px;">
                 <label style="display: flex; justify-content: center;font-size:calc(1rem + 0.6vw);" class="fontspecial">{{ term.eventTime.replace("T", " ").slice(0, 16) }}</label>
-                
-                <img :src="`${loadImgURL}${term.eventLocationImg}`" alt="User Icon" style="width: 220px; height: 150px;" />
+                <img :src="`${loadImgURL}${term.eventLocationImg}`" alt="User Icon" style="width: 220px; height: 150px;" class="localhost">
               </div>
             </template>
             <div style="width: auto; height: 200px;text-align: center;" >
@@ -49,8 +48,7 @@
             </template>
             <div style="width: auto; height: 200px;">
               <label style="display: flex; justify-content: center;font-size:calc(1rem + 0.6vw);" class="fontspecial">{{ term.eventTime.replace("T", " ").slice(0, 16) }}</label>
-              <img src="/src/assets/images/navImage2.jpg" alt="User Icon" class="user-icon"
-                style="width: 220px; height: 150px;" />
+              <img :src="`${loadImgURL}${term.eventLocationImg}`" alt="User Icon" style="width: 220px; height: 150px;" class="localhost"/>
             </div>
           </v-timeline-item>
         </v-timeline>
@@ -58,10 +56,10 @@
       <EventEditComponent ref="editEventDialog" @update="refreshTerms"/>
       <EventNewComponent ref="editEventPlus" @refresh="refreshTerms"></EventNewComponent>
     </div>
-    <div class="pagination-controls fontspecial">
-      <button @click="prevPage" :disabled="currentPage === 0">上一頁</button>
-      <button @click="nextPage" :disabled="(currentPage + 1) * itemsPerPage >= termsevent.length">下一頁</button>
-      <button @click="captureScreenshot">截圖</button>
+    <div class="pagination-controls fontspecial" style="padding-top: 10px;">
+      <button @click="prevPage" :disabled="currentPage === 0" style="font-size:calc(1rem + 1vw);">上一頁</button>
+      <button @click="shot" class="capture-btn" style="font-size:calc(1rem + 1vw);">截取螢幕</button>
+      <button @click="nextPage" :disabled="(currentPage + 1) * itemsPerPage >= termsevent.length" style="font-size:calc(1rem + 1vw);">下一頁</button>
     </div>
   </div>
 
@@ -146,9 +144,9 @@ import StaffEditComponent from '@/components/StaffEditComponent.vue';
 import StaffNewComponent from '@/components/StaffNewComponent.vue';
 import html2canvas from 'html2canvas';
 import { VTimeline, VTimelineItem, VCard, VCardTitle, VCardText, VBtn } from 'vuetify/components';
+import domtoimage from 'dom-to-image'
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
-const loadImgURL = 'https://localhost:7162/eventImg/'
 
 export default {
   components: {
@@ -168,12 +166,16 @@ export default {
   },
   data() {
     return {
+      WeddingPlans:[],
       termsevent: [],
       termschedul: [],
       termschedulstaff:[],
       currentPage: 0,
       itemsPerPage: 4,
       noweventID:0,//重載排程要用的引數
+      loadImgURL:'https://localhost:7162/eventImg/',
+      screenshotUrl: null,
+      imageCache: new Map()
     };
   },
   mounted() {
@@ -247,9 +249,17 @@ export default {
     },
   },
   methods: {
-    //載入活動資料
-    async loadevent() {
-      const API_URL = `${BASE_URL}/Events/caseID/1`;//先預設 1
+    
+    //接cookie
+    getCookieValue(name) {
+      const cookies = document.cookie.split('; ');
+      const cookie = cookies.find(c => c.startsWith(name + '='));
+      return cookie ? cookie.split('=')[1] : null;
+    },
+    //載入婚禮企劃資料
+    async loadWeddingPlans() {
+      const memberID = this.getCookieValue('memberID');
+      const API_URL = `${BASE_URL}/WeddingPlans/memberID/${memberID}`;
       try {
         const response = await fetch(API_URL);
         if (!response.ok) {
@@ -258,8 +268,49 @@ export default {
         const results = await response.json();
         this.termsevent = results;
       } catch (error) {
-        console.error('Fetch error:', error);
+        // this.createEvent();
       }
+    },
+    //載入活動資料
+    async loadevent() {
+      const memberID = this.getCookieValue('memberID');
+      const API_URL = `${BASE_URL}/Events/caseID/${memberID}`;
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const results = await response.json();
+        this.termsevent = results;
+      } catch (error) {
+        // this.createEvent();
+      }
+    },
+    //如果是新的成員要先新增相關的活動範例給它
+    async createEvent() {
+        const API_URL = `${BASE_URL}/Events`; // 請確認 API URL 是否正確
+        const memberID = this.getCookieValue('memberID');
+        const newEven = {
+          eventId:0,
+          caseId:1,
+          eventName: '未編輯',
+          eventTime: '',
+          eventLocation: '未編輯',
+          eventNotes: '未編輯',
+          eventLocationImg: 'hotel2.png'
+        }
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(newEvent),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                throw new Error('Failed to create event');
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
     },
     //打開活動編輯彈窗並傳遞事件數據
     handlePencilClick(term) {
@@ -433,7 +484,109 @@ export default {
           this.screenshotname = fileName;
           this.timestamp = new Date().toISOString().split('.')[0]; // "YYYY-MM-DDTHH:MM:SS" 格式
       });
-    }
+    },
+    // 預處理圖片
+    async preloadImages() {
+      const targetElement = this.$refs.targetArea
+      const images = targetElement.querySelectorAll('.localhost')
+      
+      for (const img of images) {
+        if (img.src.includes('localhost')) {
+          try {
+            const base64Data = await this.convertImageToBase64(img.src)
+            this.imageCache.set(img.src, base64Data)
+            // 暫時替換圖片來源
+            img.dataset.originalSrc = img.src
+            img.src = base64Data
+          } catch (error) {
+            console.error('圖片轉換失敗:', error)
+          }
+        }
+      }
+    },
+    // 轉換圖片為 Base64
+    async convertImageToBase64(imgUrl) {
+      try {
+        const response = await fetch(imgUrl, {
+          mode: 'cors',
+          credentials: 'include' // 如果需要發送 cookies
+        })
+        const blob = await response.blob()
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onloadend = () => resolve(reader.result)
+          reader.onerror = reject
+          reader.readAsDataURL(blob)
+        })
+      } catch (error) {
+        console.error('轉換圖片失敗:', error)
+        throw error
+      }
+    },
+    // 恢復原始圖片來源
+    restoreImages() {
+      const targetElement = this.$refs.targetArea
+      const images = targetElement.querySelectorAll('.localhost')
+      
+      for (const img of images) {
+        if (img.dataset.originalSrc) {
+          img.src = img.dataset.originalSrc
+          delete img.dataset.originalSrc
+        }
+      }
+    },
+
+    // 準備並執行截圖
+    async prepareAndCapture() {
+      try {
+        // 先預處理圖片
+        await this.preloadImages()
+        
+        // 執行截圖
+        await this.takeScreenshot()
+        
+        // 恢復原始圖片
+        this.restoreImages()
+      } catch (error) {
+        console.error('截圖過程發生錯誤:', error)
+        this.restoreImages() // 確保圖片被恢復
+      }
+    },
+    // 執行截圖
+    async takeScreenshot() {
+      try {
+        const targetElement = this.$refs.targetArea
+        const dataUrl = await domtoimage.toPng(targetElement, {
+          quality: 1.0,
+          bgcolor: '#fff',
+          cacheBust: true, // 避免快取問題
+          filter: (node) => {
+            // 可以在這裡添加額外的過濾規則
+            return true
+          },
+          // 處理字體
+          fontEmbedCSS: document.querySelector('style')?.innerHTML || ''
+        })
+        this.screenshotUrl = dataUrl
+      } catch (error) {
+        console.error('截圖失敗:', error)
+        throw error
+      }
+    },
+    // 下載截圖
+    downloadScreenshot() {
+      if (!this.screenshotUrl) return
+      
+      const link = document.createElement('a')
+      link.download = `screenshot-${Date.now()}.png`
+      link.href = this.screenshotUrl
+      link.click()
+    },
+    //截圖按鈕
+    shot(){
+      this.prepareAndCapture();
+      this.downloadScreenshot();
+    },
   },
 };
 
@@ -470,7 +623,19 @@ export default {
   .pagination-controls {
     display: flex;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: 20px;
+  }
+
+  .pagination-controls button{
+    padding: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border-radius: 80px;
+    margin-right: 10px
+  }
+
+  .pagination-controls button:hover{
+    border: 3px black solid;
   }
 
   .text-caption {
