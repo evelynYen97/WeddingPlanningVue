@@ -76,6 +76,8 @@ const loadReviewData=async()=>{
   })
   const data=await response.json();
   reviewsAndImgs.value=data.reviews;
+  reviewsAndImgs.value.length==0? noData.value=true:noData.value=false;
+  console.log(noData.value)
   totalPage.value=data.totalPages>10?10:data.totalPages;
   reviews.value=reviewsAndImgs.value.map(item=>item.reviewDTO);
 }
@@ -170,7 +172,8 @@ const  openLightbox=(index, reviewImages)=>{
 const onHide = () => {
   visibleRef.value = false
 }
-
+//
+const noData=ref(false);
 //分類搜尋
 const changeSort=(sortType)=>{
   searchTerms.value.page=1;
@@ -313,11 +316,13 @@ const updateKeyword=()=>{
                   </div>
                 </div>
              </div>
+             <div class="col-12 col-md-12 mb-3" v-if="showInfo===false">暫無評價，歡迎寫下你對{{shopInfo.shopName}}的評價~</div>
+               <div class="col-12 col-md-12 mb-3" v-if="noData===true&& showInfo===true">查無評價</div>
              <div class="text-center my-4" v-show="showInfo===true">
                     <v-pagination :length="totalPage" v-model="currentPage"
                     @update:modelValue="updatePage"></v-pagination>
                </div>
-               <div class="col-12 col-md-12 mb-3" v-if="showInfo===false">暫無評價，歡迎寫下你對{{shopInfo.shopName}}的評價~</div>
+               
          </div>
             <!-- row end↑ -->
             </div>
