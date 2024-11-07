@@ -2,6 +2,21 @@
     <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
     
   <div class="container">
+    <div id="Valert">
+    <v-alert
+      v-model="alertShow"
+      :type="alertType"
+      border="start"
+      close-label="Close Alert"
+      :title="alertMessage"
+      variant="tonal"
+      closable
+      class="alert-center"
+      dismissable
+    >
+      點擊提示框右上角可關閉此提示
+    </v-alert>
+</div>
     <div class="row" id="videoRow">
         <video id="myVideo" controls loop autoplay>
             <source src="../assets/video/weddingplan.mp4" type="video/mp4">
@@ -11,6 +26,7 @@
     <div class="row">
       <div class="col-12 col-md-12 mb-3 mt-5">
         <h2 id="weddingPlanTitle">婚禮企劃書</h2>
+        <img src="/public/loveloading.gif" alt="loading" id="loadingheart" v-show="isLoading"/>
         <!-- <button ref="generateButton">生成 PDF</button> -->
         <div id="makePDFButton" class="my-4">
         <ClickButtonAComponent @ButtonAClick="generatePDF"><h3 >生成PDF</h3></ClickButtonAComponent>
@@ -32,7 +48,8 @@
                 <h2 id="weddingDate" class="mb-0 whiteBoldFont"> {{weddingplanData.weddingLocation}} &nbsp;&nbsp;{{ formattedTime}}</h2>
             </div>
         </div>
-      
+    </div>  
+    <div class="row">
     <div class="block">
         <button class="closeBtn">×</button>
         <div style="width: 1200px;height:800px;background-color: #001733;" class="pdfContent">
@@ -79,6 +96,19 @@
              </div>
             </div>
      </div>  
+     <div class="block" >
+        <button class="closeBtn mb-3">x</button>
+        <button class="upBtn rounded button-55">▲</button>
+        <button class="downBtn rounded button-55">▼</button>
+        <div id="weddingplaceBackground2" class="pdfContent">
+             <div class="quill-editor" id="eventPlaceEdit">
+                <h5>可以貼上其他場地説明照片</h5>
+             </div>
+             <div class="quill-editor" id="simulateSlogan">
+                <h2 style="color: white; font-weight: bold;">愛情是永恆的詩篇，我們寫下每一行。</h2>
+             </div>
+            </div>
+        </div>
      <div class="block" >
         <button class="closeBtn mb-3">x</button>
         <button class="upBtn rounded button-55">▲</button>
@@ -293,8 +323,8 @@ const memberID = getMemberID();
         weddingplanData.value=await responseData.json();
         formattedTime.value = weddingplanData.value.weddingTime.replace('T', ' ');
             imageSrc = `http://localhost:5173/src/assets/images/weddingPlanImg/${weddingplanData.value.editingImgName}`;
+            // venueImgPath1= `https://localhost:7162/Ven1/${weddingplanData.value.venueImgName1}`;
             venueImgPath1= `http://localhost:5173/src/assets/images/Ven1/${weddingplanData.value.venueImgName1}`;
-            console.log(weddingplanData.value.venueImgName1)
             venueImgPath2=`http://localhost:5173/src/assets/images/Ven1/${weddingplanData.value.venueImgName2}`;
             // eventTimeLinePath=`https://localhost:7162/eventImg/${weddingplanData.value.eventImgName}`;
 
@@ -341,12 +371,20 @@ const memberID = getMemberID();
     };
     //加載數據end
 
+    //加載PDF loading
+    const isLoading=ref(false);
+
     //總預算
     const budgetTotal=ref(0);
 
     //pdf
     const generatePDF = () => {
-    const elements = Array.from(document.querySelectorAll('.block')).map(block => block.querySelector('.pdfContent')).filter(el => el !== null);
+    if(memberID>1){
+        isLoading.value=true;
+        setTimeout(()=>{
+          isLoading.value = false    
+        },10000)
+        const elements = Array.from(document.querySelectorAll('.block')).map(block => block.querySelector('.pdfContent')).filter(el => el !== null);
 
 if (elements.length === 0) {
     alert('沒有可生成的內容！');
@@ -385,9 +423,22 @@ const promises = elements.map(element => {
 
     pdf.save('download.pdf');
   });
+}
+else{
+    alertShow.value=true;
+    alertType.value='warning';
+    alertMessage.value='請登入以獲得完整服務。';
+}
 };
+    
+//alert
+const alertShow = ref(false);
+    const alertType = ref('success'); // 或 'error', 'warning', 'info'
+    const alertMessage=ref('請登入以獲得完整服務。')
+    
+    
 
-const generateButton = ref(null);
+
   onMounted(()=>{
     const editors = document.querySelectorAll('.quill-editor');
         editors.forEach(editor => {
@@ -451,6 +502,11 @@ const generateButton = ref(null);
     font-weight: normal;
     font-style: normal;
     }
+
+    #loadingheart{
+        margin-left:200px;
+    }
+
         #myVideo{
             height:500px;
             margin-top: 50px;
@@ -502,6 +558,23 @@ const generateButton = ref(null);
             top: 50px;
         }
 
+        #weddingplaceBackground2{
+            background: url('@/assets/images/weddingPlanImg/weddingplace2.jpg') no-repeat;
+          background-size: contain;
+          height:800px;
+          width: 1200px;
+          top:0px;
+        }
+
+        #eventPlaceEdit{
+            position:absolute;
+        left: 100px;
+        top: 120px;
+        height: 520px;
+        width: 1050px;
+        font-size: 24px;
+        }
+
        #quill-1{
          background: url('@/assets/images/weddingPlanImg/wed1.jpg') no-repeat;
           background-size: contain;
@@ -509,7 +582,7 @@ const generateButton = ref(null);
           width: 1200px;
       }
       #weddingPlace{
-         background: url('@/assets/images/weddingPlanImg/wed5.jpg') no-repeat;
+         background: url('@/assets/images/weddingPlanImg/weddingplace1.jpg') no-repeat;
           background-size: contain;
           height:800px;
           width: 1200px;
@@ -818,6 +891,13 @@ const generateButton = ref(null);
              position: absolute;
         }
 
+        #Valert{
+            width:370px;
+            height: 50px;
+            position: fixed;
+            top: 85%;
+            left:80%;
+        }
         /* button */
 
 /* CSS */

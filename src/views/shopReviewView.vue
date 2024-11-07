@@ -194,6 +194,7 @@ const updateKeyword=()=>{
   searchTerms.value.page=1;
   searchTerms.value.keyword=searchKeyword.value;
   loadReviewData();
+  searchTerms.value.keyword="";
 };
 </script>
 
