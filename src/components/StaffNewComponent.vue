@@ -26,7 +26,8 @@ const BASE_URL = import.meta.env.VITE_API_BASEURL;
 export default {
     data() {
         return {
-            newData:0,
+            scheduleId:0,
+            eventId:0,
             dialog: false,
             newStaff: {
                 "personnelId": 0,
@@ -37,8 +38,9 @@ export default {
         };
     },
     methods: {
-        open(scheduleId) {
-            this.newData = scheduleId; // 將傳入的scheduleId複製到本地變量
+        open(scheduleId,eventid) {
+            this.scheduleId = scheduleId; // 將傳入的scheduleId複製到本地變量
+            this.eventId = eventid;
             this.resetForm();
             this.dialog = true;
         },
@@ -55,12 +57,12 @@ export default {
                 console.error(error);
             }
             this.dialog = false; // 關閉對話框
-            this.$emit('staffnew');//觸發更新事件
+            this.$emit('staffnew', this.eventId);
         },
         resetForm() {
             this.newStaff = {
                 "personnelId": 0,
-                "scheduleId": this.newData,
+                "scheduleId": this.scheduleId,
                 "personnelName": "",
                 "assistanceContent": ""
             }

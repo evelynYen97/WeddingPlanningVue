@@ -65,7 +65,7 @@ export default {
                 console.error('Fetch error:', error);
             }
             this.dialog = false; // 關閉對話框
-            this.$emit('schedulnew'); // 觸發更新事件
+            this.$emit('schedulnew', this.newData.eventId);
         },
         resetForm() {
             this.newSchedul = {

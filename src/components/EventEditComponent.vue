@@ -50,7 +50,7 @@ const BASE_URL = import.meta.env.VITE_API_BASEURL;
                 }
                 let terms = {
                     "eventId": this.editedEvent.eventId,
-                    "caseId": this.editedEvent.caseId, //之後吃cookie裡的
+                    "caseId": this.editedEvent.caseId,
                     "eventName": this.editedEvent.eventName,
                     "eventTime": this.editedEvent.eventTime,
                     "eventLocation": this.editedEvent.eventLocation,

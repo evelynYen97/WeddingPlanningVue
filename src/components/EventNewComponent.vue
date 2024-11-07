@@ -33,7 +33,7 @@ export default {
             dialog: false,
             newEvent: {
                 eventId:0,
-                caseId:1, //之後吃cookie
+                caseId:0, //之後吃cookie
                 eventName: '',
                 eventTime: '',
                 eventLocation: '',
@@ -42,11 +42,13 @@ export default {
             },
             selectedFile: null,
             imageUrl:null,
-            loadImgURL:'https://localhost:7162/eventImg/'
+            loadImgURL:'https://localhost:7162/eventImg/',
+            caseId:0,
         };
     },
     methods: {
-        open() {
+        open(caseID) {
+            this.caseId = caseID;
             this.resetForm();
             this.dialog = true;
         },
@@ -75,7 +77,7 @@ export default {
         resetForm() {
             this.newEvent = {
                 eventId:0,
-                caseId:1, //之後吃cookie
+                caseId:this.caseId,
                 eventName: '',
                 eventTime: '',
                 eventLocation: '',

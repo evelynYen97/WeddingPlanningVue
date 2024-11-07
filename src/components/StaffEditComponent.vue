@@ -27,12 +27,14 @@ export default {
     data() {
         return {
             editedData:{},
+            eventid:0,
             dialog: false,
         };
     },
     methods: {
-        open(event) {
+        open(event,eventid) {
             this.editedData = { ...event }; // 將傳入的事件數據複製到本地變量
+            this.eventid = eventid;
             this.dialog = true; // 打開對話框
         },
         async saveChanges() {
@@ -49,7 +51,7 @@ export default {
                 console.error(error);
             }
             this.dialog = false; // 關閉對話框
-            this.$emit('staffupdate');//觸發更新事件
+            this.$emit('staffupdate', this.eventId);
         },
     },
 };

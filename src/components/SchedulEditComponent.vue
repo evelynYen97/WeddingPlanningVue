@@ -58,7 +58,7 @@ export default {
                 console.error(error);
             }
             this.dialog = false; // 關閉對話框
-            this.$emit('schedulupdate'); // 觸發更新事件
+            this.$emit('schedulupdate', this.editedData.eventId);
         },
     },
 };
