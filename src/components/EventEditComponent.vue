@@ -1,13 +1,15 @@
 <template>
-    <v-dialog v-model="dialog" max-width="500px" class="my-dialog" transition="dialog-transition">
+    <v-dialog v-model="dialog" max-width="470px" class="my-dialog1" transition="dialog-transition">
         <v-card>
-            <v-card-title class="headline">修改事件</v-card-title>
-            <v-card-text>
+            <v-card-title class="headline fontspecial">修改事件</v-card-title>
+            <v-card-text style="padding-top: 0px;">
                 <v-text-field v-model="editedEvent.eventName" label="Event Name" outlined></v-text-field>
                 <v-text-field v-model="editedEvent.eventLocation" label="Event Location" outlined></v-text-field>
                 <v-text-field v-model="editedEvent.eventTime" label="Event Time" type="datetime-local" outlined></v-text-field>
                 <v-textarea v-model="editedEvent.eventNotes" label="Event Notes" outlined></v-textarea>
-                <p>{{ editedEvent.eventLocationImg }}</p>
+                <div style="font-weight: bold;">目前圖片:</div>
+                <img :src="`${loadImgURL}${editedEvent.eventLocationImg}`" alt="Now Image" style="width: 220px;height: 150px;"/>
+                <input type="file" @change="onFileChange" accept="image/*" style="color:black;width: 402px;height: auto;"/>
             </v-card-text>
             <v-card-actions>
                 <button @click="saveEvent" class="btn">
@@ -24,6 +26,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 
     export default {
@@ -31,6 +34,9 @@ const BASE_URL = import.meta.env.VITE_API_BASEURL;
             return {
                 dialog: false,
                 editedEvent: {}, // 存放編輯的事件數據
+                selectedFile: null,
+                imageUrl:null,
+                loadImgURL:'https://localhost:7162/eventImg/'
             };
         },
         methods: {
@@ -39,9 +45,12 @@ const BASE_URL = import.meta.env.VITE_API_BASEURL;
                 this.dialog = true; // 打開對話框
             },
             async saveEvent() {
+                if(this.selectedFile != null){
+                    this.editedEvent.eventLocationImg = this.selectedFile.name;
+                }
                 let terms = {
                     "eventId": this.editedEvent.eventId,
-                    "caseId": 1, //之後吃cookie裡的
+                    "caseId": this.editedEvent.caseId,
                     "eventName": this.editedEvent.eventName,
                     "eventTime": this.editedEvent.eventTime,
                     "eventLocation": this.editedEvent.eventLocation,
@@ -63,49 +72,77 @@ const BASE_URL = import.meta.env.VITE_API_BASEURL;
                 } catch (error) {
                     console.error('Fetch error:', error);
                 }
+                this.uploadImage();
                 this.dialog = false; // 關閉對話框
                 this.$emit('update');
+            },
+            //當使用者選擇新圖片時，設定 selectedFile
+            onFileChange(event) {
+            const file = event.target.files[0];
+                if (file) {
+                    this.selectedFile = file;
+                }
+            },
+            //上傳圖片
+            async uploadImage() {
+                if (!this.selectedFile) {
+                    alert("請先選擇圖片！");
+                    return;
+                }
+                // 使用 FormData 將圖片檔案包裝為表單數據
+                const formData = new FormData();
+                const UpURL = `https://localhost:7162/api/EventsAPI/upload`
+                formData.append('image', this.selectedFile);
+                try {
+                    const response = await axios.post(UpURL, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                    // 假設 API 回傳一個包含圖片 URL 的 JSON 物件
+                    this.imageUrl = response.data.filePath;
+                    console.log("圖片上傳成功:", this.imageUrl);
+                } catch (error) {
+                    console.error("上傳失敗:", error);
+                }
             },
         },
     };
 </script>
 <style scoped>
-    .my-dialog .v-card {
-        border-radius: 20px; /* 自定義圓角 */
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 陰影 */
+    @font-face {
+        font-family: 'ChenYuluoyan-Thin'; /* 自定義字體名稱 */
+        src: url('@/assets/fonts/ChenYuluoyan-Thin.ttf') format('truetype'); /* 字體檔案路徑 */
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .fontspecial {
+        font-family: 'ChenYuluoyan-Thin', sans-serif; /* 將自定義字體應用於標題、段落、按鈕等 */
     }
     
     /* 標題樣式 */
-    .my-dialog .v-card-title {
+    .my-dialog1 .v-card-title {
         font-weight: bold;
-        font-size: 1.5em;
-        color: #372209; /* Vuetify 藍色 */
+        font-size: 3em;
+        color: #8e8e8e;
         text-align: center;
     }
     
-    /* 自定義 v-text-field 樣式 */
-    .my-dialog .v-field__field {
-        border: 1px solid #475460;
-        border-radius: 5px;
-        background-color: #B0B0B0;
-        transition: border-color 0.3s, background-color 0.3s; /* 過渡效果 */
+    input{
+        background-color:#e6e4e4 !important;
+        color: #B0B0B0;
+        border-radius: 10px;
     }
 
-    /* 懸停時的效果 */
-    .my-dialog .v-field__field:hover {
-        border-color: #c3cad0; /* 懸停時邊框顏色 */
-        background-color: #aebdca; /* 懸停時背景顏色 */
+    ::v-deep .v-field__field{
+        background-color:#e6e4e4 !important;
+        border-radius: 12px;
     }
 
-    /* 動態過渡效果 */
-    .dialog-transition-enter-active, 
-    .dialog-transition-leave-active {
-        transition: opacity 0.5s ease, transform 0.5s ease; /* 設置透明度和變換的過渡效果 */
-    }
-    .dialog-transition-enter, 
-    .dialog-transition-leave-to /* .leave-active 在 Vue 2.x 中 */ {
-        opacity: 0;
-        transform: translateY(-30px); /* 進場時向上滑動，退場時向下滑動 */
+    ::v-deep .v-field__input{
+        background-color:#e6e4e4 !important;
+        border-radius: 12px;
     }
 
     .btn {
@@ -115,13 +152,14 @@ const BASE_URL = import.meta.env.VITE_API_BASEURL;
         background-color: #B0B0B0;
         overflow: hidden;
         box-shadow: 0px 0px 17px 1px rgba(0, 0, 0, 0.34);
-        padding: 8px 12px;
+        padding: 8px 10px;
         text-decoration: none;
         margin-right: 10px;
+        border-radius: 10px;
     }
     .btn span {
         color: #ffffff;
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         font-weight: bold;
         text-align: left;
         text-decoration: none;

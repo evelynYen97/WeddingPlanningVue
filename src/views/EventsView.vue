@@ -3,15 +3,32 @@
     <div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;">
     </div>
   </SampleComponent>
-
-  <div class="container" style="margin-top: 50px;" >
-    <div class="row" ref="eventshot">
-      <div class="col-3 carousel-wrapper" v-for="(term, index) in paginatedTerms" :key="term.eventId" >
+  <div style="position: relative; width: 100%; height: 100vh;">
+    <img src="/src/assets/images/活動排程背景圖.jpg" alt="Background" style="position: absolute; top: auto; bottom: 0; left: 0; width: 100%; height:100%; object-fit: cover; z-index: -1;">
+    <div v-if="WeddingPlans.length > 0" class="container" style="width: 500px; height: auto; position: relative; z-index: 1;top:85px">
+      <v-card>
+          <v-card-title class="headline fontspecial" style="font-size:calc(1.5rem + 1.5vw)">婚禮</v-card-title>
+          <v-card-text style="padding-top: 0px;">
+              <v-text-field v-model="WeddingPlans[0].weddingName" label="Wedding Name" outlined></v-text-field>
+              <v-text-field v-model="WeddingPlans[0].weddingLocation" label="Wedding Location" outlined></v-text-field>
+              <v-text-field v-model="WeddingPlans[0].weddingTime" label="Wedding Time" type="datetime-local" outlined></v-text-field>
+              <v-textarea v-model="WeddingPlans[0].introduction" label="Wedding Notes" outlined></v-textarea>
+          </v-card-text>
+          <v-card-actions style="justify-content: right;padding-top: 0%;">
+            <button @click="saveWeddingPlans" style="border: 2px black solid; font-size:calc(1rem + 0.6vw);padding:7px 20px;margin-right: 10px;font-weight: 600;border-radius: 15px" class="fontspecial" >保存</button>
+          </v-card-actions>
+      </v-card>
+    </div>
+  </div>
+  
+  <div class="container" style="margin-top: 50px;" ref="targetArea">
+    <div class="row"  style="margin-bottom: 10px">
+      <div class="col-3 carousel-wrapper" v-for="(term, index) in this.termsevent" :key="term.eventId" v-show="index >= currentPage * itemsPerPage && index < (currentPage + 1) * itemsPerPage">
         <div class="icon-container">
           <i class="fa-solid fa-pencil pencil-icon" style="font-size:22px;margin-right: 20px;color:#B0B0B0;cursor: pointer;" @click="handlePencilClick(term)">
             <p style="font-size: 13px !important; margin-top: 5px;">Edit</p>
           </i>
-          <i class="fa-solid fa-circle-plus new-icon" style="font-size: 22px;margin-right: 20px;color: #A6C8F0;cursor: pointer;" @click="handlePlusClick()">
+          <i class="fa-solid fa-circle-plus new-icon" style="font-size: 22px;margin-right: 20px;color: #A6C8F0;cursor: pointer;" @click="handlePlusClick(this.caseId)">
             <p style="font-size: 13px !important; margin-top: 5px;">New</p>
           </i>
           <i class="fa-solid fa-ban delete-icon" style="font-size: 24px;color: #D4A1BB;cursor: pointer;" @click="handleDeleteClick(term.eventId)">
@@ -23,8 +40,7 @@
             <template v-slot:opposite>
               <div style="width: auto; height: 200px;">
                 <label style="display: flex; justify-content: center;font-size:calc(1rem + 0.6vw);" class="fontspecial">{{ term.eventTime.replace("T", " ").slice(0, 16) }}</label>
-                
-                <img :src="`${loadImgURL}${term.eventLocationImg}`" alt="User Icon" style="width: 220px; height: 150px;" />
+                <img :src="`${loadImgURL}${term.eventLocationImg}`" alt="User Icon" style="width: 220px; height: 150px;" class="localhost">
               </div>
             </template>
             <div style="width: auto; height: 200px;text-align: center;" >
@@ -49,24 +65,23 @@
             </template>
             <div style="width: auto; height: 200px;">
               <label style="display: flex; justify-content: center;font-size:calc(1rem + 0.6vw);" class="fontspecial">{{ term.eventTime.replace("T", " ").slice(0, 16) }}</label>
-              <img src="/src/assets/images/navImage2.jpg" alt="User Icon" class="user-icon"
-                style="width: 220px; height: 150px;" />
+              <img :src="`${loadImgURL}${term.eventLocationImg}`" alt="User Icon" style="width: 220px; height: 150px;" class="localhost"/>
             </div>
           </v-timeline-item>
         </v-timeline>
       </div>
-      <EventEditComponent ref="editEventDialog" @update="refreshTerms"/>
-      <EventNewComponent ref="editEventPlus" @refresh="refreshTerms"></EventNewComponent>
+      <EventEditComponent ref="editEventDialog" @update="refreshTerms()"/>
+      <EventNewComponent ref="editEventPlus" @refresh="refreshTerms()"></EventNewComponent>
     </div>
-    <div class="pagination-controls fontspecial">
-      <button @click="prevPage" :disabled="currentPage === 0">上一頁</button>
-      <button @click="nextPage" :disabled="(currentPage + 1) * itemsPerPage >= termsevent.length">下一頁</button>
-      <button @click="captureScreenshot">截圖</button>
+    <div class="pagination-controls fontspecial" style="padding-top: 10px;">
+      <button @click="prevPage" :disabled="currentPage === 0" style="font-size:calc(1rem + 1vw);">上一頁</button>
+      <button @click="shot" class="capture-btn" style="font-size:calc(1rem + 1vw);">截取螢幕</button>
+      <button @click="nextPage" :disabled="(currentPage + 1) * itemsPerPage >= termsevent.length" style="font-size:calc(1rem + 1vw);">下一頁</button>
     </div>
   </div>
 
   <div class="container" style="margin-bottom: 50px;">
-    <div v-for="terms in termschedul" :key="terms.scheduleId">
+    <div v-for="terms in this.termschedul" :key="terms.scheduleId">
       <v-timeline style="justify-content: flex-start !important;">
         <v-timeline-item dot-color="teal-lighten-3" size="small" >
           <v-row align="center" justify="start">
@@ -75,7 +90,7 @@
               <v-card style="width: 300px; height: auto;">
                 <v-card-title class="bg-info" style="font-weight: bold;background-color: #5579a2 !important;">
                   {{ terms.scheduleStageName }}
-                  <i class="fa-solid fa-user-plus" @click="staffNewClick(terms.scheduleId)" style="margin-left: 15px;"></i>
+                  <i class="fa-solid fa-user-plus" @click="staffNewClick(terms.scheduleId,terms.eventId)" style="margin-left: 15px;"></i>
                 </v-card-title>
                 <v-card-text style="background-color:#eeecec;padding-top: 16px;padding-bottom: 10px">
                   <strong class="me-4">{{ terms.scheduleTime.split("T")[0].split("-").slice(1).join("-") }}</strong>
@@ -111,7 +126,7 @@
                         <div class="text-caption">
                           {{ staff.assistanceContent }}
                         </div>
-                        <button class="btn" @click="staffEditClick(staff)">
+                        <button class="btn" @click="staffEditClick(staff,terms.eventId)">
                           修改
                           <span></span><span></span><span></span><span></span>
                         </button>
@@ -129,10 +144,10 @@
         </v-timeline-item>
       </v-timeline>
     </div>
-    <SchedulEditComponent ref="editschedulDialog" @schedulupdate="refreshschedul(this.noweventID)"></SchedulEditComponent>
-    <SchedulNewComponent ref="newschedulDialog" @schedulnew="refreshschedul(this.noweventID)"></SchedulNewComponent>
-    <StaffEditComponent ref="editstaffDialog" @staffupdate="refreshschedul(this.noweventID)"></StaffEditComponent>
-    <StaffNewComponent ref="newstaffDialog" @staffnew="refreshschedul(this.noweventID)"></StaffNewComponent>
+    <SchedulEditComponent ref="editschedulDialog" @schedulupdate="refreshschedul"></SchedulEditComponent>
+    <SchedulNewComponent ref="newschedulDialog" @schedulnew="refreshschedul"></SchedulNewComponent>
+    <StaffEditComponent ref="editstaffDialog" @staffupdate="refreshschedul"></StaffEditComponent>
+    <StaffNewComponent ref="newstaffDialog" @staffnew="refreshschedul"></StaffNewComponent>
   </div>  
 </template>
 
@@ -145,10 +160,10 @@ import SchedulNewComponent from '@/components/SchedulNewComponent.vue';
 import StaffEditComponent from '@/components/StaffEditComponent.vue';
 import StaffNewComponent from '@/components/StaffNewComponent.vue';
 import html2canvas from 'html2canvas';
-import { VTimeline, VTimelineItem, VCard, VCardTitle, VCardText, VBtn } from 'vuetify/components';
+import { VTimeline, VTimelineItem, VCard, VCardTitle, VCardText} from 'vuetify/components';
+import domtoimage from 'dom-to-image'
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
-const loadImgURL = 'https://localhost:7162/eventImg/'
 
 export default {
   components: {
@@ -168,29 +183,45 @@ export default {
   },
   data() {
     return {
+      WeddingPlans:{},
       termsevent: [],
       termschedul: [],
       termschedulstaff:[],
       currentPage: 0,
       itemsPerPage: 4,
       noweventID:0,//重載排程要用的引數
+      loadImgURL:'https://localhost:7162/eventImg/',
+      screenshotUrl: null,
+      imageCache: new Map(),
+      memberID:'',
+      caseId:'',
     };
+  },
+  async created() {
+    await this.loadWeddingPlans();
   },
   mounted() {
     this.loadevent();
+    this.loadschedul();
   },
   watch: {
-    // 當 paginatedTerms 更新並渲染後執行選取
-    paginatedTerms(newPaginatedTerms) { // 監視 paginatedTerms
+    // 當 termsevent 更新並渲染後執行選取
+    termsevent(newPaginatedTerms) { // 監視 termsevent
+      console.log(newPaginatedTerms);
       this.$nextTick(() => {
-        const dots = document.querySelectorAll('.v-timeline .v-timeline-divider__inner-dot');
+        const dots = document.querySelectorAll('.v-timeline .v-timeline-divider__inner-dot:not(.bg-teal-lighten-3)');
 
+        console.log(dots);
         newPaginatedTerms.forEach((term, index) => {
-          if (dots[index]) {
+          if (dots[index]) {//如果還沒被綁定data-event-id才進來被綁定
             dots[index].setAttribute('data-event-id', term.eventId); // 用來確認選取
             dots[index].style.backgroundColor = '#D8D8EB';
-            dots[index].addEventListener('click', () => this.loadschedul(term.eventId));
 
+            dots[index].addEventListener('click', () => {
+              const eventId = dots[index].getAttribute('data-event-id');
+              this.loadschedul(eventId);  // 將 eventId 傳入 loadschedul 方法
+            });
+            
             let scale = 1;
             let colorToggle = false;
             // 定時切換 scale 和顯示文字
@@ -238,36 +269,146 @@ export default {
       });
     },
   },
-  //計算翻頁頁面
-  computed: {
-    paginatedTerms() {
-      const start = this.currentPage * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.termsevent.slice(start, end);
-    },
-  },
   methods: {
-    //載入活動資料
-    async loadevent() {
-      const API_URL = `${BASE_URL}/Events/caseID/1`;//先預設 1
+    //接cookie
+    getCookieValue(name) {
+      const cookies = document.cookie.split('; ');
+      const cookie = cookies.find(c => c.startsWith(name + '='));
+      return cookie ? cookie.split('=')[1] : null;
+    },
+    //載入婚禮企劃資料
+    async loadWeddingPlans() {
+      this.memberID = this.getCookieValue('memberID');
+      if(!this.memberID){//遊客登入時,給他看Default資料
+        this.memberID = '1';
+      }
+      const API_URL = `${BASE_URL}/WeddingPlans/memberID/${this.memberID}`;
       try {
         const response = await fetch(API_URL);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const results = await response.json();
-        this.termsevent = results;
-      } catch (error) {
+        if(results.length == 0){
+          this.createWeddingPlans();//還沒有任何資料的成員,先幫他新增一個
+        }
+        else{
+          this.WeddingPlans = results;
+          this.caseId = this.WeddingPlans[0].caseId;
+          this.loadevent();
+        }
+      } 
+      catch (error) {
         console.error('Fetch error:', error);
       }
+    },
+    //儲存婚禮企劃資料
+    async saveWeddingPlans() {
+      const API_URL = `${BASE_URL}/WeddingPlans/${this.WeddingPlans[0].caseId}`;
+      const caseID = parseInt(this.WeddingPlans[0].caseId);
+      let terms = {
+        "caseId": caseID,
+        "memberId": this.memberID,
+        "weddingName": this.WeddingPlans[0].weddingName,
+        "introduction": this.WeddingPlans[0].introduction,
+        "weddingTime": this.WeddingPlans[0].weddingTime,
+        "weddingLocation": this.WeddingPlans[0].weddingLocation
+      }
+      try {
+        const response = await fetch(API_URL,{
+            method: 'PUT',
+            body: JSON.stringify(terms),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }else{
+          alert('修改成功');
+        }
+      } catch (error) {
+          console.error('Fetch error:', error);
+      }
+    },
+    //如果是新的成員要先新增相關的活動範例給它
+    async createWeddingPlans() {
+      const API_URL = `${BASE_URL}/WeddingPlans`;
+      const mem = parseInt(this.memberID);
+      const newterms = {
+        "caseId": 0,
+        "memberId": mem,
+        "weddingName": "尚無",
+        "introduction": "尚無",
+        "weddingTime": "2024-11-07T03:28:57.636Z",
+        "weddingLocation": "尚無"
+      }
+      try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(newterms),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to create event');
+        }
+      } catch (error) {
+          console.error('Fetch error:', error);
+      }
+      this.loadWeddingPlans();
+    },
+    //載入活動資料
+    async loadevent() {
+      const API_URL = `${BASE_URL}/Events/caseID/${this.caseId}`;
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const results = await response.json();
+        if(results.length == 0){
+          this.createEvent();//還沒有任何資料的成員,先幫他新增一個
+          console.log(this.WeddingPlans[0].caseId);
+        }
+        else{
+          this.termsevent = results;
+        }
+      } catch (error) {
+          console.error('Fetch error:', error);
+      }
+    },
+    //如果是新的成員要先新增相關的活動範例給它
+    async createEvent() {
+      const API_URL = `${BASE_URL}/Events`;
+      const newterms = {
+        "eventId": 0,
+        "caseId": this.WeddingPlans[0].caseId,
+        "eventName": "尚無",
+        "eventTime": "2024-11-22T18:00:00",
+        "eventLocation": "尚無",
+        "eventNotes": "尚無",
+        "eventLocationImg": "hotel2.png"
+      }
+      console.log(newterms);
+      try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(newterms),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to create event');
+        }
+      } catch (error) {
+          console.error('Fetch error:', error);
+      }
+      this.loadevent();
     },
     //打開活動編輯彈窗並傳遞事件數據
     handlePencilClick(term) {
       this.$refs.editEventDialog.open(term); 
     },
     // 打開活動新增彈窗並傳遞事件數據
-    handlePlusClick() {
-      this.$refs.editEventPlus.open(); 
+    handlePlusClick(caseId) {
+      this.$refs.editEventPlus.open(caseId); 
     },
     //刪除活動事件
     handleDeleteClick(eventId){
@@ -298,7 +439,7 @@ export default {
     },
     //載入排程資訊
     async loadschedul(eventID) {
-      this.noweventID = eventID;
+      console.log(eventID);
       const API_URL = `${BASE_URL}/Schedules/EventID/${eventID}`;
       try {
         const response = await fetch(API_URL);
@@ -306,11 +447,39 @@ export default {
           throw new Error('Network response was not ok');
         }
         const results = await response.json();
-        this.termschedul = results;
-
+        if(results.length == 0){
+          this.createSchedule(eventID);//還沒有任何資料的成員,先幫他新增一個
+        }
+        else{
+          this.termschedul = results;
+        }
       } catch (error) {
         console.error('Fetch error:', error);
       }
+    },
+    //如果是新的成員要先新增相關的活動範例給它
+    async createSchedule(eventID) {
+      const API_URL = `${BASE_URL}/Schedules`;
+      const newterms = {
+        "scheduleId": 0,
+        "eventId": eventID,
+        "scheduleTime": "2024-11-22T18:00:00",
+        "scheduleStageName": "尚無",
+        "scheduleStageNotes": "尚無"
+      }
+      try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(newterms),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to create event');
+        }
+      } catch (error) {
+          console.error('Fetch error:', error);
+      }
+      this.loadschedul();
     },
     //打開編輯排程對話框並傳入事件數據
     SchedulEditClick(term) {
@@ -325,6 +494,8 @@ export default {
     },
     //刪除排程事件
     scheduleDeleteClick(scheduleId,eventID){
+      console.log(`刪除排成${scheduleId}`);
+      console.log(`刪除活動${eventID}`);
       const isConfirmed = window.confirm("您確定要刪除此活動嗎？"); // 確認視窗
       if (!isConfirmed) return; // 如果使用者點擊取消，則直接返回
       const deleteschedule = async () => {
@@ -364,22 +535,23 @@ export default {
       }
     },
     //彈窗掛載資料
-    staffEditClick(staffdata) {
+    staffEditClick(staffdata,eventid) {
       if (this.$refs.editstaffDialog) {
-        this.$refs.editstaffDialog.open(staffdata); 
+        this.$refs.editstaffDialog.open(staffdata,eventid); 
       } else {
         console.error('editstaffDialog 尚未掛載');
       }
     },
-    staffNewClick(scheduleId) {
+    staffNewClick(scheduleId,eventId) {
       if (this.$refs.newstaffDialog) {
-        this.$refs.newstaffDialog.open(scheduleId); 
+        this.$refs.newstaffDialog.open(scheduleId,eventId); 
       } else {
         console.error('newstaffDialog 尚未掛載');
       }
     },
     //刪除事件人員
     staffDeleteClick(staffId,eventID){
+      console.log(eventID);
       const isConfirmed = window.confirm("您確定要刪除此活動嗎？"); // 確認視窗
       if (!isConfirmed) return; // 如果使用者點擊取消，則直接返回
       const deletestaff = async () => {
@@ -433,7 +605,109 @@ export default {
           this.screenshotname = fileName;
           this.timestamp = new Date().toISOString().split('.')[0]; // "YYYY-MM-DDTHH:MM:SS" 格式
       });
-    }
+    },
+    // 預處理圖片
+    async preloadImages() {
+      const targetElement = this.$refs.targetArea
+      const images = targetElement.querySelectorAll('.localhost')
+      
+      for (const img of images) {
+        if (img.src.includes('localhost')) {
+          try {
+            const base64Data = await this.convertImageToBase64(img.src)
+            this.imageCache.set(img.src, base64Data)
+            // 暫時替換圖片來源
+            img.dataset.originalSrc = img.src
+            img.src = base64Data
+          } catch (error) {
+            console.error('圖片轉換失敗:', error)
+          }
+        }
+      }
+    },
+    // 轉換圖片為 Base64
+    async convertImageToBase64(imgUrl) {
+      try {
+        const response = await fetch(imgUrl, {
+          mode: 'cors',
+          credentials: 'include' // 如果需要發送 cookies
+        })
+        const blob = await response.blob()
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onloadend = () => resolve(reader.result)
+          reader.onerror = reject
+          reader.readAsDataURL(blob)
+        })
+      } catch (error) {
+        console.error('轉換圖片失敗:', error)
+        throw error
+      }
+    },
+    // 恢復原始圖片來源
+    restoreImages() {
+      const targetElement = this.$refs.targetArea
+      const images = targetElement.querySelectorAll('.localhost')
+      
+      for (const img of images) {
+        if (img.dataset.originalSrc) {
+          img.src = img.dataset.originalSrc
+          delete img.dataset.originalSrc
+        }
+      }
+    },
+
+    // 準備並執行截圖
+    async prepareAndCapture() {
+      try {
+        // 先預處理圖片
+        await this.preloadImages()
+        
+        // 執行截圖
+        await this.takeScreenshot()
+        
+        // 恢復原始圖片
+        this.restoreImages()
+      } catch (error) {
+        console.error('截圖過程發生錯誤:', error)
+        this.restoreImages() // 確保圖片被恢復
+      }
+    },
+    // 執行截圖
+    async takeScreenshot() {
+      try {
+        const targetElement = this.$refs.targetArea
+        const dataUrl = await domtoimage.toPng(targetElement, {
+          quality: 1.0,
+          bgcolor: '#fff',
+          cacheBust: true, // 避免快取問題
+          filter: (node) => {
+            // 可以在這裡添加額外的過濾規則
+            return true
+          },
+          // 處理字體
+          fontEmbedCSS: document.querySelector('style')?.innerHTML || ''
+        })
+        this.screenshotUrl = dataUrl
+      } catch (error) {
+        console.error('截圖失敗:', error)
+        throw error
+      }
+    },
+    // 下載截圖
+    downloadScreenshot() {
+      if (!this.screenshotUrl) return
+      
+      const link = document.createElement('a')
+      link.download = `screenshot-${Date.now()}.png`
+      link.href = this.screenshotUrl
+      link.click()
+    },
+    //截圖按鈕
+    shot(){
+      this.prepareAndCapture();
+      this.downloadScreenshot();
+    },
   },
 };
 
@@ -448,6 +722,10 @@ export default {
 
   .fontspecial {
       font-family: 'ChenYuluoyan-Thin', sans-serif; /* 將自定義字體應用於標題、段落、按鈕等 */
+  }
+
+  .v-card-text{
+    padding-bottom: 0px;
   }
 
   .titleColor {
@@ -470,7 +748,19 @@ export default {
   .pagination-controls {
     display: flex;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: 20px;
+  }
+
+  .pagination-controls button{
+    padding: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border-radius: 80px;
+    margin-right: 10px
+  }
+
+  .pagination-controls button:hover{
+    border: 3px black solid;
   }
 
   .text-caption {

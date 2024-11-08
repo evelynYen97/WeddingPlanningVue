@@ -37,9 +37,7 @@
             <button @click="deleteImage" class="btn btn-red" data-hover="DELETE!">
                 <div>刪除</div>
             </button>
-            <!-- <input type="text" v-model="memberID" style="width: 100px; border: 2px solid #4CAF50; padding: 8px;" />
-            <button @click="fetchEditingID" class="btn">搜尋圖層資訊</button> -->
-            <button @click="handleSave" class="btn btn-green" data-hover="SAVE!">
+            <button v-show="memberID?.length > 0" @click="handleSave" class="btn btn-green" data-hover="SAVE!">
                 <div>保存</div>
             </button>
         </div>
@@ -81,7 +79,7 @@ export default {
                 width: 0,
                 height: 0,
             },
-            memberID: '',
+            memberID:'',
             editingID: null,
             ImgUsings: '',
             selectedFile: null,
@@ -89,14 +87,28 @@ export default {
             isComponentRestart:true,
             componentKey: 0,
             screenshotname:'',
-            timestamp:''
+            timestamp:'',
+            storedImageSrc: '' // 用於存放從 localStorage 中取出的 Base64 圖片數據
         };
+    },
+    async created() {
+        await this.getmemberid();
+        this.fetchEditingID();
     },
     mounted() {
         this.setupInteract();
         this.addContainerClickListener();
     },
     methods: {
+        //接cookie 
+        getCookieValue(name) {
+            const cookies = document.cookie.split('; ');
+            const cookie = cookies.find(c => c.startsWith(name + '='));
+            return cookie ? cookie.split('=')[1] : null;
+        },
+        getmemberid(){
+            this.memberID = this.getCookieValue('memberID');
+        },
         handleDataSent(imagePath, materialId, width, height, name) {
             this.addImage(imagePath, width, height, materialId, name, 1);
         },
@@ -113,6 +125,7 @@ export default {
                 }
                 const EditingID = await response.json();
                 this.editingID = EditingID;  // 將ID存儲到 data 中
+                console.log(this.editingID);
                 this.fetchImgUsings();//呼叫圖層資訊
             } catch (error) {
                 console.error('Fetch error:', error);
@@ -173,7 +186,7 @@ export default {
         AddMemImg() {
             let Memterms = {
                 "memberMaterialId": 0,
-                "memberId": 1,//先預設給1
+                "memberId": this.memberID,
                 "memberImgName": this.selectedFile.name,
                 "estimatedLength": 200,
                 "estimatedWidth": 200
@@ -213,8 +226,7 @@ export default {
             const elements = container.querySelectorAll('[default-material-id][websource][memsource]');
 
             elements.forEach(element => {
-                console.log(element);
-                const API_URL = `${BASE_URL}/ImgUsings/${element.getAttribute('default-material-id')}`;
+                const API_URL = `${BASE_URL}/ImgUsings/${element.getAttribute('default-material-id')}`;//原圖層素材紀錄修改位置
                 const pleft = parseInt(element.style.left.replace('px', ''));//取原top left
                 const ptop = parseInt(element.style.top.replace('px', ''));
                 const imgElement = element.querySelector('img');//抓圖片物件
@@ -227,12 +239,10 @@ export default {
                 let imgY = 0;
 
                 if (revise == 1) {
-                    console.log(1);
                     imgX = parseFloat(parseFloat(imgElement.getAttribute('data-x')).toFixed(2)) + pleft;
                     imgY = parseFloat(parseFloat(imgElement.getAttribute('data-y')).toFixed(2)) + ptop;
                 }
                 else {
-                    console.log(0);
                     imgX = parseFloat(parseFloat(imgElement.getAttribute('data-x')).toFixed(2));
                     imgY = parseFloat(parseFloat(imgElement.getAttribute('data-y')).toFixed(2));
                 }
@@ -263,7 +273,7 @@ export default {
             const elements = container.querySelectorAll('[data-material-id][websource][memsource]');
 
             elements.forEach(element => {
-                const imageid = element.getAttribute('data-material-id');
+                const imageid = element.getAttribute('data-material-id');//新增在塗層的素材
                 const imgElement = element.querySelector('img');
                 const width = imgElement.style.width;
                 const widthWithoutPx = width.replace('px', '');
@@ -280,6 +290,7 @@ export default {
                     "imgY": parseFloat(parseFloat(imgElement.getAttribute('data-y')).toFixed(2))//toFixed(2)會將數字四捨五入到小數點後兩位，返回的是一個字串。如果你需要它是數字型態而不是字串，可以再使用 parseFloat()
                 }
                 const post = async () => {
+                    console.log(this.editingID);
                     const API_URL = `${BASE_URL}/ImgUsings?imageid=${imageid}&editingid=${this.editingID}`;
                     const response = await fetch(API_URL, {
                         method: 'POST',
@@ -292,9 +303,8 @@ export default {
         },
         handleSave() {
             // 呼叫 putsql 和 postsql
-            this.putsql();
-            this.postsql();
             this.captureScreenshot();
+            this.screenpostsql();
         },
         //圖層所有元素順序添加進畫面
         defaultImg() {
@@ -456,7 +466,7 @@ export default {
                 const fileName = `screenshot_${Date.now()}.png`;
                 this.screenshotname = fileName;
                 this.timestamp = new Date().toISOString().split('.')[0];// "YYYY-MM-DDTHH:MM:SS" 格式
-                this.uploadScreenshot(imageData,fileName);
+                this.uploadScreenshot(imageData,fileName);//先註解
             });
         },
         uploadScreenshot(imageData,fileName) {
@@ -477,25 +487,54 @@ export default {
         },
         //Screenshot存回sql
         screenpostsql() {
-            let terms = {//之後會換
-                "editingImgFileId": 0,
-                "memberId": 1,
-                "editTime": this.timestamp,
-                "screenshot": this.screenshotname,
-                "imgEditingName": "圖層1"
+            if(this.editingID==0){
+                let terms = {//之後會換
+                    "editingImgFileId": 0,
+                    "memberId": this.memberID,
+                    "editTime": this.timestamp,
+                    "screenshot": this.screenshotname,
+                    "imgEditingName": "圖層1"
+                }
+                const post = async () => {
+                    const API_URL = `${BASE_URL}/EditingImgFiles`;
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(terms),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    if (response.ok) {
+                        await this.fetchEditingID(); // 等待 fetchEditingID 完成後更新 this.editingID
+                        this.putsql(); // 然後執行 putsql
+                        this.postsql(); // 最後執行 postsql
+                    }
+                }
+                post();
+                
             }
-            console.log(this.timestamp);
-            console.log(this.screenshotname);
-            console.log(JSON.stringify(terms));
-            const post = async () => {
-                const API_URL = `${BASE_URL}/EditingImgFiles`;
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(terms),
-                    headers: { 'Content-Type': 'application/json' }
-                });
+            else{
+                let terms = {//之後會換
+                    "editingImgFileId": this.editingID,
+                    "memberId": this.memberID,
+                    "editTime": this.timestamp,
+                    "screenshot": this.screenshotname,
+                    "imgEditingName": "圖層1"
+                }
+                const put = async () => {
+                    const API_URL = `${BASE_URL}/EditingImgFiles/${this.editingID}`;
+                    const response = await fetch(API_URL, {
+                        method: 'PUT',
+                        body: JSON.stringify(terms),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    if (response.ok) {
+                        this.putsql(); // 更新後執行 putsql
+                        this.postsql(); // 然後執行 postsql
+                    }
+                }
+                put();
             }
-            post();
+            
         },
         // 重新調整所有圖片的位置，防止超出新的容器範圍
         adjustImagesToNewContainer() {
