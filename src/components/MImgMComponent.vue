@@ -18,7 +18,6 @@ import {ref,defineProps} from 'vue';
 
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
-const API_URL = `${BASE_URL}/MemberMaterials`
 const terms = ref([])
 
 const props = defineProps({
@@ -27,6 +26,15 @@ const props = defineProps({
         required: true
     }
 });
+
+//接cookie
+const getCookieValue = (name) => {
+    const cookies = document.cookie.split('; ');
+    const cookie = cookies.find(c => c.startsWith(name + '='));
+    return cookie ? cookie.split('=')[1] : null;
+}
+const memberID = getCookieValue('memberID');
+const API_URL = `${BASE_URL}/MemberMaterials/memberID/${memberID}`;
 
 const loadImg = async () => {
     try {

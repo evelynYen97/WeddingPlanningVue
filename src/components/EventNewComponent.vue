@@ -1,13 +1,13 @@
 <template>
-    <v-dialog v-model="dialog" max-width="500px" class="my-dialog" transition="dialog-transition">
+    <v-dialog v-model="dialog" max-width="450px" class="my-dialog" transition="dialog-transition">
         <v-card>
-            <v-card-title class="headline" >新增事件</v-card-title>
-            <v-card-text>
+            <v-card-title class="headline fontspecial" >新增事件</v-card-title>
+            <v-card-text style="padding-top: 0px;">
                 <v-text-field v-model="newEvent.eventName" label="Event Name" outlined></v-text-field>
                 <v-text-field v-model="newEvent.eventLocation" label="Event Location" outlined></v-text-field>
                 <v-text-field v-model="newEvent.eventTime" label="Event Time" type="datetime-local" outlined></v-text-field>
                 <v-textarea v-model="newEvent.eventNotes" label="Event Notes" outlined></v-textarea>
-                <!-- 圖片之後的位置 -->
+                <input type="file" @change="onFileChange" accept="image/*" style="width:402px;height: auto"/>
             </v-card-text>
             <v-card-actions>
                 <button @click="createEvent" class="btn">
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 
 export default {
@@ -32,31 +33,36 @@ export default {
             dialog: false,
             newEvent: {
                 eventId:0,
-                caseId:1, //之後吃cookie
+                caseId:0, //之後吃cookie
                 eventName: '',
                 eventTime: '',
                 eventLocation: '',
                 eventNotes: '',
-                eventLocationImg: '' // 如果需要新增圖片欄位，可以填入
-            }
+                eventLocationImg: ''
+            },
+            selectedFile: null,
+            imageUrl:null,
+            loadImgURL:'https://localhost:7162/eventImg/',
+            caseId:0,
         };
     },
     methods: {
-        open() {
+        open(caseID) {
+            this.caseId = caseID;
             this.resetForm();
             this.dialog = true;
         },
         async createEvent() {
-            const newEventDetails = {
-                ...this.newEvent,
-                caseId: 1 // 之後可從 cookie 或其他來源取得
-            };
             const API_URL = `${BASE_URL}/Events`; // 請確認 API URL 是否正確
-
+            
+            this.uploadImage();
+            if(this.selectedFile != null){
+                this.newEvent.eventLocationImg = this.selectedFile.name;
+            }
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    body: JSON.stringify(newEventDetails),
+                    body: JSON.stringify(this.newEvent),
                     headers: { 'Content-Type': 'application/json' }
                 });
                 if (!response.ok) {
@@ -71,72 +77,94 @@ export default {
         resetForm() {
             this.newEvent = {
                 eventId:0,
-                caseId:1, //之後吃cookie
+                caseId:this.caseId,
                 eventName: '',
                 eventTime: '',
                 eventLocation: '',
                 eventNotes: '',
                 eventLocationImg: ''
             };
-        }
+        },
+        //當使用者選擇新圖片時，設定 selectedFile
+        onFileChange(event) {
+        const file = event.target.files[0];
+            if (file) {
+                this.selectedFile = file;
+            }
+        },
+        //上傳圖片
+        async uploadImage() {
+            if (!this.selectedFile) {
+                alert("請先選擇圖片！");
+                return;
+            }
+            // 使用 FormData 將圖片檔案包裝為表單數據
+            const formData = new FormData();
+            const UpURL = `https://localhost:7162/api/EventsAPI/upload`
+            formData.append('image', this.selectedFile);
+            try {
+                const response = await axios.post(UpURL, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                // 假設 API 回傳一個包含圖片 URL 的 JSON 物件
+                this.imageUrl = response.data.filePath;
+                console.log("圖片上傳成功:", this.imageUrl);
+            } catch (error) {
+                console.error("上傳失敗:", error);
+            }
+        },
     }
 };
 </script>
 
 <style scoped>
-    .my-dialog .v-card {
-        border-radius: 20px; /* 自定義圓角 */
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 陰影 */
+    @font-face {
+        font-family: 'ChenYuluoyan-Thin'; /* 自定義字體名稱 */
+        src: url('@/assets/fonts/ChenYuluoyan-Thin.ttf') format('truetype'); /* 字體檔案路徑 */
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .fontspecial {
+        font-family: 'ChenYuluoyan-Thin', sans-serif; /* 將自定義字體應用於標題、段落、按鈕等 */
     }
     
     /* 標題樣式 */
     .my-dialog .v-card-title {
         font-weight: bold;
-        font-size: 1.5em;
-        color: #372209; /* Vuetify 藍色 */
+        font-size: 3em;
+        color: #556679; /* Vuetify 藍色 */
         text-align: center;
     }
-    
-    /* 自定義 v-text-field 樣式 */
-    .my-dialog .v-field__field {
-        border: 2px solid #475460;
+
+    input{
+        background-color:#dae3ee !important;
+        color: #475460;
         border-radius: 10px;
-        background-color: #f0f4f8;
-        transition: border-color 0.3s, background-color 0.3s; /* 過渡效果 */
     }
 
-    /* 懸停時的效果 */
-    .my-dialog .v-field__field:hover {
-        border-color: #b0c0cf; /* 懸停時邊框顏色 */
-        background-color: #f3f9fe; /* 懸停時背景顏色 */
+    ::v-deep .v-field__field{
+        background-color:#dae3ee !important;
+        border-radius: 12px;
     }
-
-
-    /* 動態過渡效果 */
-    .dialog-transition-enter-active, 
-    .dialog-transition-leave-active {
-        transition: opacity 0.5s ease, transform 0.5s ease; /* 設置透明度和變換的過渡效果 */
-    }
-    .dialog-transition-enter, 
-    .dialog-transition-leave-to /* .leave-active 在 Vue 2.x 中 */ {
-        opacity: 0;
-        transform: translateY(-30px); /* 進場時向上滑動，退場時向下滑動 */
-    }
-
+    
     .btn {
         position: relative;
         z-index: 1;
         min-width: 90px;
-        background-color: #A6C8F0;
+        background-color: #9cbbde;
         overflow: hidden;
         box-shadow: 0px 0px 17px 1px rgba(0, 0, 0, 0.34);
-        padding: 8px 12px;
+        padding: 8px 10px;
         text-decoration: none;
         margin-right: 10px;
+        border-radius: 10px;
     }
     .btn span {
         color: #ffffff;
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         font-weight: bold;
         text-align: left;
         text-decoration: none;
@@ -155,7 +183,7 @@ export default {
         width: 47%;
         right: 7px;
         top: 50%;
-        background: #ffffff;
+        background: #556679;
         transform: scaleX(0.25);
         transform-origin: center right;
         transition: all 0.3s ease;
