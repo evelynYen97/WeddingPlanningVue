@@ -35,6 +35,12 @@ initializeFunction();
           </div>
         </div>
       </div>
+      <nav style="--bs-breadcrumb-divider: '>>';" aria-label="breadcrumb">
+            <ol class="breadcrumb ">
+              <li class="breadcrumb-item "><RouterLink :to="{name:'dish'}">桌菜列表</RouterLink></li>
+              <li class="breadcrumb-item active" aria-current="page">{{ dish.dishesName }}</li>
+            </ol>
+          </nav>
       <div class="row">
         <div class="col-lg-6 col-md-12" >
           <article class="post-item card border-0 shadow-sm p-3">
@@ -61,14 +67,14 @@ initializeFunction();
                   <a href="#" class="text-decoration-none">名稱：{{ dish.dishesName }}</a>
                 </h2>
                 <br>
-                <h3>種類：{{dish.dishesSort}}</h3>
+                <h5>種類：{{dish.dishesSort}}</h5>
                 <br>
-                <h3>內含： {{ dish.dishesDescription}}</h3>
+                <h5>內含： {{ dish.dishesDescription}}</h5>
                 <div class="post-header">
                 <h5></h5>
                 </div>
                 <br>
-                <h3>價格：{{dish.pricePerTable}}元/桌</h3>
+                <h5>價格：{{dish.pricePerTable}}元/桌</h5>
                 <br>
                 <br>  
                 <br>         

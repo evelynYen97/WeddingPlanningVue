@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, nextTick } from 'vue';
+import { useRouter } from 'vue-router';
 import ShopView from './ShopView.vue';
 import Cookies from 'js-cookie';
+
 
 const API_URL = 'https://localhost:7048/api/Venues';
 const venues = ref([]);
 const searchKeyword = ref(''); // 儲存搜尋欄的關鍵字
 const inputClass = ref('keyword');
 const selectedDate = ref<Date | null>(null); // 新增篩選的日期，設定為 Date 或 null
+const router = useRouter();
 
 // 加載場地資料
 const loadVenue = async () => {
   const response = await fetch(API_URL);
   const datas = await response.json();
-  venues.value = datas
+  venues.value = await datas
     .filter(item => !item.memberId) // 僅保留 memberId 為空的項目
     .map(item => ({
       ...item,
@@ -21,6 +24,7 @@ const loadVenue = async () => {
       availableTime: item.availableTime.replace('T', ' ') // 轉換可用時間格式
     }))
     .sort((a, b) => new Date(a.availableTime).getTime() - new Date(b.availableTime).getTime());
+    
 };
 
 // 計算屬性，用於篩選場地資料
@@ -74,39 +78,86 @@ async function addToBudget(venue) {
     }
     alert('成功加入預算表！');
 
-    // 下訂成功後，更新該場地的 memberId
-    await updateVenueMemberId(venue.venueId, memberId);
-
   } catch (error) {
     console.error('加入預算表時發生錯誤：', error);
     alert('加入預算表失敗');
   }
 }
 
-
-// 使用 PUT 方法更新場地的 memberId
-async function updateVenueMemberId(venueId, memberId) {
+// 使用 PUT 方法更新場地的 memberId，傳送完整的場地物件
+async function updateVenueMemberId(venue) {
+  const updatedVenue = {
+  venueId: venue.venueId,
+  shopId: venue.shopId,
+  memberId: Number(Cookies.get('memberID')), // 只更新 memberId，其他都一樣
+  venueFunction: venue.venueFunction,
+  venueStyle: venue.venueStyle,
+  inOurDoor: venue.inOurDoor,
+  venueName: venue.venueName,
+  tableCapacity: venue.tableCapacity,
+  guestCapacity: venue.guestCapacity,
+  venueRentalPrice: venue.venueRentalPrice,
+  venueImg: venue.venueImg,
+  venueInfo: venue.venueInfo,
+  availableTime: new Date(venue.availableTime).toISOString(), // 轉換 ISO 8601 格式
+  venueImg2: venue.venueImg2,
+  isDelete: false,
+  orderTime: venue.orderTime,
+  };
+  console.log(updatedVenue)
   try {
-    const response = await fetch(`https://localhost:7048/api/Venues/${venueId}`, {
-      method: 'PUT',
+    const response = await fetch(`https://localhost:7048/api/Venues/${venue.venueId}`, {
+      method: 'PUT',             
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ memberId: Number(memberId) }) // 確保 memberId 是數字格式
+      body: JSON.stringify(updatedVenue) // 傳送完整的場地物件
     });
-
+    console.log(venue.venueId)
+    
     if (!response.ok) {
+      const errorData = await response.json();
+      console.error('後端返回的錯誤訊息：', errorData);
       throw new Error('無法更新場地的 memberId');
     }
+
+    // 成功更新後本地資料的同步
+    const index = venues.value.findIndex(v => v.venueId === venue.venueId);
+    if (index !== -1) {
+      venues.value[index].memberId = updatedVenue.memberId;
+    }
+
     console.log('場地的 memberId 更新成功');
+  
+  // 等待 DOM 更新完成後，刷新資料表
+  nextTick(() => { 
+    loadVenue();  // 重新載入場地資料
+  });
+    
   } catch (error) {
     console.error('更新場地 memberId 時發生錯誤：', error);
     alert('無法更新場地資料');
   }
 }
+async function handleBooking(venue) {
+  addToBudget(venue); // 將場地加入預算表
+  updateVenueMemberId(venue); // 更新場地的 memberId
 
-onMounted(() => {
-  loadVenue();
+  // 等待 DOM 更新完成後，刷新資料表
+  nextTick(() => { 
+    loadVenue();  // 重新載入場地資料
+  });
+  
+}
+
+// 定義跳轉到場地詳細頁的函式
+const goToVenueDetail = (id: number) => {
+  router.push({ name: 'venueitem', params: { id } });
+};
+
+onMounted(async() => {
+  await loadVenue();
+  nextTick()
 });
 
 </script>
@@ -115,13 +166,13 @@ onMounted(() => {
    <ShopView></ShopView> 
 
    <div class="card">
-      <h3 style="padding-left: 180px;">可預定場地列表</h3>
+      <h3 style="padding-left: 200px; font-weight: bold;" class="mb-3">可預定場地列表</h3>
       <InputText 
           v-model="searchKeyword" 
           placeholder="輸入場地名稱進行搜尋..." 
           class="keyword"
       />
-      <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;" class="mt-3">
           <label>選擇日期:</label>
           <Calendar v-model="selectedDate" placeholder="選擇可用日期" dateFormat="yy-mm-dd" />
       </div>
@@ -140,9 +191,20 @@ onMounted(() => {
               </template>
           </Column>
           <Column field="availableTime" header="可用時間" style="width: 20%" />
+
+          <Column header="詳細資訊" style="width: 10%; text-align:center">
+            <template #body="{ data }">
+              <Button 
+                label="顯示" 
+                icon="pi pi-info" 
+                @click.prevent="goToVenueDetail(data.venueId)" 
+                class="p-button-info"/>
+            </template>          
+          </Column>
+
           <Column header="操作" style="width: 10%; text-align:center">
               <template #body="{ data }">
-                  <Button label="下訂" icon="pi pi-check" @click.prevent="addToBudget(data)" class="p-button-success" />
+                  <Button label="下訂" icon="pi pi-check" @click.prevent="handleBooking(data)" class="p-button-success" />
               </template>
           </Column>
       </DataTable>
@@ -154,7 +216,7 @@ onMounted(() => {
    width: 80%; 
    margin: auto;
    border-radius: 10px;
-   box-shadow: 100px black;
+   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
 .keyword-input:focus {

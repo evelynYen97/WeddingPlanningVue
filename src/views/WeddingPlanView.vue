@@ -251,7 +251,7 @@ const memberID = getMemberID();
         weddingplanData.value=await responseData.json();
         formattedTime.value = weddingplanData.value.weddingTime.replace('T', ' ');
             imageSrc = `http://localhost:5173/src/assets/images/weddingPlanImg/${weddingplanData.value.editingImgName}`;
-            venueImgPath1= `https://localhost:7162/Ven1/${weddingplanData.value.venueImgName1}`;
+            venueImgPath1= `https://localhost:7162/Ven1/${weddingplanData.value.venueImgName1}`; //這裡截不到圖
             venueImgPath2=`https://localhost:7162/Ven1/${weddingplanData.value.venueImgName2}`;
             eventTimeLinePath=`https://localhost:7162/eventImg/${weddingplanData.value.eventImgName}`;
 

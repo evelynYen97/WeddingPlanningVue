@@ -11,7 +11,7 @@ const selectedCategory = ref('all'); // 存放目前選中的分類
 const searchKeyword = ref('') // 儲存搜尋欄的關鍵字
 const currentPage = ref(1) // 當前頁面
 const pageSize = ref(10) // 每頁顯示的商品數量
-const carsQuantity = reactive({}); // 每台禮車的數量，拆掉彼此影響的參數依據
+const carsQuantity = ref({}); // 每台禮車的數量，拆掉彼此影響的參數依據
 
 //讀取API資料
 const  loadCars = async() => {
@@ -22,7 +22,7 @@ const  loadCars = async() => {
 
 // 預設每台禮車的數量為 1
 datas.forEach((car) => {
-  carsQuantity[car.carId] = 1;
+  carsQuantity.value[car.carId] = 1;
   });
 }
 
@@ -76,12 +76,12 @@ watch(selectedCategory, () =>{
 
 // 增減數量函式
 function increaseQuantity(carId) {
-  carsQuantity[carId]++;
+  carsQuantity.value[carId]++;
 }
 
 function decreaseQuantity(carId) {
-  if (carsQuantity[carId] > 1) {
-    carsQuantity[carId]--;
+  if (carsQuantity.value[carId] > 1) {
+    carsQuantity.value[carId]--;
   }else{
     alert('每件數量不能低於1。')
   }
@@ -100,11 +100,11 @@ async function addToBudget(car) {
     memberId: memberId,
     budgetItemDetail: car.carName,                                  // 車輛名稱
     budgetItemPrice: car.rentalPerDay,                              // 車輛單價
-    budgetItemAmount: carsQuantity[car.carId],                      // 禮車數量
-    budgetItemSubtotal: car.rentalPerDay * carsQuantity[car.carId], // 禮車總價
+    budgetItemAmount: carsQuantity.value[car.carId],                      // 禮車數量
+    budgetItemSubtotal: car.rentalPerDay * carsQuantity.value[car.carId], // 禮車總價
     budgetItemSort: '禮車'                                          // 固定值 "禮車"
   };
-
+  console.log(budgetItem)
   try {
     const response = await fetch( 'https://localhost:7048/api/MemberBudgetItems', {
       method: 'POST',
@@ -232,7 +232,7 @@ loadCars()
                                  id="quantity" 
                                  name="quantity" 
                                  class="form-control input-number" 
-                                 :value="carsQuantity[car.carId]"  />
+                                 v-model="carsQuantity[car.carId]"  />
                           <span class="input-group-btn">
                             <button type="button" 
                                     class="quantity-right-plus btn btn-success btn-number" 

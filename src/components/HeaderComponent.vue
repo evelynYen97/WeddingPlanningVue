@@ -107,7 +107,7 @@ const scrollToContactUs = () => {
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                   <li><RouterLink class="dropdown-item" :to="{name:'allShop'}">所有商家</RouterLink></li>
-                  <li><RouterLink class="dropdown-item" :to="{name:'cake'}">婚宴會場</RouterLink></li>
+                  <li><RouterLink class="dropdown-item" :to="{name:'venue'}">婚宴會場</RouterLink></li>
                   <li><RouterLink class="dropdown-item" :to="{name:'dish'}">婚宴菜餚</RouterLink></li>
                   <li><RouterLink class="dropdown-item" :to="{name:'car'}">婚宴禮車</RouterLink></li>
                   <li><RouterLink class="dropdown-item" :to="{name:'cake'}">送禮喜餅</RouterLink></li>
