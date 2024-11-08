@@ -1,6 +1,6 @@
 <script setup>
 import SampleComponent from '@/components/SampleComponent.vue';
-import { ref } from 'vue'; // 使用 ref 來進行雙向綁定
+import { ref,onMounted  } from 'vue'; // 使用 ref 來進行雙向綁定
 
 
 // 從環境變數獲取 BASE_URL
@@ -11,6 +11,22 @@ const API_URL = `${BASE_URL}/Members`;
 const email = ref('');
 const password = ref('');
 // const lastLoginTime = ref('');
+
+// 檢查是否已經登入
+onMounted(() => {
+  // 解析 cookie 為物件
+  const cookies = document.cookie.split(";").reduce((acc, cookie) => {
+    const [key, value] = cookie.split("=").map(c => c.trim());
+    acc[key] = value;
+    return acc;
+  }, {});
+
+  // 如果存在 memberID 或 memberName，則跳轉到會員中心
+  if (cookies.memberID || cookies.memberName) {
+    alert('您已經登入了，將自動跳轉回會員中心');
+    window.location.href = '/profile';
+  }
+});
 
 // 處理表單提交
 async function handleLogin(event) {
@@ -96,25 +112,17 @@ async function handleLogin(event) {
                   </div>
 
                   <div class="form-outline mb-4">
-                    <input
-                      type="password"
-                      id="password"
-                      v-model="password"
-                      class="form-control form-control-lg"
-                    />
+                    <input type="password" id="password" v-model="password" class="form-control form-control-lg"/>
                     <label class="form-label" for="password">Password</label>
                   </div>
 
                   <div class="pt-1 mb-4">
-                    <button
-                      type="submit"
-                      class="btn btn-dark text-white btn-lg btn-block"
-                    >
+                    <button type="submit" class="btn btn-dark text-white btn-lg btn-block">
                       Login
                     </button>
                   </div>
 
-                  <a class="small text-muted" href='resetPassword'>忘記密碼?</a>
+                  <a class="small text-muted" href='sendResetPassword'>忘記密碼?</a>
                   <p class="mb-5 pb-lg-2" style="color: #393f81;">
                     您還沒有加入會員嗎?
                     <a href='register' style="color: #393f81;">建立會員</a>

@@ -23,7 +23,6 @@ const userData = ref({
 })
 
 const validity = ref({
-    "userNameRequired":true,
     "pwdValidate":true,
     "pwdRequired":true,
     "pwdConfirmed":true,
@@ -60,8 +59,7 @@ const validate = async() =>{
     //解構賦值(javascrypt語法 可以簡化程式但是會移除響應式的特性)
     const { username, password1, password2, useremail, phonenumber, address, gender, birthday, preference, weddingStatus, budget } = userData.value
 
-    //資料一定要輸入的驗證
-    validity.value.userNameRequired = username.length > 0
+    //資料驗證
     validity.value.pwdRequired = password1.length > 0
     validity.value.emailRequired = useremail.length > 0
     validity.value.nameRequired = username.length > 0
@@ -77,17 +75,15 @@ const validate = async() =>{
 
     //密碼與再次輸入密碼一致
     validity.value.pwdConfirmed = password1 === password2
-    //Email格式是否正確
+    //檢查Email是否符合格式
     validity.value.emailFormat = emailRule.test(useremail)
-    //檢查密碼是否符合網站要求
+    //檢查密碼是否符合格式
     validity.value.pwdValidate = pwdRule.test(password1)
 
+    validity.value.isValid = validity.value.pwdRequired && validity.value.emailRequired && validity.value.emailFormat && validity.value.nameRequired   && validity.value.pwdConfirmed  && validity.value.pwdValidate 
+    // && validity.value.preferenceRequired && validity.value.weddingStatusRequired && validity.value.budgetRequired && validity.value.budgetIntegerRequired && validity.value.phoneRequired && validity.value.addressRequired && validity.value.genderRequired
 
-    // console.log(validity.value)
-    // console.log(userData.value)
-
-    validity.value.isValid = validity.value.userNameRequired && validity.value.pwdRequired && validity.value.emailRequired && validity.value.nameRequired && validity.value.phoneRequired && validity.value.addressRequired && validity.value.genderRequired && validity.value.pwdConfirmed && validity.value.emailFormat && validity.value.pwdValidate && validity.value.birthdayRequired && validity.value.preferenceRequired && 
-    validity.value.weddingStatusRequired && validity.value.budgetRequired && validity.value.budgetIntegerRequired
+    
 
     // 檢查 Email 是否已存在
     if (await checkEmailExists(useremail)) {
@@ -97,22 +93,20 @@ const validate = async() =>{
 
     //fetch
     if(validity.value.isValid){
-        // userData.value.registrationTime = new Date().toISOString();
-        //因為資料庫是使用datetime2 所以只能用toISOString 顯示的時間是UTC時間
-        //因為後端已經寫了別的方法來轉換時間 所以這段已經不需要了
 
+        const formattedBirthday = birthday ? birthday : null;
         // 準備 JSON 資料
         const requestBody = JSON.stringify({
-            MemberName: userData.value.username,
-            Email: userData.value.useremail,
-            Password: userData.value.password1,
-            PhoneNumber:userData.value.phonenumber,
-            Address:userData.value.address,
-            Sex:userData.value.gender,
-            Birthday:userData.value.birthday,
-            Preference:userData.value.preference,
-            WeddingStatus:userData.value.weddingStatus,
-            MemberBudget:userData.value.budget,
+            MemberName: username,
+            Email: useremail,
+            Password: password1,
+            PhoneNumber: phonenumber || null,
+            Address: address || null,
+            Sex: gender || null,
+            Birthday: formattedBirthday,
+            Preference: preference || null,
+            WeddingStatus: weddingStatus || null,
+            MemberBudget: budget || null
             // RegistrationTime: userData.value.registrationTime 
 
             
@@ -217,9 +211,9 @@ const validate = async() =>{
                     </div>
                     <div class="col-12 col-xl-7">
                         <input type="tel" v-model.trim="userData.phonenumber" id="phonenumber" class="form-control" pattern="[0-9]{4}-[0-9]{3}-[0-9]{3}" placeholder="請輸入連絡電話" autocomplete="off" required>
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <small v-if="!validity.phoneRequired" class="text-danger hide">請輸入連絡電話</small>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <!-- end -->
@@ -230,9 +224,9 @@ const validate = async() =>{
                     </div>
                     <div class="col-12 col-xl-7">
                         <input type="text" v-model.trim="userData.address" id="address" class="form-control" placeholder="請填寫地址" autocomplete="off" required>
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <small v-if="!validity.addressRequired" class="text-danger hide">請填寫住址</small>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <!-- end -->
@@ -243,9 +237,9 @@ const validate = async() =>{
                     </div>
                     <div class="col-12 col-xl-7">
                         <input type="text" v-model.trim="userData.gender" id="gender" class="form-control" placeholder="請填寫性別" autocomplete="off" required>
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <small v-if="!validity.genderRequired" class="text-danger hide">請填寫性別</small>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <!-- end -->
@@ -255,10 +249,10 @@ const validate = async() =>{
                         <label for="birthday" class="form-label">生日</label>
                     </div>
                     <div class="col-12 col-xl-7">
-                        <input type="date" v-model.trim="userData.birthday" id="birthday" class="form-control" autocomplete="off" required>
-                        <div class="mb-3">
+                        <input type="date" v-model.trim="userData.birthday" id="birthday" class="form-control" autocomplete="off">
+                        <!-- <div class="mb-3">
                             <small v-if="!validity.birthdayRequired" class="text-danger hide">請填寫生日</small>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <!-- end -->
@@ -274,9 +268,9 @@ const validate = async() =>{
                         <option value="西式風格">西式風格</option>
                         <option value="其他">其他</option>
                         </select>
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <small v-if="!validity.preferenceRequired" class="text-danger hide">請填寫婚禮風格</small>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <!-- end -->
@@ -291,9 +285,9 @@ const validate = async() =>{
                         <option value="已婚">已婚</option>
                         <option value="未完婚">未完婚</option>
                         </select>
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <small v-if="!validity.weddingStatusRequired" class="text-danger hide">請填寫結婚狀態</small>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <!-- end -->
@@ -304,11 +298,11 @@ const validate = async() =>{
                     </div>
                     <div class="col-12 col-xl-7">
                         <input type="text" v-model.trim="userData.budget" id="budget" class="form-control" placeholder="請填寫預算" autocomplete="off" required>
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <small v-if="!validity.budgetRequired" class="text-danger hide">請填寫預算</small><br>
                             <small v-if="!validity.budgetIntegerRequired" class="text-danger hide">預算必須是整數</small>
 
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <!-- end -->

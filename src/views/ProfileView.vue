@@ -1,10 +1,16 @@
 <script setup>
 import SampleComponent from '@/components/SampleComponent.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BASE_URL}/Members`;
 
+const getMemberIdFromCookie = () => {
+  return document.cookie
+    .split('; ')
+    .find(row => row.startsWith('memberID='))
+    ?.split('=')[1];
+};
 
 //初始化 editOption
 const initializeEditOption = (memberData) => ({
@@ -19,13 +25,6 @@ const initializeEditOption = (memberData) => ({
     weddingStatus: memberData?.weddingStatus || "",
     budget: memberData?.memberBudget || ""
 });
-
-const getMemberIdFromCookie = () => {
-  return document.cookie
-    .split('; ')
-    .find(row => row.startsWith('memberID='))
-    ?.split('=')[1];
-};
 
 const editOption = ref({});
 const member = ref(null); // 用來存放從 API 獲取的會員資料
@@ -42,6 +41,9 @@ const openEditModal = () => {
 //重設編輯資料時顯示的值
 const resetEditOptions = () => openEditModal();
 
+const toEmailverify = () => {
+    window.location.href = '/emailverify';
+};
 
 // 在關閉模態框時調用重置函數
 const closeEditModal = () => {
@@ -93,6 +95,16 @@ const editMemberData = async () => {
         errorMessage.value = ''; // 在 3 秒後清空錯誤消息
       }, 3000);
       return;
+    }
+
+    // 檢查電話格式
+    const phonePattern = /^(0\d{1,2}-?\d{6,8}|09\d{2}-?\d{3}-?\d{3})$/
+    if (!phonePattern.test(editOption.value.phonenumber)){
+      errorMessage.value = '電話格式不正確。';
+        setTimeout(() => {
+            errorMessage.value = ''; // 設置一段時間後清空錯誤訊息
+        }, 3000); // 3秒後消失
+        return;
     }
 
     // 檢查電子郵件格式
@@ -149,6 +161,16 @@ const editMemberData = async () => {
   }
 };
 
+// // 監聽 email 的變更
+// watch(
+//   () => editOption.value.useremail,
+//   (newEmail, oldEmail) => {
+//     if (newEmail !== oldEmail) {
+//       // 當 email 改變時，將 verifyByEmail 設為 '未驗證'
+//       member.value.verifyByEmail = '未驗證';
+//     }
+//   }
+// );
 
 
 // 使用 onMounted 來在元件掛載後呼叫 API
@@ -177,11 +199,27 @@ onMounted(() => {
         <div style="position: relative;">
           <div class="mb-0 text-end">
             <h1 class="fs-1 text-end">會員中心</h1>
-          </div>
-          <div style="position: relative;">
-            <button class="btn btn-dark text-white btn-lg" id="editProfile" data-bs-toggle="modal" data-bs-target="#editModal" style="position: absolute; top:1px; right: 200px;">
+            <div class="mb-0 text-end d-flex justify-content-end align-items-center gap-3">
+              <button 
+                v-if="member"  
+                class="btn"
+                :class="{
+                  'btn-primary': member.verifyByEmail === '已驗證',
+                  'btn-danger': member.verifyByEmail !== '已驗證'
+                }"
+              >
+                {{member.verifyByEmail}}
+                <span class="badge bg-light"></span>
+              </button>
+              <button 
+                class="btn btn-dark" 
+                id="editProfile" 
+                data-bs-toggle="modal" 
+                data-bs-target="#editModal"
+              >
                 編輯
-            </button>
+              </button>
+            </div>
         </div>
           <div v-if="member">
             <div class="mb-0 text-end">
@@ -253,7 +291,7 @@ onMounted(() => {
 
 
 <!-- 編輯資料 -->
-  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="editModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
@@ -313,6 +351,7 @@ onMounted(() => {
         <div class="modal-footer">
           <button @click="closeEditModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
           <button @click="editMemberData" type="button" class="btn btn-primary">儲存變更</button>
+          <button @click="toEmailverify" type="button" class="btn btn-warning">驗證電子郵件</button>
         </div>
       </div>
     </div>

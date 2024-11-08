@@ -22,6 +22,8 @@ import ResetPasswordView from '@/views/ResetPasswordView.vue'
 import ShopReviewView from '@/views/shopReviewView.vue'
 import WriteReviewView from '@/views/WriteReviewView.vue'
 import VenuesView from '@/views/VenuesView.vue'
+import SendResetPasswordView from '@/views/SendResetPasswordView.vue'
+import EmailVerifyView from '@/views/EmailVerifyView.vue'
 
 
 const router = createRouter({
@@ -84,6 +86,16 @@ const router = createRouter({
       path: '/resetPassword',
       name: 'resetPassword',
       component: ResetPasswordView
+    },
+    { //寄送密碼信頁面
+      path: '/sendResetPassword',
+      name: 'sendResetPassword',
+      component: SendResetPasswordView
+    },
+    { //email 驗證頁面
+      path: '/emailVerify',
+      name: 'emailVerify',
+      component: EmailVerifyView
     },
     { //我的檔案
       path: '/profile',
