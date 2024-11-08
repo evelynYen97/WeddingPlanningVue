@@ -144,7 +144,7 @@ const validate = async() =>{
     <SampleComponent>
         <div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div>
     </SampleComponent>
-    <div>
+    <div id="form-contain">
         <form id="registerForm" novalidate @submit.prevent="validate()">
             <div class="container">
                 <div class="row">
@@ -153,7 +153,7 @@ const validate = async() =>{
                 <!-- start -->
                 <div class="row mb-3">
                     <div class="col-12 col-xl-1 offset-xl-2">
-                        <label for="email" class="form-label">電子郵件</label>
+                        <label for="email" class="form-label">*電子郵件</label>
                     </div>
                     <div class="col-12 col-xl-7">
                         <input type="email" v-model.trim="userData.useremail" id="email" class="form-control" placeholder="請輸入Email" autocomplete="off" required>
@@ -167,10 +167,12 @@ const validate = async() =>{
                 <!-- start -->
                 <div class="row mb-3">
                     <div class="col-12 col-xl-1 offset-xl-2">
-                        <label for="password1" class="form-label">密碼</label>
+                        <label for="password1" class="form-label">*密碼</label>
                     </div>
                     <div class="col-12 col-xl-7">
                         <input type="password" v-model.trim="userData.password1" id="password1" class="form-control" placeholder="請輸入密碼" autocomplete="off" required>
+                        <small>密碼至少8個字，要有大小寫字母加數字
+                        </small>
                         <div class="mb-3">
                             <small v-if="!validity.pwdRequired" class="text-danger">請輸入密碼</small><br>
                             <small v-if="!validity.pwdValidate" class="text-danger">密碼至少8個字，要有大小寫字母加數字</small>
@@ -181,7 +183,7 @@ const validate = async() =>{
                 <!-- start -->
                 <div class="row mb-3">
                     <div class="col-12 col-xl-1 offset-xl-2">
-                        <label for="password2" class="form-label">再次輸入密碼</label>
+                        <label for="password2" class="form-label">*再次輸入密碼</label>
                     </div>
                     <div class="col-12 col-xl-7">
                         <input type="password" v-model.trim="userData.password2" id="password2" class="form-control" placeholder="請再次輸入密碼" autocomplete="off" required>
@@ -194,7 +196,7 @@ const validate = async() =>{
                 <!-- start -->
                 <div class="row mb-3">
                     <div class="col-12 col-xl-1 offset-xl-2">
-                        <label for="username" class="form-label">姓名</label>
+                        <label for="username" class="form-label">*姓名</label>
                     </div>
                     <div class="col-12 col-xl-7">
                         <input type="text" v-model.trim="userData.username" id="username" class="form-control" placeholder="請輸入姓名" autocomplete="off" required>
@@ -259,7 +261,7 @@ const validate = async() =>{
                 <!-- start -->
                 <div class="row mb-3">
                     <div class="col-12 col-xl-1 offset-xl-2">
-                        <label for="preference" class="form-label">婚禮風格</label>
+                        <label for="preference" class="form-label">偏好</label>
                     </div>
                     <div class="col-12 col-xl-7">
                         <select class="form-select" v-model.trim="userData.preference" id="preference"  placeholder="請選擇喜歡的婚禮風格" required>
@@ -317,5 +319,14 @@ const validate = async() =>{
 </template>
 
 <style lang="css" scoped>
+input,select {
+  border: 1px solid #D0D0D0	; 
+  border-radius: 4px;
+  padding: 5px; 
+  width: 100%; 
+}
 
+#form-contain {
+    margin-top: 50px;
+}
 </style>
