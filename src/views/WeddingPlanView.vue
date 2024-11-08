@@ -1,6 +1,14 @@
 <template>
     <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
-    
+    <div id="videoContain">
+    <div class="row" id="videoRow">
+        <h2 id="weddingPlanTitle">婚禮企劃書</h2>
+        <video id="myVideo" controls loop autoplay>
+            <source src="../assets/video/weddingplan.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</div>
   <div class="container">
     <div id="Valert">
     <v-alert
@@ -17,15 +25,10 @@
       點擊提示框右上角可關閉此提示
     </v-alert>
 </div>
-    <div class="row" id="videoRow">
-        <video id="myVideo" controls loop autoplay>
-            <source src="../assets/video/weddingplan.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-    </div>
+
     <div class="row">
       <div class="col-12 col-md-12 mb-3 mt-5">
-        <h2 id="weddingPlanTitle">婚禮企劃書</h2>
+        
         <img src="/public/loveloading.gif" alt="loading" id="loadingheart" v-show="isLoading"/>
         <!-- <button ref="generateButton">生成 PDF</button> -->
         <div id="makePDFButton" class="my-4">
@@ -509,17 +512,24 @@ const alertShow = ref(false);
 
         #myVideo{
             height:500px;
-            margin-top: 50px;
         }
         #weddingPlanTitle{
             font-family: 'ChenYuluoyan-Thin', sans-serif;
             font-size:50px;
             margin-top: 50px;
         }
-        /* #videoRow{
-            background: url('@/assets/images/weddingPlanImg/videobg1.jpg');
-            width: 100%;
-        } */
+        #videoContain{
+            background: url('@/assets/images/weddingPlanImg/videobg1.jpg') ;
+            width:100%;
+            height: 700px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #videoRow{
+            margin: 0;
+        }
 
         #makePDFButton{
             height: 50px;
