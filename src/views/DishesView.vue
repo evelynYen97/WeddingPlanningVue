@@ -11,7 +11,7 @@ const selectedCategory = ref('all'); // 儲存選中的分類
 const searchKeyword = ref(''); // 儲存搜尋欄的關鍵字
 const currentPage = ref(1) // 當前頁面
 const pageSize = ref(10) // 每頁顯示的商品數量
-const dishesQuantity = reactive({}); // 每個桌菜(每桌)的數量，拆掉彼此影響的參數依據
+const dishesQuantity = ref({}); // 每個桌菜(每桌)的數量，拆掉彼此影響的參數依據
 
 // 讀取 API 資料
 const loadDishes = async () => {
@@ -22,7 +22,7 @@ const loadDishes = async () => {
 
 //預設每張桌菜的數量為 1
 datas.forEach((dish) => {
-  dishesQuantity[dish.dishesId] = 1;
+  dishesQuantity.value[dish.dishesId] = 1;
   });
 };
 
@@ -94,8 +94,8 @@ function increaseQuantity(dishesId) {
 }
 
 function decreaseQuantity(dishesId) {
-  if (dishesQuantity[dishesId] > 1) {
-    dishesQuantity[dishesId]--;
+  if (dishesQuantity.value[dishesId] > 1) {
+    dishesQuantity.value[dishesId]--;
   }else{
     alert('每件不能低於1。')
   }
@@ -114,11 +114,11 @@ async function addToBudget(dish) {
     memberId: memberId,
     budgetItemDetail: dish.dishesName,                                      // 桌菜名稱
     budgetItemPrice: dish.pricePerTable,                                    // 桌菜單價
-    budgetItemAmount: dishesQuantity[dish.dishesId],                        // 桌菜桌數
-    budgetItemSubtotal: dish.pricePerTable * dishesQuantity[dish.dishesId], // 辦桌總價
+    budgetItemAmount: dishesQuantity.value[dish.dishesId],                        // 桌菜桌數
+    budgetItemSubtotal: dish.pricePerTable * dishesQuantity.value[dish.dishesId], // 辦桌總價
     budgetItemSort: '桌菜'                                                  // 固定值 "桌菜"
   };
-
+  console.log(budgetItem)
   try {
     const response = await fetch( 'https://localhost:7048/api/MemberBudgetItems', {
       method: 'POST',
@@ -225,7 +225,7 @@ loadDishes();
                                 -
                               </button>
                             </span>
-                            <input type="text" id="quantity" name="quantity" class="form-control input-number" :value="dishesQuantity[dish.dishesId]" />
+                            <input type="text" id="quantity" name="quantity" class="form-control input-number" v-model="dishesQuantity[dish.dishesId]" />
                             <span class="input-group-btn">
                               <button type="button" class="quantity-right-plus btn btn-success btn-number"
                               @click="increaseQuantity(dish.dishesId)">

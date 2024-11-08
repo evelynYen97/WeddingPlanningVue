@@ -22,6 +22,7 @@ import ResetPasswordView from '@/views/ResetPasswordView.vue'
 import ShopReviewView from '@/views/shopReviewView.vue'
 import WriteReviewView from '@/views/WriteReviewView.vue'
 import VenuesView from '@/views/VenuesView.vue'
+import VenueItemView from '@/views/VenueItemView.vue'
 
 
 const router = createRouter({
@@ -149,6 +150,11 @@ const router = createRouter({
       path: '/writeReview/:id',
       name: 'writeReview',
       component: WriteReviewView
+    },
+    { //場地個別頁面
+      path: '/venue/:id',
+      name: 'venueitem',
+      component: VenueItemView
     },
 
 

@@ -35,6 +35,14 @@ initializeFunction();
           </div>
         </div>
       </div>
+
+      <nav style="--bs-breadcrumb-divider: '>>';" aria-label="breadcrumb">
+            <ol class="breadcrumb ">
+              <li class="breadcrumb-item "><RouterLink :to="{name:'car'}">禮車列表</RouterLink></li>
+              <li class="breadcrumb-item active" aria-current="page">{{ car.carName }}</li>
+            </ol>
+          </nav>
+
       <div class="row">
         <div class="col-lg-6 col-md-12" >
           <article class="post-item card border-0 shadow-sm p-3">
@@ -61,14 +69,14 @@ initializeFunction();
                   <a href="#" class="text-decoration-none">名稱：{{ car.carName }}</a>
                 </h2>
                 <br>
-                <h3>{{ car.passengerCapacity }}人座</h3>
+                <h5>{{ car.passengerCapacity }}人座</h5>
                 <div class="post-header">
                 <h5></h5>
                 </div>
                 <br>
-                <h3>價格：{{ car.rentalPerDay }}/天</h3>
+                <h5>價格：{{ car.rentalPerDay }}/天</h5>
                 <br>
-                <h3>{{ car.carDetail }}</h3>             
+                <h5>{{ car.carDetail }}</h5>             
                 <h4></h4>
                 
                 <h4></h4>      
