@@ -37,8 +37,6 @@
             <button @click="deleteImage" class="btn btn-red" data-hover="DELETE!">
                 <div>刪除</div>
             </button>
-            <!-- <input type="text" v-model="memberID" style="width: 100px; border: 2px solid #4CAF50; padding: 8px;" />
-            <button @click="fetchEditingID" class="btn">搜尋圖層資訊</button> -->
             <button @click="handleSave" class="btn btn-green" data-hover="SAVE!">
                 <div>保存</div>
             </button>
@@ -92,11 +90,24 @@ export default {
             timestamp:''
         };
     },
+    async created() {
+        await this.getmemnerid();
+        this.fetchEditingID();
+    },
     mounted() {
         this.setupInteract();
         this.addContainerClickListener();
     },
     methods: {
+        //接cookie 
+        getCookieValue(name) {
+            const cookies = document.cookie.split('; ');
+            const cookie = cookies.find(c => c.startsWith(name + '='));
+            return cookie ? cookie.split('=')[1] : null;
+        },
+        getmemnerid(){
+            this.memberID = this.getCookieValue('memberID');
+        },
         handleDataSent(imagePath, materialId, width, height, name) {
             this.addImage(imagePath, width, height, materialId, name, 1);
         },
@@ -173,7 +184,7 @@ export default {
         AddMemImg() {
             let Memterms = {
                 "memberMaterialId": 0,
-                "memberId": 1,//先預設給1
+                "memberId": this.memberID,
                 "memberImgName": this.selectedFile.name,
                 "estimatedLength": 200,
                 "estimatedWidth": 200
@@ -214,7 +225,7 @@ export default {
 
             elements.forEach(element => {
                 console.log(element);
-                const API_URL = `${BASE_URL}/ImgUsings/${element.getAttribute('default-material-id')}`;
+                const API_URL = `${BASE_URL}/ImgUsings/${element.getAttribute('default-material-id')}`;//原圖層素材紀錄修改位置
                 const pleft = parseInt(element.style.left.replace('px', ''));//取原top left
                 const ptop = parseInt(element.style.top.replace('px', ''));
                 const imgElement = element.querySelector('img');//抓圖片物件
@@ -263,7 +274,7 @@ export default {
             const elements = container.querySelectorAll('[data-material-id][websource][memsource]');
 
             elements.forEach(element => {
-                const imageid = element.getAttribute('data-material-id');
+                const imageid = element.getAttribute('data-material-id');//新增在塗層的素材
                 const imgElement = element.querySelector('img');
                 const width = imgElement.style.width;
                 const widthWithoutPx = width.replace('px', '');
@@ -477,20 +488,18 @@ export default {
         },
         //Screenshot存回sql
         screenpostsql() {
+            
             let terms = {//之後會換
-                "editingImgFileId": 0,
-                "memberId": 1,
+                "editingImgFileId": this.editingID,
+                "memberId": this.memberID,
                 "editTime": this.timestamp,
                 "screenshot": this.screenshotname,
                 "imgEditingName": "圖層1"
             }
-            console.log(this.timestamp);
-            console.log(this.screenshotname);
-            console.log(JSON.stringify(terms));
             const post = async () => {
-                const API_URL = `${BASE_URL}/EditingImgFiles`;
+                const API_URL = `${BASE_URL}/EditingImgFiles/${this.editingID}`;
                 const response = await fetch(API_URL, {
-                    method: 'POST',
+                    method: 'PUT',
                     body: JSON.stringify(terms),
                     headers: { 'Content-Type': 'application/json' }
                 });
