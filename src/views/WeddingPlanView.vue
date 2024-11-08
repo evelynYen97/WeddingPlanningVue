@@ -85,7 +85,7 @@
         <button class="downBtn rounded button-55">▼</button>
         <div id="handBackground" class="pdfContent">
             <div style="position:absolute;height: 550px;width: 1100px;background-color:#CECDCD; border-radius: 25px; left: 55px; z-index: 0;" ></div>
-            <img :src="imageSrc" alt="simulate" id="simulateImg" >
+            <img :src="'data:image/png;base64,' +weddingplanData.editingImgName" alt="simulate" id="simulateImg" >
             <!-- <img src="`@/assets/images/weddingPlanImg/Simulated.png`" alt="simulate" id="simulateImg" > -->
             <div class="quill-editor" id="simulateEdit">
                 <h2 style="color: #AC929E; font-weight: bold;">場景模擬圖</h2>
@@ -241,7 +241,6 @@ const memberID = getMemberID();
     const formattedTime=ref('');
     const budgetItems1=ref([]);
     const budgetItems2=ref([]);
-    let imageSrc =''; 
     let venueImgPath1='';
     let venueImgPath2='';
     let eventTimeLinePath='';
@@ -250,7 +249,6 @@ const memberID = getMemberID();
         const responseData=await fetch(`${API_URL}/planData/${memberID}`);
         weddingplanData.value=await responseData.json();
         formattedTime.value = weddingplanData.value.weddingTime.replace('T', ' ');
-            imageSrc = `http://localhost:5173/src/assets/images/weddingPlanImg/${weddingplanData.value.editingImgName}`;
             venueImgPath1= `https://localhost:7162/Ven1/${weddingplanData.value.venueImgName1}`; //這裡截不到圖
             venueImgPath2=`https://localhost:7162/Ven1/${weddingplanData.value.venueImgName2}`;
             eventTimeLinePath=`https://localhost:7162/eventImg/${weddingplanData.value.eventImgName}`;
@@ -501,6 +499,8 @@ const generateButton = ref(null);
         left: 100px;
         z-index: 2;
         border-radius: 15px;
+        width: 640px;
+        height: 360px;
       }
 
       #simulateEdit{
