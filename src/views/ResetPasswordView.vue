@@ -1,65 +1,102 @@
 <script setup>
 import SampleComponent from '@/components/SampleComponent.vue';
-import { ref } from 'vue'; // 使用 ref 來進行雙向綁定
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-
-// 從環境變數獲取 BASE_URL
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BASE_URL}/Members`;
 
-// 定義 email 和 password 的 ref
-const email = ref('');
+const newPassword = ref('');
+const confirmPassword = ref('');
+const route = useRoute(); 
+const router = useRouter();
 
-async function handleChangePassword(event) {
-    event.preventDefault(); // 防止表單自動提交
+const userData = ref({
+  newPassword: true,
+  confirmPassword: true,
+});
+const validity = ref({
+  pwdValidate1: true,
+  pwdValidate2: true,
+});
 
-      // 檢查 email 是否為空
-  if (!email.value) {
-    console.error('請輸入 email');
-    alert('請輸入 email'); // 或者用其他方式顯示錯誤訊息
-    return; // 終止函數，防止繼續執行
+const pwdRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+
+// 驗證 token 是否有效的函數
+async function validateToken(token) {
+  try {
+    const response = await fetch(`${API_URL}/ValidateToken?token=${encodeURIComponent(token)}`);
+    return response.ok;
+  } catch (error) {
+    console.error('Token 驗證失敗:', error);
+    return false;
+  }
+}
+
+// 處理密碼重設的函數
+async function handleResetPassword() {
+  const token = route.query.token;
+  console.log("Token:", token);
+
+  // 密碼驗證
+  validity.value.pwdValidate1 = pwdRule.test(newPassword.value);
+  validity.value.pwdValidate2 = pwdRule.test(confirmPassword.value);
+
+  validity.value.newPassword = newPassword.value.length > 0 && pwdRule.test(newPassword.value);
+  validity.value.confirmPassword = confirmPassword.value.length > 0 && pwdRule.test(confirmPassword.value);
+
+
+
+  if (!validity.value.newPassword) {
+    alert('密碼不得為空且必須符合規則！');
+    return;
   }
 
-  try
-  {
-    const response = await fetch(`${API_URL}/SendPasswordReset?email=${encodeURIComponent(email.value)}`, {
+  if (!validity.value.confirmPassword) {
+    alert('確認密碼不得為空且必須符合規則！');
+    return;
+  }
+
+  if (newPassword.value !== confirmPassword.value) {
+    alert('請輸入相同的密碼！');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/ResetPassword?token=${encodeURIComponent(token)}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        email: email.value, // 使用 ref 值
-      }),
+      body: JSON.stringify(newPassword.value),
     });
 
     if (response.ok) {
-    alert('已寄送密碼修改信至信箱');
-    window.location.href = '/login';    
-    } 
-    
-    else {
-    const data = await response.json(); // 解析 JSON 格式的回應
-    console.error('發生錯誤:', data.message);
-
-    if (response.status === 400) {
-        alert(`登入失敗：${data.message || '使用者email錯誤。'}`);
-    } else if (response.status === 500) {
-        alert(`登入失敗：${data.message || '伺服器內部錯誤，請稍後再試。'}`);
+      alert('密碼已成功重設，請登入！');
+      window.location.href = '/login';
     } else {
-        alert(`登入失敗：${data.message || response.statusText}`);
+      const data = await response.json();
+      alert(`錯誤：${data.message}`);
     }
-}
-
-  }catch (error) {
+  } catch (error) {
     console.error('發生錯誤:', error);
-    
   }
-
 }
+
+// 當組件初始化時檢查 token 是否有效
+onMounted(async () => {
+  const token = route.query.token;
+  if (!token || !(await validateToken(token))) {
+    alert('無效或缺失的 token！');
+    window.location.href = '/login';
+  }
+});
 </script>
 
 <template>
-    <SampleComponent><div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div></SampleComponent>
+  <SampleComponent>
+    <div class="slide" style="background: url(/src/assets/images/navImage3.jpg) no-repeat;background-size: cover;"></div>
+  </SampleComponent>
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col col-xl-10">
@@ -67,28 +104,31 @@ async function handleChangePassword(event) {
           <div class="row g-0">
             <div class="col-md-6 col-lg-7 d-flex align-items-center">
               <div class="card-body p-4 p-lg-5 text-black">
-                <form @submit="handleChangePassword">
+                <form @submit.prevent="handleResetPassword">
                   <div class="d-flex align-items-center mb-3 pb-1">
                     <i class="bi bi-person-fill" style="font-size: 2rem;"></i>
-                    <span class="h1 fw-bold mb-0">忘記密碼</span>
+                    <span class="h1 fw-bold mb-0">重新設定您的密碼</span>
                   </div>
-
                   <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">
-                    我們需要驗證您的身分，請輸入您的電子郵件
+                    請輸入您的新密碼
                   </h5>
-
                   <div class="form-outline mb-4">
-                    <input type="email" id="email" v-model="email" class="form-control form-control-lg"/>
-                    <label class="form-label" for="email">Email</label>
+                    <input type="password" id="newPassword" v-model="newPassword" class="form-control form-control-lg"/>
+                    <label class="form-label" for="newPassword">新密碼</label>
+                    <div class="mb-3">
+                      <small v-if="!validity.pwdValidate1" class="text-danger">密碼至少8個字，要有大小寫字母加數字</small>
+                    </div>
                   </div>
-
+                  <div class="form-outline mb-4">
+                    <input type="password" id="confirmPassword" v-model="confirmPassword" class="form-control form-control-lg"/>
+                    <label class="form-label" for="confirmPassword">確認密碼</label>
+                    <div class="mb-3">
+                      <small v-if="!validity.pwdValidate2" class="text-danger">密碼至少8個字，要有大小寫字母加數字</small>
+                    </div>
+                  </div>
                   <div class="pt-1 mb-4">
-                    <button type="submit" class="btn btn-dark text-white btn-lg btn-block">Login</button>
+                    <button type="submit" class="btn btn-dark text-white btn-lg btn-block">Send</button>
                   </div>
-                  <p class="mb-5 pb-lg-2" style="color: #393f81;">
-                    您還沒有加入會員嗎?
-                    <a href='register' style="color: #393f81;">建立會員</a>
-                  </p>
                 </form>
               </div>
             </div>
@@ -107,6 +147,5 @@ async function handleChangePassword(event) {
   </div>
 </template>
 
-<style lang="css" scoped>
-
+<style scoped>
 </style>

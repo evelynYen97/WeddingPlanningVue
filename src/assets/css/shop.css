@@ -87,6 +87,43 @@ CSS STRUCTURE:
 /*--------------------------------------------------------------
 /** 1. VARIABLES
 --------------------------------------------------------------*/
+.breadcrumb {
+  font-size: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  /* 加粗字體 */
+}
+
+.breadcrumb-item a {
+  color: inherit;
+  /* 繼承父元素的顏色 */
+  text-decoration: none;
+  /* 去除底線 */
+}
+
+.venueButton {
+  background-color: white;
+  color: black;
+  border: 2px solid black;
+  padding: 10px 20px;
+  font-size: 30px;
+  font-weight: bold;
+  border-radius: 15px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  /* 陰影效果 */
+  transition: background-color 0.3s, color 0.3s;
+  /* 過渡效果 */
+  text-decoration: none;
+  /* 移除文字下方的直線 */
+}
+
+.venueButton:hover {
+  background-color: black;
+  color: white;
+  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3);
+  /* 加強陰影效果 */
+}
+
 :root {
   /* widths for rows and containers
      */

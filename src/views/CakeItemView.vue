@@ -35,6 +35,14 @@ initializeFunction();
           </div>
         </div>
       </div>
+
+          <nav style="--bs-breadcrumb-divider: '>>';" aria-label="breadcrumb">
+            <ol class="breadcrumb ">
+              <li class="breadcrumb-item "><RouterLink :to="{name:'cake'}">喜餅列表</RouterLink></li>
+              <li class="breadcrumb-item active" aria-current="page">{{ cake.cakeName }}</li>
+            </ol>
+          </nav>
+
       <div class="row">
         <div class="col-lg-6 col-md-12" >
           <article class="post-item card border-0 shadow-sm p-3">
@@ -49,6 +57,7 @@ initializeFunction();
             </div>
           </article>
         </div>
+        
         <div class="col-lg-6 col-md-12" >
           <article class="post-item card border-0 shadow-sm p-3">
             <div class="image-holder zoom-effect">

@@ -1,16 +1,18 @@
 <script setup>
 import SampleComponent from '@/components/SampleComponent.vue';
 import ShopReviewComponent from '@/components/shopReviewComponent.vue';
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { useRoute } from 'vue-router';
+import Cookies from 'js-cookie';
 
 const route = useRoute();
 const shopId = route.params.id;
-const shop = ref([]);
+const shop = ref({});
 const cakes = ref([]);
 const cars = ref([]);
 const dishes = ref([]);
 const showVenueButton = ref(false);
+const ItemQuantity = reactive({}); // 每個商品的數量，拆掉彼此影響的參數依據
 const dataURL = `https://localhost:7048/api/Shops/${shopId}/data`; // 設立取得資料的 URL
 
 // 初始化函數，依序取得商店和各分類產品資料
@@ -29,18 +31,20 @@ const initializeFunction = async () => {
 };
 
 // 取得 shopId 並發送請求到後端 API
-const fetchShopData = async (shopId) => {
+const fetchShopData = async () => {
   try {
-    //GET請求，將shopId加入到URL中
     const response = await fetch(dataURL);
-
     const data = await response.json();
 
-  cakes.value = data.cakes;
-  cars.value = data.cars;
-  dishes.value = data.dishes;
+    cakes.value = data.cakes;
+    cars.value = data.cars;
+    dishes.value = data.dishes;
+    console.log('取得的商店資料:', data);
 
-  console.log('取得的商店資料:', data);
+    // 初始化每個商品的數量
+    cakes.value.forEach((cake) => { ItemQuantity[cake.cakeId] = 1; });
+    dishes.value.forEach((dish) => { ItemQuantity[dish.dishesId] = 1; });
+    cars.value.forEach((car) => { ItemQuantity[car.carId] = 1; });
 
     // 檢查是否喜餅、汽車、菜餚皆無資訊，才顯示按鈕
     if(cakes.value.length === 0 && cars.value.length === 0 && dishes.value.length === 0){
@@ -50,6 +54,89 @@ const fetchShopData = async (shopId) => {
     console.error('載入產品資料失敗:', error);
   }
 };
+
+// 增加數量函式
+function increaseQuantity(id) {
+  if (ItemQuantity[id] !== undefined) {
+    ItemQuantity[id]++;
+  }
+}
+
+// 減少數量函式
+function decreaseQuantity(id) {
+  if (ItemQuantity[id] > 1) {
+    ItemQuantity[id]--;
+  } else {
+    alert('每件不能低於1。');
+  }
+}
+
+
+// 空白budgetItem準備填入
+const budgetItem = reactive({
+  memberId: '',
+  budgetItemDetail: '',
+  budgetItemPrice: 0,
+  budgetItemAmount: 0,
+  budgetItemSubtotal: 0,
+  budgetItemSort: ''
+});
+
+//將各自的項目加入預算規畫表 
+async function addToBudget(item) {
+  const memberId = Cookies.get('memberID'); // 取得會員 ID
+
+  if (!memberId) {
+    alert('您尚未登入，請先登入');
+    return;
+  }
+
+  // 根據品項類型設定預算項目
+  if (item.cakeId) {
+    // 當品項是喜餅時
+    budgetItem.memberId = memberId;
+    budgetItem.budgetItemDetail = item.cakeName;
+    budgetItem.budgetItemPrice = item.cakePrice;
+    budgetItem.budgetItemAmount = ItemQuantity[item.cakeId];
+    budgetItem.budgetItemSubtotal = item.cakePrice * ItemQuantity[item.cakeId];
+    budgetItem.budgetItemSort = '喜餅糕點';
+  } else if (item.dishesId) {
+    // 當品項是桌菜時
+    budgetItem.memberId = memberId;
+    budgetItem.budgetItemDetail = item.dishesName;
+    budgetItem.budgetItemPrice = item.pricePerTable;
+    budgetItem.budgetItemAmount = ItemQuantity[item.dishesId];
+    budgetItem.budgetItemSubtotal = item.pricePerTable * ItemQuantity[item.dishesId];
+    budgetItem.budgetItemSort = '桌菜';
+  } else if (item.carId) {
+    // 當品項是禮車時
+    budgetItem.memberId = memberId;
+    budgetItem.budgetItemDetail = item.carName;
+    budgetItem.budgetItemPrice = item.rentalPerDay;
+    budgetItem.budgetItemAmount = ItemQuantity[item.carId];
+    budgetItem.budgetItemSubtotal = item.rentalPerDay * ItemQuantity[item.carId];
+    budgetItem.budgetItemSort = '禮車';
+  }
+
+  // 發送 API 請求
+  try {
+    const response = await fetch('https://localhost:7048/api/MemberBudgetItems', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(budgetItem)
+    });
+
+    if (!response.ok) {
+      throw new Error('無法加入預算表');
+    }
+    alert('成功加入預算表！');
+  } catch (error) {
+    console.error('加入預算表時發生錯誤：', error);
+    alert('加入預算表失敗');
+  }
+}
 
 // 在元件掛載時執行初始化函數
 initializeFunction();
@@ -63,10 +150,19 @@ initializeFunction();
     </SampleComponent>
 
     <section id="latest-blog" class="py-5">
+      
       <div class="container-fluid">
+        <nav style="--bs-breadcrumb-divider: '>>';" aria-label="breadcrumb">
+            <ol class="breadcrumb ">
+              <li class="breadcrumb-item "><RouterLink :to="{name:'allShop'}">商家列表</RouterLink></li>
+              <li class="breadcrumb-item active" aria-current="page">{{ shop.shopName }}</li>
+            </ol>
+          </nav>
+
         <!-- 廠商資訊 -->
         <div class="row">
           <div class="col-lg-6 col-md-12">
+            
             <article class="post-item card border-0 shadow-sm p-3">
               <div class="image-holder zoom-effect">
                 <a href="#">
@@ -81,8 +177,15 @@ initializeFunction();
                 <h2 class="post-title">
                   <a href="#" class="text-decoration-none">商家名稱：{{ shop.shopName }}</a>
                 </h2>
-                <h3>內容物：</h3>
-                <h3>過敏原資訊：</h3>
+                <br>
+                <h5>服務內容：{{shop.shopSort}}</h5>
+                <br>
+                <h5>聯絡人：{{shop.contactPerson}}</h5>
+                <br>
+                <h5>連絡電話：{{ shop.contactPhone }}</h5>
+                <br>
+                <h5>付款方式：{{ shop.payment }}</h5>
+                <br>
               </div>
             </article>
           </div>
@@ -113,11 +216,12 @@ initializeFunction();
                 <span class="price">{{ cake.cakePrice }}</span>
                 <div class="d-flex align-items-center justify-content-between">
                   <div class="input-group product-qty">
-                    <button type="button" class="quantity-left-minus btn btn-danger btn-number" @click="decreaseQuantity(cake.cakeID)">-</button>
-                    <input type="text" id="quantity" name="quantity" class="form-control input-number"/>
-                    <button type="button" class="quantity-right-plus btn btn-success btn-number" @click="increaseQuantity(cake.cakeID)">+</button>
+                    <button type="button" class="quantity-left-minus btn btn-danger btn-number" @click="decreaseQuantity(cake.cakeId)">-</button>
+                    <input type="text" name="quantity" id="quantity" class="form-control input-number" 
+                    :value="ItemQuantity[cake.cakeId]" />
+                    <button type="button" class="quantity-right-plus btn btn-success btn-number" @click="increaseQuantity(cake.cakeId)">+</button>
                   </div>
-                  <a href="#" class="nav-link">加入預算規劃表 <iconify-icon icon="uil:shopping-cart" /></a>
+                  <a href="#" class="nav-link"@click.prevent="addToBudget(cake)">加入預算規劃表 <iconify-icon icon="uil:shopping-cart" /></a>
                 </div>
               </div>
             </div>
@@ -140,6 +244,16 @@ initializeFunction();
                 <span class="flavor">{{ dish.dishesSort }}</span><br>
                 <span class="qty">{{ dish.dishesDescription }}</span>
                 <span class="price">{{ dish.pricePerTable }}</span>
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="input-group product-qty">
+                    <button type="button" class="quantity-left-minus btn btn-danger btn-number" @click="decreaseQuantity(dish.dishesId)">-</button>
+                    <input type="text" name="quantity" id="quantity" class="form-control input-number" 
+                    v-model="ItemQuantity[dish.dishesId]" />
+                    <button type="button" class="quantity-right-plus btn btn-success btn-number" @click="increaseQuantity(dish.dishesId)">+</button>
+                  </div>
+                  <a href="#" class="nav-link"@click.prevent="addToBudget(dish)">加入預算規劃表 <iconify-icon icon="uil:shopping-cart" /></a>
+                </div>
+
               </div>
             </div>
           </div>
@@ -161,6 +275,16 @@ initializeFunction();
                 <span class="flavor">{{ car.carDetail }}</span><br>
                 <span class="qty">{{ car.passengerCapacity }}人座</span>
                 <span class="price">{{ car.rentalPerDay }}</span>
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="input-group product-qty">
+                    <button type="button" class="quantity-left-minus btn btn-danger btn-number" @click="decreaseQuantity(car.carId)">-</button>
+                    <input type="text" name="quantity" id="quantity" class="form-control input-number" 
+                    v-model="ItemQuantity[car.carId]" />
+                    <button type="button" class="quantity-right-plus btn btn-success btn-number" @click="increaseQuantity(car.carId)">+</button>
+                  </div>
+                  <a href="#" class="nav-link"@click.prevent="addToBudget(car)">加入預算規劃表 <iconify-icon icon="uil:shopping-cart" /></a>
+                </div>
+
               </div>
             </div>
           </div>
@@ -185,23 +309,4 @@ initializeFunction();
 <style lang="css" scoped>
 @import '../assets/css/shop.css';
 
-/* 按鈕樣式 */
-.venueButton {
-  background-color: white;
-  color: black;
-  border: 2px solid black;
-  padding: 10px 20px;
-  font-size: 30px;
-  font-weight: bold;
-  border-radius: 15px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* 陰影效果 */
-  transition: background-color 0.3s, color 0.3s; /* 過渡效果 */
-  text-decoration: none; /* 移除文字下方的直線 */
-}
-
-.venueButton:hover {
-  background-color: black;
-  color: white;
-  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3); /* 加強陰影效果 */
-}
 </style>

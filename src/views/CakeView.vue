@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed, watch, reactive } from 'vue'
+import { ref, computed, watch, reactive, toRaw, onMounted} from 'vue'
 import ShopView from './ShopView.vue';
 import Cookies from 'js-cookie';
-import { stringify } from 'postcss';
+import { document, stringify } from 'postcss';
 
 const API_URL = 'https://localhost:7048/api/Cakes'
 
@@ -11,7 +11,7 @@ const selectedCategory = ref('all') // 儲存選擇的商品分類
 const searchKeyword = ref('') // 儲存搜尋欄的關鍵字
 const currentPage = ref(1) // 當前頁面
 const pageSize = ref(10) // 每頁顯示的商品數量
-const cakesQuantity = reactive({}); // 每個喜餅的數量，拆掉彼此影響的參數依據
+const cakesQuantity = ref({}); // 每個喜餅的數量，拆掉彼此影響的參數依據
 
 // 讀取 API 資料
 const loadcakes = async () => {
@@ -21,7 +21,7 @@ const loadcakes = async () => {
 
 // 預設每個喜餅的數量為 1
 datas.forEach((cake) => {
-  cakesQuantity[cake.cakeID] = 1;
+  cakesQuantity.value[cake.cakeID] = 1;
   });
 }
 
@@ -74,20 +74,23 @@ watch(selectedCategory, () =>{
 
 // 增減數量函式
 function increaseQuantity(cakeID) {
-  cakesQuantity[cakeID]++;
+  cakesQuantity.value[cakeID]++;
 }
 
 function decreaseQuantity(cakeID) {
-  if (cakesQuantity[cakeID] > 1) {
-    cakesQuantity[cakeID]--;
+  if (cakesQuantity.value[cakeID] > 1) {
+    cakesQuantity.value[cakeID]--;
   }else{
     alert('每件不能低於1。')
   }
 }
 
+
 //將喜餅加入預算規畫表
 async function addToBudget(cake) {
   const memberId = Cookies.get('memberID'); // 取得會員 ID
+
+  console.log(JSON.stringify(cakesQuantity.value,null,2)); 
 
   if (!memberId) {
     alert('您尚未登入，請先登入');
@@ -98,11 +101,11 @@ async function addToBudget(cake) {
     memberId: memberId,
     budgetItemDetail: cake.cakeName,              // 喜餅名稱
     budgetItemPrice: cake.cakePrice,              // 喜餅單價
-    budgetItemAmount: cakesQuantity[cake.cakeID], // 喜餅數量
-    budgetItemSubtotal: cake.cakePrice * cakesQuantity[cake.cakeID], // 喜餅總價
-    budgetItemSort: '喜餅'                        // 固定值 "喜餅"
+    budgetItemAmount: cakesQuantity.value[cake.cakeID], // 喜餅數量
+    budgetItemSubtotal: cake.cakePrice * cakesQuantity.value[cake.cakeID], // 喜餅總價
+    budgetItemSort: '喜餅糕點'                     // 固定值 "喜餅糕點"
   };
-
+  console.log(budgetItem)
   try {
     const response = await fetch( 'https://localhost:7048/api/MemberBudgetItems', {
       method: 'POST',
@@ -121,6 +124,8 @@ async function addToBudget(cake) {
     alert('加入預算表失敗');
   }
 }
+
+
 
 loadcakes()
 
@@ -230,7 +235,7 @@ loadcakes()
                               -
                             </button>
                           </span>
-                          <input type="text" id="quantity" name="quantity" class="form-control input-number" :value="cakesQuantity[cake.cakeID]" />
+                          <input type="text" id="quantity" name="quantity" class="form-control input-number" v-model="cakesQuantity[cake.cakeID]" />
                           <span class="input-group-btn">
                             <button type="button" class="quantity-right-plus btn btn-success btn-number" @click="increaseQuantity(cake.cakeID)">
                               +                     

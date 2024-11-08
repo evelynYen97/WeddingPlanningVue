@@ -179,8 +179,6 @@ loadAllShop();
                       </figure>
                       <h3>{{ shop.shopName }}</h3>
                       <span class="flavor">{{ shop.shopSort }}</span><br>
-                      <span class="qty">評價：{{ shop.shopRating }}</span>
-                      <span class="price">付款方式：{{ shop.payment }}</span>
                     </div>
                   </div>
                   <!-- /Product Item -->
