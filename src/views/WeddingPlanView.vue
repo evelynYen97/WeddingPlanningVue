@@ -92,8 +92,8 @@
                 <h4 style=" font-weight: bold;color:#353637;">桌數:&nbsp;</h4>
                 <h4 style=" font-weight: bold;color:#353637;">賓客人數:&nbsp;</h4>
             </div>
-            <img :src="venueImgPath1" alt="venue1" id="venue1Img">
-            <img :src="venueImgPath2" alt="venue2" id="venue2Img">
+            <img :src="'data:image/jpg;base64,'+venueImgData.venueImgName1" alt="venue1" id="venue1Img">
+            <img :src="'data:image/jpg;base64,'+venueImgData.venueImgName2" alt="venue2" id="venue2Img">
              <div class="quill-editor" id="firstPageHeader">
                 <h1 style="color: white; font-weight: bold;">Forever starts today.</h1>
              </div>
@@ -119,7 +119,6 @@
         <div id="handBackground" class="pdfContent">
             <div style="position:absolute;height: 550px;width: 1100px;background-color:#CECDCD; border-radius: 25px; left: 55px; z-index: 0;" ></div>
             <img :src="'data:image/png;base64,' +weddingplanData.editingImgName" alt="simulate" id="simulateImg" >
-            <!-- <img src="`@/assets/images/weddingPlanImg/Simulated.png`" alt="simulate" id="simulateImg" > -->
             <div class="quill-editor" id="simulateEdit">
                 <h2 style="color: #AC929E; font-weight: bold;">場景模擬圖</h2>
              </div>
@@ -316,16 +315,13 @@ const memberID = getMemberID();
     const formattedTime=ref('');
     const budgetItems1=ref([]);
     const budgetItems2=ref([]);
-    let venueImgPath1='';
-    let venueImgPath2='';
+    const venueImgData=ref([]);
     let eventTimeLinePath='';
     //加載數據start
     const loadWeddingplanData=async()=>{
         const responseData=await fetch(`${API_URL}/planData/${memberID}`);
         weddingplanData.value=await responseData.json();
         formattedTime.value = weddingplanData.value.weddingTime.replace('T', ' ');
-            venueImgPath1= `https://localhost:7162/Ven1/${weddingplanData.value.venueImgName1}`; //這裡截不到圖
-            venueImgPath2=`https://localhost:7162/Ven1/${weddingplanData.value.venueImgName2}`;
             eventTimeLinePath=`https://localhost:7162/eventImg/${weddingplanData.value.eventImgName}`;
 
     }
@@ -337,6 +333,12 @@ const memberID = getMemberID();
         console.log(eventsData.value)
     }
     loadEventsData();
+
+    const loadVenueImgsData=async()=>{
+        const response =await fetch (`https://localhost:7162/api/WeddingPlansAPI/VenueImgData/${memberID}`);
+        venueImgData.value=await response.json();
+    }
+    loadVenueImgsData();
 
     const loadEventScheduleData=async()=>{
         const responseEventSchedule=await fetch(`${API_URL}/EventSchedules/${memberID}`);
