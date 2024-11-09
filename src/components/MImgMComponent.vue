@@ -52,7 +52,8 @@ loadImg()
 
 const emit = defineEmits(['Memdata-sent']); // 定義 emit
 const sendMemData = (term) => {
-    const imagePath = `https://localhost:7048/uploads/${term.memberImgName}`;
+    const base64Image = `data:image/jpeg;base64,${term.memberImgBase64}`;
+    const imagePath = base64Image;
     const name = term.memberImgName;
     const memberid = term.memberid;
     const materialId = term.memberMaterialId;

@@ -48,10 +48,27 @@
                 <div>會員上傳圖片</div>
             </button>
         </div>
-        <div class="wrapper">
-            <p>說明之後放這</p>
+    </div>  
+    <div style="display: flex; justify-content:left; align-items: center; width: 100%;">
+        <div style="width: 100%; max-width: 900px; margin: auto;padding: 16px">
+            <h2>使用說明</h2>
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <button class="nav-link active cool" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true" style="border: 0;font-size: large;">圖層說明</button>
+                    <button class="nav-link cool" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false" style="border: 0;font-size: large;">按鈕說明</button>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                    <img src="/src/assets/images/圖層說明.png">
+                </div>
+                <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                    <img src="/src/assets/images/按鈕說明.png">
+                </div>
+            </div>
         </div>
     </div>
+
 </template>
 
 <script>
@@ -390,7 +407,8 @@ export default {
                 newImageContainer.setAttribute('websource', 1);
                 newImageContainer.setAttribute('memsource', 0);
             } else {
-                newImage.src = `/src/assets/images/Layer_MemImg/${imageName}`;
+                const base64Image = `data:image/jpeg;base64,${imageName}`;
+                newImage.src = base64Image;
                 newImageContainer.setAttribute('websource', 0);
                 newImageContainer.setAttribute('memsource', 1);
             }
@@ -814,6 +832,17 @@ MimgmenuComponent {
     position: sticky;
 }
 
+button.active{
+    background-color: #dfa38a !important;
+    font-weight: bold;
+    color: white !important;
+}
+
+button.cool:hover{
+    color: #dfa38a !important;
+    background-color:white;
+}
+
 /* 使用 flexbox 讓 .container 和 .components-wrapper 橫向排列 */
 .wrapper {
     display: flex;
@@ -856,7 +885,7 @@ body {
     max-width: 1020px;
     width: 1012px;
     height: 626px;
-    background-color: #D8CAB8;
+    background-color: #b8aea0;
 }
 
 .size-info {
