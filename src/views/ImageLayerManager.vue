@@ -846,8 +846,8 @@ button.cool:hover{
 /* 使用 flexbox 讓 .container 和 .components-wrapper 橫向排列 */
 .wrapper {
     display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
     padding-top: 50px;
     width: 100%;
 }

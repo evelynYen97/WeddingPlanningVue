@@ -5,7 +5,7 @@
   </SampleComponent>
   <div style="position: relative; width: 100%; height: 100vh;">
     <img src="/src/assets/images/活動排程背景圖.jpg" alt="Background" style="position: absolute; top: auto; bottom: 0; left: 0; width: 100%; height:100%; object-fit: cover; z-index: -1;">
-    <div v-if="WeddingPlans.length > 0" class="container" style="width: 500px; height: auto; position: relative; z-index: 1;top:85px">
+    <div v-if="WeddingPlans.length > 0" class="container" style="width: 550px; height: auto; position: relative; z-index: 1;top:220px">
       <v-card>
           <v-card-title class="headline fontspecial" style="font-size:calc(1.5rem + 1.5vw)">婚禮</v-card-title>
           <v-card-text style="padding-top: 0px;">
