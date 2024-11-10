@@ -105,4 +105,9 @@ onBeforeUnmount(() => {
     .text2-container {
         margin: 50px;
     }
+
+     /* 滑鼠 */
+     * {
+        cursor: none; /* 隱藏原生滑鼠 */
+    }
 </style>
