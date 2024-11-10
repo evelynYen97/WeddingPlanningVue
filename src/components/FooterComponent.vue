@@ -61,7 +61,7 @@
                 <div class="row align-items-center footer-info">
                     
                     <!-- Logo Section -->
-                    <div class="col-lg-3 col-md-4 col-sm-12 mb-4 d-flex justify-content-center footer-widget">
+                    <div class="col-lg-3 col-md-4 col-sm-12 mb-4 d-flex justify-content-center">
                         <div class="footer-logo">
                             <a href="#"><img src="../assets/images/weddingLogo02.png" alt="Logo" class="img-fluid"></a>
                         </div>
@@ -183,15 +183,8 @@
 
 .footer-info {
     display: flex;
-    justify-content: space-between;
-    max-width: 1200px; /* 調整這裡的寬度來增加間距 */
-    margin: 0 auto; /* 確保內容置中 */
-    padding: 0 20px; /* 調整內邊距來讓內容靠近外框 */
+    justify-content: space-around;
     flex-wrap: wrap;
-}
-
-.footer-widget {
-    margin: 0 20px; /* 增加區塊之間的間距 */
 }
 
 .sponsor {
@@ -204,10 +197,4 @@
     margin: 0;
     text-align: left;
 }
-
-/* 針對品牌列表的調整，讓它更靠近 footer 寬度 */
-.brand-wrapper {
-    max-width: 1200px; /* 確保和 footer-info 寬度一致 */
-    margin: 0 auto;
-}
-</style>
+</style> 
