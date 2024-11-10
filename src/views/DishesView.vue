@@ -90,7 +90,7 @@ watch(selectedCategory, () =>{
 
 // 增減數量函式
 function increaseQuantity(dishesId) {
-  dishesQuantity[dishesId]++;
+  dishesQuantity.value[dishesId]++;
 }
 
 function decreaseQuantity(dishesId) {

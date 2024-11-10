@@ -184,7 +184,6 @@ function scrollToHomeTop() {
                   <a class="dropdown-toggle fontSize" :style="{ color: textColor }">註冊會員</a>
                 </RouterLink>
                 <div v-else class="user-container fontSize hover-1">
-                  <img src="/src/assets/images/PAREO.jpg" alt="User Icon" class="user-icon" />
                   <span :style="{ color: textColor }" class="nav-link">使用者: {{ memberName }}</span>
                   <button @click="handleLogout" class="btn btn-outline-danger btn-sm ms-2">登出</button>
                 </div>

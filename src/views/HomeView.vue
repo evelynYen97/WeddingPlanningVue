@@ -7,6 +7,7 @@
     import { ref, onMounted, onUnmounted } from 'vue';
     import gsap from 'gsap';
     import ScrollTrigger from 'gsap/ScrollTrigger';
+import { RouterLink } from 'vue-router';
 
     gsap.registerPlugin(ScrollTrigger);
     // 滑鼠相關的狀態管理
@@ -253,7 +254,7 @@
                 選擇我們精選的婚宴會場，為您的婚禮創造完美的氛圍。
               </p>
               <div class="btn-container">
-                <a href="#" class="btn btn-outline-secondary">了解更多</a>
+                <RouterLink :to="{name:'venue'}" class="btn btn-outline-secondary">了解更多</RouterLink>
               </div>
             </div>
           </div>
@@ -272,7 +273,7 @@
                 我們提供多樣化的婚宴菜餚選擇，滿足每位賓客的味蕾。
               </p>
               <div class="btn-container">
-                <a href="#" class="btn btn-outline-secondary">了解更多</a>
+                <RouterLink :to="{name:'dish'}" class="btn btn-outline-secondary">了解更多</RouterLink>
               </div>
             </div>
           </div>
@@ -291,7 +292,7 @@
                 豪華禮車服務，為您和賓客提供舒適的接送體驗。
               </p>
               <div class="btn-container">
-                <a href="#" class="btn btn-outline-secondary">了解更多</a>
+                <RouterLink :to="{name:'car'}" class="btn btn-outline-secondary">了解更多</RouterLink>
               </div>
             </div>
           </div>
@@ -310,7 +311,7 @@
                 精美的喜餅選擇，讓您的婚禮更添甜蜜。
               </p>
               <div class="btn-container">
-                <a href="#" class="btn btn-outline-secondary">了解更多</a>
+                <RouterLink :to="{name:'cake'}" class="btn btn-outline-secondary">了解更多</RouterLink>
               </div>
             </div>
           </div>
