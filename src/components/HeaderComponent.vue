@@ -67,7 +67,9 @@ const scrollToContactUs = () => {
   }
 };
 
-
+function scrollToHomeTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 </script>
 
@@ -93,7 +95,7 @@ const scrollToContactUs = () => {
           <div class="navbar-collapse collapse" id="slide-navbar-collapse">
             <ul class="navbar-nav list-inline light text-uppercase align-items-center w-100 d-flex justify-content-between">
               <li class="nav-item">
-                <RouterLink :style="{ color: textColor }" class="nav-link fontSize hover-1" :to="{name:'home'}">首頁</RouterLink>
+                <RouterLink :style="{ color: textColor }" class="nav-link fontSize hover-1" :to="{name:'home'}" @click="scrollToHomeTop">首頁</RouterLink>
               </li>
               <li class="nav-item dropdown">
                 <a

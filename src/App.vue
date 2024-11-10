@@ -14,10 +14,6 @@ import FooterComponent from './components/FooterComponent.vue'
 import ContactUsComponent from './components/ContactUsComponent.vue'
 
 
-
-    
-
-
 </script>
 
 <template>
@@ -27,7 +23,7 @@ import ContactUsComponent from './components/ContactUsComponent.vue'
 
  <div id="contact-us">
     <ContactUsComponent></ContactUsComponent>
-  </div>
+ </div>
 <FooterComponent></FooterComponent>
 </template>
 
