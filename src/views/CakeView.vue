@@ -181,27 +181,6 @@ loadcakes()
                 />
               </div>
               <div class="col-6">
-                <!-- 分頁控制 -->
-                  <nav aria-label="Page navigation" class="mt-4">
-                  <ul class="pagination justify-content-center">
-                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                      <a class="page-link" href="#" @click.prevent="goToPage(currentPage - 1)">上一頁</a>
-                    </li>
-                    <li 
-                      class="page-item" 
-                      v-for="page in totalPages" 
-                      :key="page" 
-                      :class="{ active: page === currentPage }"
-                    >
-                      <a class="page-link" href="#" @click.prevent="goToPage(page)">{{ page }}</a>
-                    </li>
-                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                      <a class="page-link" href="#" @click.prevent="goToPage(currentPage + 1)">下一頁</a>
-                    </li>
-                  </ul>
-                </nav>
-                <!-- 分頁控制結束 -->
-
               </div>
             </div>
 
