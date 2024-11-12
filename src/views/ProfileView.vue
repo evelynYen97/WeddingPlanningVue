@@ -108,14 +108,14 @@ const editMemberData = async () => {
     }
 
     // 檢查電話格式
-    const phonePattern = /^(0\d{1,2}-?\d{6,8}|09\d{2}-?\d{3}-?\d{3})$/
-    if (!phonePattern.test(editOption.value.phonenumber)){
-      errorMessage.value = '電話格式不正確。';
-        setTimeout(() => {
-            errorMessage.value = ''; // 設置一段時間後清空錯誤訊息
-        }, 3000); // 3秒後消失
-        return;
-    }
+    const phonePattern = /^(0\d{1,2}-?\d{6,8}|09\d{2}-?\d{3}-?\d{3})$/;
+if (editOption.value.phonenumber !== '' && !phonePattern.test(editOption.value.phonenumber)) {
+  errorMessage.value = '電話格式不正確。';
+  setTimeout(() => {
+    errorMessage.value = ''; // 設置一段時間後清空錯誤訊息
+  }, 3000); // 3秒後消失
+  return;
+}
 
     // 檢查電子郵件格式
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
