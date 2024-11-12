@@ -16,17 +16,11 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+## Overview
 
-```sh
-npm run dev
-```
+## Run Locally
 
-### Compile and Minify for Production
 
-```sh
-npm run build
-```
 
 ### Run Unit Tests with [Vitest](https://vitest.dev/)
 
