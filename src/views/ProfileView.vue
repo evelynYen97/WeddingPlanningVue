@@ -128,18 +128,19 @@ const editMemberData = async () => {
     }
 
     const updatedMemberData = {
-        memberId:memberId.value,
-        memberName: editOption.value.username,
-        email: editOption.value.useremail,
-        phoneNumber: editOption.value.phonenumber,
-        birthday:editOption.value.birthday,
-        sex: editOption.value.sex,
-        preference: editOption.value.preference,
-        address: editOption.value.address,
-        weddingStatus: editOption.value.weddingStatus,
-        memberBudget: editOption.value.budget
-        
+      memberId: memberId.value,
+      memberName: editOption.value.username,
+      email: editOption.value.useremail,
     };
+
+    // 選擇性添加其他有值的欄位
+    if (editOption.value.phonenumber) updatedMemberData.phoneNumber = editOption.value.phonenumber;
+    if (editOption.value.birthday) updatedMemberData.birthday = editOption.value.birthday;
+    if (editOption.value.sex) updatedMemberData.sex = editOption.value.sex;
+    if (editOption.value.preference) updatedMemberData.preference = editOption.value.preference;
+    if (editOption.value.address) updatedMemberData.address = editOption.value.address;
+    if (editOption.value.weddingStatus) updatedMemberData.weddingStatus = editOption.value.weddingStatus;
+    if (editOption.value.budget) updatedMemberData.memberBudget = editOption.value.budget;
     
 
     

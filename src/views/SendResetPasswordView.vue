@@ -107,5 +107,12 @@ async function handleChangePassword(event) {
 </template>
 
 <style lang="css" scoped>
+input,select {
+  border: 2px solid #D0D0D0	; 
+  border-radius: 4px;
+  padding: 5px; 
+  width: 100%; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+}
 
 </style>
