@@ -185,7 +185,7 @@ function scrollToHomeTop() {
                 </RouterLink>
                 <div v-else class="user-container fontSize hover-1">
                   <span :style="{ color: textColor }" class="nav-link">使用者: {{ memberName }}</span>
-                  <button @click="handleLogout" class="btn btn-outline-danger btn-sm ms-2">登出</button>
+                  <button @click="handleLogout" class="btn btn-outline-danger btn-sm ms-2 " :style="{ color: textColor }" >登出</button>
                 </div>
               </div>
               </li>
