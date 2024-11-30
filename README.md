@@ -9,7 +9,7 @@ Click the image to watch the full video🔽
 Text supplement: Email content and attachment image settings
 ![Text supplement](ReadMeImgVideo/7j_Additional_Text.png)
 ### Merchant and product page design & Order management & Product listing and delisting management
-<img src="ReadMeImgVideo/Merchant.gif" width="100">
+<img src="ReadMeImgVideo/Merchant.gif" width="800">
 ### Wedding Scene Decoration Simulator
 Click the image to watch the full video🔽
 [![Watch the video](ReadMeImgVideo/Wedding_Scene_Decoration_Simulator.png)]([https://www.youtube.com/watch?v=example](https://drive.google.com/file/d/1q_biCjmvPCxhFfJv9o2nE4JEOxoxZ4yc/view?usp=drive_link))
