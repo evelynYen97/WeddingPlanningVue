@@ -4,11 +4,11 @@ This project is a Wedding Planning Website management, based on **Vue.js 3** and
 
 ## ✨ Key features
 ### Homepage & To-Do List & Contact Us
-![GIF Example](https://drive.google.com/file/d/1UdTG0Hcuvvtp8PgMuwFSphnjUCDDBF0u/view?usp=drive_link)
+[![GIF Example](ReadMeImgVideo/Homepage.png)](https://drive.google.com/file/d/1UdTG0Hcuvvtp8PgMuwFSphnjUCDDBF0u/view?usp=drive_link)
 ### Wedding Scene Decoration Simulator
-[Watch the video](https://drive.google.com/file/d/1q_biCjmvPCxhFfJv9o2nE4JEOxoxZ4yc/view?usp=drive_link)
+[![Watch the video](ReadMeImgVideo/Wedding_Scene_Decoration_Simulator.png)]([https://www.youtube.com/watch?v=example](https://drive.google.com/file/d/1q_biCjmvPCxhFfJv9o2nE4JEOxoxZ4yc/view?usp=drive_link))
 ### Event Schedule Planning
-[Watch the video](https://drive.google.com/file/d/1ZS-Qi6YeyHihkE7jRfe6uDorJE5bL2hL/view?usp=drive_link)
+[![Watch the video](ReadMeImgVideo/Event_Schedule.png)]([https://www.youtube.com/watch?v=example](https://drive.google.com/file/d/1ZS-Qi6YeyHihkE7jRfe6uDorJE5bL2hL/view?usp=drive_link))
 
 ### Leave a review for the shop
 Members can leave their reviews for specific shop.
