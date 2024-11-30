@@ -5,7 +5,7 @@ This project is a Wedding Planning Website management, based on **Vue.js 3** and
 ## ✨ Key features
 ### Homepage & To-Do List & Contact Us
 Click the image to watch the full video🔽
-[![GIF Example](ReadMeImgVideo/Homepage.png)](https://drive.google.com/file/d/1UdTG0Hcuvvtp8PgMuwFSphnjUCDDBF0u/view?usp=drive_link)
+[![GIF Example](ReadMeImgVideo/Homepage.png)](https://drive.google.com/file/d/1UdTG0Hcuvvtp8PgMuwFSphnjUCDDBF0u/view?usp=drive_link){:height="auto" width="200px"}
 Text supplement: Email content and attachment image settings
 ![Text supplement](ReadMeImgVideo/7j_Additional_Text.png)
 ### Merchant and product page design & Order management & Product listing and delisting management
