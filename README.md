@@ -3,6 +3,13 @@
 This project is a Wedding Planning Website management, based on **Vue.js 3** and **ASP.NET Core WebAPI**. The database management is implemented using **Microsoft SQL Server 2022**.
 
 ## ✨ Key features
+### Homepage & To-Do List & Contact Us
+![GIF Example](https://drive.google.com/file/d/1UdTG0Hcuvvtp8PgMuwFSphnjUCDDBF0u/view?usp=drive_link)
+### Wedding Scene Decoration Simulator
+[Watch the video](https://drive.google.com/file/d/1q_biCjmvPCxhFfJv9o2nE4JEOxoxZ4yc/view?usp=drive_link)
+### Event Schedule Planning
+[Watch the video](https://drive.google.com/file/d/1ZS-Qi6YeyHihkE7jRfe6uDorJE5bL2hL/view?usp=drive_link)
+
 ### Leave a review for the shop
 Members can leave their reviews for specific shop.
 ![Shop review](ReadMeImgVideo/review.png)
